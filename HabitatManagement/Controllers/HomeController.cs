@@ -1,6 +1,7 @@
 ﻿using HabitatManagement.BusinessEntity;
 using HabitatManagement.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -14,11 +15,19 @@ namespace HabitatManagement.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        string _connectionstring = string.Empty;
+       //private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+       //public HomeController(ILogger<HomeController> logger)
+       //{
+       //    _logger = logger;
+       //}
+
+       IConfiguration _configuration;
+        public HomeController(IConfiguration configuration)
         {
-            _logger = logger;
+            _configuration = configuration;
+            _connectionstring = _configuration["ConnectionStrings:DefaultConnection"];
         }
 
         public IActionResult Index()
@@ -120,7 +129,8 @@ namespace HabitatManagement.Controllers
         {
             totalRecords = 0;
             List<PermitFormScreenDesignTemplateBE> list = new List<PermitFormScreenDesignTemplateBE>();
-            using (SqlConnection conn = new SqlConnection("Data Source=RSKBSL135; Initial Catalog= HabitatManagement; User ID=sa; pwd=deadline@1;"))
+
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplate_BlockFetch", conn);

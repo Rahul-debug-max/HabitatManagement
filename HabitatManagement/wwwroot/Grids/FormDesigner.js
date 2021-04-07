@@ -69,7 +69,6 @@ function formDesignerGrid(formDesignerColumnNames) {
             });
         },
         gridComplete: function (e) {
-            //gridCompleteAgreements(e);
         },
     }).navGrid('#pagerFormDesigner', { edit: false, add: false, del: false, search: false, refresh: false })
 
