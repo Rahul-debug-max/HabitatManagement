@@ -57,10 +57,10 @@ namespace HabitatManagement.Controllers
                     "Design",
                     "Description",
                     "Active",
-                    "CreatedDateTime",
-                    "LastUpdatedDateTime",
-                    "CreatedBy",
-                    "UpdatedBy"
+                    "Created Date",
+                    "Updated Date",
+                    "Created By",
+                    "Updated By"
             };
                 return this.Json(new { columnNames });
             }
