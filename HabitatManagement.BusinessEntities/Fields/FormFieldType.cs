@@ -7,18 +7,18 @@ namespace HabitatManagement.BusinessEntities
 {
     public enum FormFieldType
     {
-        Label = 1,
-        Textbox = 2,
-        Checkbox = 3,
-        Radio = 4,
-        Dropdown = 5,
-        Date = 6,
-        DateAndTime = 7,
-        Signature = 8,
-        TextArea = 9,
-        CheckList = 10,
-        Table = 11,
-        Email = 12,
-        Image = 13,
+        //Label = 1,
+        Textbox = 1,
+        Checkbox = 2,
+        Radio = 3,
+        Dropdown = 4,
+        Date = 5,
+        DateAndTime = 6,
+        Signature = 7,
+        TextArea = 8,
+        CheckList = 9,
+        Table = 10,
+        Email = 11,
+        Image = 12,
     }
 }

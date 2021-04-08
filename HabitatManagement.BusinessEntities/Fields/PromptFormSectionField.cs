@@ -7,11 +7,11 @@ namespace HabitatManagement.BusinessEntities
 {
     public enum PromptFormSectionField
     {
-        SectionA = 1,
-        SectionB = 2,
-        SectionC = 3,
-        SectionD = 4,
-        SectionE = 5,
-        SectionF = 6,
+        SectionA,
+        SectionB,
+        SectionC,
+        SectionD,
+        SectionE,
+        SectionF,
     }
 }
