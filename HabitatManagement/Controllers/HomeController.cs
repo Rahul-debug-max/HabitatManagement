@@ -1,4 +1,4 @@
-﻿using HabitatManagement.BusinessEntity;
+﻿using HabitatManagement.BusinessEntities;
 using HabitatManagement.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -118,6 +118,13 @@ namespace HabitatManagement.Controllers
                 //var jsonResult = Json(jsonData, JsonRequestBehavior.AllowGet);
                 //jsonResult.MaxJsonLength = int.MaxValue;
                 return jsonResult;
+
+                //JavaScriptSerializer serializer = new JavaScriptSerializer();
+                //serializer.MaxJsonLength = Int32.MaxValue; // Whatever max length you want here 
+                //ContentResult result = new ContentResult();
+                //result.Content = serializer.Serialize(jsonData);
+                //result.ContentType = "application/json";
+                //return result;
             }
             catch (Exception ex)
             {
