@@ -21,32 +21,24 @@ SP database version			9VERSION
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[PermitFormScreenDesignTemplate]') AND TYPE in (N'U'))
 BEGIN
 
-CREATE TABLE [dbo].PermitFormScreenDesignTemplate(
-	[FormID] [int] IDENTITY(1,1) NOT NULL,
-	[Design] [nvarchar](max) NOT NULL,
-	[Description] [nvarchar](max) NOT NULL,
-	[Active] [bit] NOT NULL,
-	[CreatedDateTime] [datetime] NOT NULL,
-	[LastUpdatedDateTime] [datetime] NOT NULL,
-	[CreatedBy] [char](20) NOT NULL,
-	[UpdatedBy] [char](20) NOT NULL,
-PRIMARY KEY CLUSTERED 
-(
-	[FormID] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+    CREATE TABLE [dbo].[PermitFormScreenDesignTemplate](
+	    [FormID] [int] IDENTITY(1,1) NOT NULL,
+	    [Design] [nvarchar](20) NOT NULL,
+	    [Description] [nvarchar](60) NOT NULL,
+	    [Active] [bit] NOT NULL DEFAULT ((1)),
+	    [CreatedDateTime] [datetime] NOT NULL DEFAULT (getdate()),
+	    [LastUpdatedDateTime] [datetime] NOT NULL DEFAULT (getdate()) ,
+	    [CreatedBy] [char](10) NOT NULL,
+	    [UpdatedBy] [char](10) NOT NULL,
+    PRIMARY KEY CLUSTERED 
+    (
+	    [FormID] ASC
+    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+    ) ON [PRIMARY]
 
 END
 GO
 
-ALTER TABLE [dbo].PermitFormScreenDesignTemplate ADD  DEFAULT ((1)) FOR [Active]
-GO
-
-ALTER TABLE [dbo].PermitFormScreenDesignTemplate ADD  DEFAULT (getdate()) FOR [CreatedDateTime]
-GO
-
-ALTER TABLE [dbo].PermitFormScreenDesignTemplate ADD  DEFAULT (getdate()) FOR [LastUpdatedDateTime]
-GO
 
 
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[PermitFormScreenDesignTemplateDetail]') AND TYPE in (N'U'))
@@ -58,19 +50,17 @@ CREATE TABLE [dbo].PermitFormScreenDesignTemplateDetail(
 	[FieldName] [nvarchar](max) NULL,
 	[FieldType] [int] NOT NULL,
 	[Section] [int] NULL,
-	[Sequence] [int] NOT NULL,
+	[Sequence] [int] NOT NULL DEFAULT ((0)),
  CONSTRAINT [PK_PermitFormScreenDesignTemplateDetail] PRIMARY KEY CLUSTERED 
 (
 	[FormID] ASC,
 	[Field] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
-
 END
 GO
 
-ALTER TABLE [dbo].PermitFormScreenDesignTemplateDetail ADD  DEFAULT ((0)) FOR [Sequence]
-GO
+
 
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[TemplateFormFieldData]') AND TYPE in (N'U'))
 BEGIN
