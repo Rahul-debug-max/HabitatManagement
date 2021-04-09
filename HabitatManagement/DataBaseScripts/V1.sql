@@ -60,8 +60,6 @@ CREATE TABLE [dbo].PermitFormScreenDesignTemplateDetail(
 END
 GO
 
-
-
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[TemplateFormFieldData]') AND TYPE in (N'U'))
 BEGIN
 
@@ -70,6 +68,25 @@ CREATE TABLE [dbo].TemplateFormFieldData(
 	[Field] [int] NOT NULL,
 	[FieldValue] [nvarchar](max) NULL
 )
+END
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[DigitalSignature]') AND TYPE in (N'U'))
+BEGIN
+
+CREATE TABLE [dbo].[DigitalSignature](
+	[SignatureID] [int] NOT NULL,
+	[UserID] [char](40) NOT NULL,
+	[Blob] [image] NULL,
+	[DigitalSignatoryTypeSurrogate] [int] NULL,
+    [CreationDateTime] [datetime] NOT NULL,
+	[LastUpdatedDate] [datetime] NOT NULL DEFAULT (getdate()),
+PRIMARY KEY CLUSTERED 
+(
+	[SignatureID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
 END
 GO
 
@@ -467,6 +484,83 @@ BEGIN
  END  
 END  
 GO
+
+
+/****** Object:  StoredProcedure [dbo].[usp_DigitalSignature_Fetch]    Script Date: 08-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_DigitalSignature_Fetch]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_DigitalSignature_Fetch]
+GO
+CREATE PROCEDURE [dbo].[usp_DigitalSignature_Fetch]      
+  @SignatureID INT  
+AS  
+BEGIN  
+SET NOCOUNT ON;  
+   
+SELECT DigitalSignature.* FROM DigitalSignature  WHERE SignatureID = @SignatureID   
+
+END  
+GO
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_DigitalSignature_Add]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_DigitalSignature_Add]
+GO
+
+CREATE PROCEDURE [dbo].[usp_DigitalSignature_Add]  
+@SignatureID INT,  
+@UserID char(40),  
+@CreationDateTime datetime,     
+@Blob image,  
+@DigitalSignatoryTypeSurrogate int,  
+@Surrogate INT OUT   
+  
+AS  
+IF @SignatureID = 0   
+BEGIN  
+SELECT @SignatureID =  COALESCE(MAX(SignatureID),0) + 1  FROM  DigitalSignature   
+END  
+ ELSE  
+BEGIN  
+  SET @SignatureID = @SignatureID  
+END  
+  
+INSERT INTO [dbo].DigitalSignature  
+([SignatureID],  
+[UserID],  
+[Blob],  
+ DigitalSignatoryTypeSurrogate,
+ [CreationDateTime]
+  )  
+  
+VALUES (  
+@SignatureID,  
+@UserID,  
+@Blob,  
+@DigitalSignatoryTypeSurrogate,
+@CreationDateTime)  
+  
+SELECT @Surrogate = @SignatureID  
+GO
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_DigitalSignature_Update]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_DigitalSignature_Update]
+GO
+CREATE PROCEDURE [dbo].[usp_DigitalSignature_Update] 
+  @SignatureID INT  
+ ,@UserID CHAR(40)
+ ,@Blob IMAGE  
+ ,@DigitalSignatoryTypeSurrogate INT  
+ ,@CreationDateTime datetime
+ ,@LastUpdatedDate datetime  
+AS  
+UPDATE [dbo].DigitalSignature  
+SET [UserID] = @UserID 
+ ,[Blob] = @Blob  
+ ,DigitalSignatoryTypeSurrogate = @DigitalSignatoryTypeSurrogate  
+ ,LastUpdatedDate = @LastUpdatedDate
+ ,CreationDateTime = @CreationDateTime
+WHERE SignatureID = @SignatureID  
+GO
+
 
 -------------------------------------------------------------------------------------------------------------------------------
 /* 7TRIGGERS */

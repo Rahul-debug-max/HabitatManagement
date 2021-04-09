@@ -1,10 +1,9 @@
 ﻿using HabitatManagement.BusinessEntities;
+using HabitatManagement.BusinessLogic;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Web;
 
 namespace HabitatManagement.Models
 {
@@ -76,10 +75,77 @@ namespace HabitatManagement.Models
             switch (field.FieldType)
             {
                 case FormFieldType.Textbox:
-                    sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"formDesignField\">{0}</label>", field.FieldName);
+                    sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
                     sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
                     sb.AppendFormat("<input type=\"text\" id=\"{1}\" name=\"{1}\" value=\"{0}\" class=\"form-control\" \\>", _templateFormFieldData?.FieldValue, field.Field);
                     sb.Append("</div>");
+                    break;
+                case FormFieldType.TextArea:
+                    sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
+                    sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
+                    sb.AppendFormat("<textarea id=\"{1}\" name=\"{1}\" class=\"form-control textAreaVerticalResizing\" readonly=\"readonly\" rows=\"3\" >{0}</textarea>", _templateFormFieldData?.FieldValue, field.Field);
+                    sb.Append("</div>");
+                    break;
+                case FormFieldType.Date:
+
+                    sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"FormDate_DatePart_{1}\">{0}</label>", field.FieldName, field.Field);
+                    sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none conditiondate\">");
+                    DateTime dateTime;
+                    bool isSuccess = DateTime.TryParse(_templateFormFieldData?.FieldValue, out dateTime);
+                    sb.Append("<div style=\"width: 196px!important; display:inline-block; \" >");
+                    sb.Append("<div class=\"input-group \" >");
+                    sb.AppendFormat("<input  class=\"dateTextBox form-control\"  type=\"text\" name=\"FormDate_DatePart_{1}\" id=\"FormDate_DatePart_{1}\" value=\"{0}\"/>", dateTime != DateTime.MinValue ? dateTime.ToString() : "", field.Field);
+                    sb.Append("<span class=\"input-group-addon input-group-calendar-span\">");
+                    sb.AppendFormat("<span id=\"imgClearFormDateTime_{0}\" class=\"ui-datepicker-trigger glyphicons glyphicons-remove\" style=\"cursor: pointer !important;\" />", _templateFormFieldData?.FieldValue);
+                    sb.Append("</span>");
+                    sb.Append("</div>");
+                    sb.Append("</div>");
+                    sb.Append("</div>");
+
+                    break;
+                case FormFieldType.DateAndTime:
+
+                    sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"FormDate_DatePart_{1}\">{0}</label>", field.FieldName, field.Field);
+                    sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none conditiondate\">");
+                    DateTime dateAndTime;
+                    bool success = DateTime.TryParse(_templateFormFieldData?.FieldValue, out dateAndTime);
+                    sb.Append("<div style=\"width: 196px!important; display:inline-block; \" >");
+                    sb.Append("<div class=\"input-group \" >");
+                    sb.AppendFormat("<input  class=\"dateTextBox form-control\"  type=\"text\" name=\"FormDate_DatePart_{1}\" id=\"FormDate_DatePart_{1}\" value=\"{0}\"/>", dateAndTime != DateTime.MinValue ? dateAndTime.ToString() : "", field.Field);
+                    sb.Append("<span class=\"input-group-addon input-group-calendar-span\">");
+                    sb.AppendFormat("<span id=\"imgClearFormDateTime_{0}\" class=\"ui-datepicker-trigger glyphicons glyphicons-remove\" style=\"cursor: pointer !important;\" />", _templateFormFieldData?.FieldValue);
+                    sb.Append("</span>");
+                    sb.Append("</div>");
+                    sb.Append("</div>");
+                    sb.Append("<div style=\"width: 117px!important; display:inline-block;padding-left: 10px; \" >");
+                    sb.Append("<div class=\"timectrlwidth input-group \" >");
+                    sb.AppendFormat("<input  class=\"timeTextBox form-control\" type=\"text\" name=\"FormDate_TimePart_{1}\" id=\"FormDate_TimePart_{1}\" value=\"{0}\" />", dateAndTime != DateTime.MinValue ? dateAndTime.ToString() : "", field.Field);
+                    sb.Append("</div>");
+                    sb.Append("</div>");
+                    sb.Append("</div>");
+
+                    break;
+                case FormFieldType.Signature:
+
+                    sb.Append("<div class=\"col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none dvSignatureDataType\" >");
+                    sb.Append("<div class=\"panel panel-default\" style=\"margin-bottom:0px;\" >");
+                    sb.Append("<div class=\"panel-heading\" style=\"text-align:right;background-color: #f5f5f5; padding: 10px 15px;\" >");
+                    sb.AppendFormat("<button type=\"button\" class=\"btn btn-primary x1\" onclick=\"editDigitalSignature(this)\" title=\"{0}\" style=\"margin-right:5px;\" \"><span class=\"glyphicons glyphicons-edit\"></span></button>", "Edit");
+                    sb.AppendFormat("<button type=\"button\" class=\"btn btn-primary x1\" onclick=\"resetDigitalSignature(this)\" title=\"{0}\" \"><span class=\"glyphicons glyphicons-refresh\"></span></button>", "Reset");
+                    sb.Append("</div>");
+                    sb.Append("<div class=\"panel-body paddlftrght-none\" style=\"padding-bottom: 0; padding-top: 0;\" >");
+                    sb.AppendFormat("<div id=\"digitalcanvasouter_{0}\">", field.Field);
+                    sb.AppendFormat("<div class=\"conditionDigitalSignature\" id=\"digitalSignature_{0}\"></div>", field.Field);
+                    sb.Append("</div>");
+                    sb.Append("</div>");
+                    sb.Append("</div>");
+
+                    var digitalSignatureImage64BitString = FormLogic.GetDigitalSignature(Convert.ToInt32(_templateFormFieldData?.FieldValue));
+
+                    sb.AppendFormat("<input type=\"hidden\" id='SignatureResponse' readonly=\"readonly\" class=\"form-control\" value=\"{0}\"  />", digitalSignatureImage64BitString);
+                    sb.AppendFormat("<input type=\"hidden\" id='SignatureId' readonly=\"readonly\" class=\"form-control\" value=\"{0}\"  />", _templateFormFieldData?.FieldValue);
+                    sb.Append("</div>");
+
                     break;
 
                     //case FormFieldType.Label:

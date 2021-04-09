@@ -13,9 +13,18 @@ namespace HabitatManagement
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public IConfigurationRoot ConfigurationRoot { get; set; }
+        public static string ConnectionString { get; private set; }
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+
+            ConfigurationRoot = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appSettings.json")
+                .Build();
+
         }
 
         public IConfiguration Configuration { get; }
@@ -46,6 +55,7 @@ namespace HabitatManagement
 
             app.UseAuthorization();
 
+            ConnectionString = ConfigurationRoot.GetConnectionString("DefaultConnection");
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
