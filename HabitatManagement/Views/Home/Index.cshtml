@@ -3,13 +3,19 @@
 }
 
 <link rel="stylesheet" href="~/css/Style.css" />
-<script src="~/Grids/FormDesigner.js"></script>
+<script src="~/js/View/index.js"></script>
 
 <script type="text/javascript">
     $(document).ready(function () {
-        InitiliazeToolbarScrollBar('FormTemplateFlexi');      
+        PermitFormTemplateList.onInit({
+            addEditURL: '@Url.Action("PermitFormScreenDesignTemplate", "Home")',
+            deleteURL: '@Url.Action("DeleteTemplates", "Home")',
+            detailURL: '@Url.Action("PermitFormScreenDesignTemplateDetail", "Home")',
+            screenLayoutURL: '@Url.Action("PermitFormTemplateFields", "Home")',
+            jqGridDataURL: '@Url.Action("GetFormDesignerData", "Home")',
+            jqGridColumnURL: '@Url.Action("GetFormDesignerColumnNames", "Home")'
+        });
     });
-
 </script>
 
 <style>
