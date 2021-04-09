@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace HabitatManagement.BusinessEntities
 {
-    public class DigitalSignatureBE
+    public class DigitalSignatureBE : BusinessEntity
     {
         public int SignatureID { get; set; }
         public string UserID { get; set; }

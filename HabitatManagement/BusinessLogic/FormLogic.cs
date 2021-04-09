@@ -73,6 +73,7 @@ namespace HabitatManagement.BusinessLogic
 
                 SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplate_Add", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
+                BusinessEntityHelper.ReplaceNullProperties<PermitFormScreenDesignTemplateBE>(o);
                 FromPermitFormScreenDesignTemplateBE(ref cmd, o);
                 cmd.Parameters.Add("ErrorOccured", SqlDbType.Bit);
                 cmd.Parameters["ErrorOccured"].Direction = ParameterDirection.Output;
@@ -99,6 +100,7 @@ namespace HabitatManagement.BusinessLogic
 
                 SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplate_Update", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
+                BusinessEntityHelper.ReplaceNullProperties<PermitFormScreenDesignTemplateBE>(o);
                 FromPermitFormScreenDesignTemplateBE(ref cmd, o);
                 cmd.Parameters.Add("ErrorOccured", SqlDbType.Bit);
                 cmd.Parameters["ErrorOccured"].Direction = ParameterDirection.Output;
@@ -160,6 +162,7 @@ namespace HabitatManagement.BusinessLogic
 
                 SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplateDetail_Add", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
+                BusinessEntityHelper.ReplaceNullProperties<PermitFormScreenDesignTemplateDetailBE>(o);
                 FromPermitFormScreenDesignTemplateDetailBE(ref cmd, o);
                 cmd.ExecuteNonQuery();
 
@@ -174,6 +177,7 @@ namespace HabitatManagement.BusinessLogic
 
                 SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplateDetail_Update", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
+                BusinessEntityHelper.ReplaceNullProperties<PermitFormScreenDesignTemplateDetailBE>(o);
                 FromPermitFormScreenDesignTemplateDetailBE(ref cmd, o);
                 cmd.Parameters.AddWithValue("Field", o.Field);
                 cmd.ExecuteNonQuery();
@@ -248,6 +252,7 @@ namespace HabitatManagement.BusinessLogic
                 SqlCommand cmd = new SqlCommand("usp_DigitalSignature_Add", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add("Surrogate", SqlDbType.Int, 8).Direction = ParameterDirection.Output;
+                BusinessEntityHelper.ReplaceNullProperties<DigitalSignatureBE>(o);
                 FromDigitalSignatureBE(ref cmd, o);
                 cmd.ExecuteNonQuery();
                 if (cmd.Parameters["Surrogate"].Value != DBNull.Value)
@@ -265,6 +270,7 @@ namespace HabitatManagement.BusinessLogic
 
                 SqlCommand cmd = new SqlCommand("usp_DigitalSignature_Update", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
+                BusinessEntityHelper.ReplaceNullProperties<DigitalSignatureBE>(o);
                 FromDigitalSignatureBE(ref cmd, o);
                 cmd.Parameters.AddWithValue("LastUpdatedDate", DateTime.Now);
                 cmd.ExecuteNonQuery();

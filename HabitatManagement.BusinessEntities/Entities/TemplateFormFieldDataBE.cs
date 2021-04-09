@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HabitatManagement.BusinessEntities
 {
-    public class TemplateFormFieldDataBE
+    public class TemplateFormFieldDataBE : BusinessEntity
     {
         public int FormID { get; set; }
         public int Field { get; set; }

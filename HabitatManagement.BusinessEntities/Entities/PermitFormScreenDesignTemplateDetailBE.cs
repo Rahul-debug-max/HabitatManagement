@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HabitatManagement.BusinessEntities
 {
-    public class PermitFormScreenDesignTemplateDetailBE
+    public class PermitFormScreenDesignTemplateDetailBE : BusinessEntity
     {
         public int FormID { get; set; }
 
