@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HabitatManagement", "HabitatManagement\HabitatManagement.csproj", "{CCD37369-CD1A-4CA4-87FB-272C304EAFFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HabitatManagement.BusinessEntities", "HabitatManagement.BusinessEntities\HabitatManagement.BusinessEntities.csproj", "{9FC5BCA1-79A2-4890-A362-48904851C9A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HabitatManagement.BusinessEntities", "HabitatManagement.BusinessEntities\HabitatManagement.BusinessEntities.csproj", "{9FC5BCA1-79A2-4890-A362-48904851C9A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

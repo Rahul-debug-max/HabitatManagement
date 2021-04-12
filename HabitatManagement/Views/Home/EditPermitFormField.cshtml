@@ -1,0 +1,33 @@
+﻿
+@model HabitatManagement.BusinessEntities.PermitFormScreenDesignTemplateDetailBE
+
+@{
+    Layout = null;
+}
+
+<form id="PermitFormField" asp-controller="Home" asp-action="PermitFormField">
+    <div class="container-fluid">
+        <div class="form-group row">
+            <label class="col-sm-2 text-right col-form-label" asp-for="FieldName" id="lblDesign">Field Name</label>
+            <div class="col-sm-10">
+                @Html.TextBox("FieldName", Model.FieldName, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 text-right col-form-label" asp-for="FieldType" id="lblFieldType">Field Type</label>
+            <div class="col-sm-10">
+                <select asp-for="FieldType" asp-items="Html.GetEnumSelectList<FormFieldType>()" class="form-control"></select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 text-right col-form-label" asp-for="Section" id="lblSection">Section</label>
+            <div class="col-sm-10">
+                <select asp-for="Section" asp-items="Html.GetEnumSelectList<PromptFormSectionField>()" class="form-control"></select>
+            </div>
+        </div>
+
+        @Html.HiddenFor(m => m.FormID)
+        @Html.HiddenFor(m => m.Sequence)
+        @Html.HiddenFor(m => m.Field)
+    </div>
+</form>

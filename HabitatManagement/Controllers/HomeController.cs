@@ -195,6 +195,127 @@ namespace HabitatManagement.Controllers
             return View(model);
         }
 
+        public JsonResult GetFieldDesignerColumnNames()
+        {
+            try
+            {
+                string[] columnNames =
+                {
+                    "Field",
+                    "Field Name",
+                    "Field Type",
+                    "Section",
+                    "Sequence"
+            };
+                return this.Json(new { columnNames });
+            }
+            catch (Exception ex)
+            {
+                return this.Json(new { ErrorMessage = ex.Message });
+            }
+        }
+
+        public ActionResult GetFieldDesignerData(int formID, string sidx, string sord, int page = 1, int rows = 10)
+        {
+            var jsonData = new
+            {
+                total = 0,
+                page,
+                records = 0,
+                rows = new List<PermitFormScreenDesignTemplateDetailBE>()
+            };
+
+            try
+            {
+                IEnumerable<PermitFormScreenDesignTemplateDetailBE> list = FormLogic.FetchAllPermitFormScreenDesignTemplateDetail(formID);
+
+                if (list == null)
+                {
+                    return Json(jsonData);
+                }
+                else
+                {
+                    var resultFormTemplate = (from obj in list
+                                              select new PermitFormScreenDesignTemplateDetailBE
+                                              {
+                                                  Field = obj.Field,
+                                                  FieldName = obj.FieldName,
+                                                  FieldTypeValue = obj.FieldType.ToString(),
+                                                  SectionValue = obj.Section.ToString(),
+                                                  Sequence = obj.Sequence
+                                              }).ToList();
+
+                    jsonData = new
+                    {
+                        total = 1,
+                        page,
+                        records = int.MaxValue,
+                        rows = resultFormTemplate
+                    };
+                }
+
+                var jsonResult = Json(jsonData);
+                return jsonResult;
+            }
+            catch (Exception ex)
+            {
+                return Json(jsonData);
+            }
+        }
+
+
+        public ActionResult EditPermitFormField(int formID, int fieldID)
+        {
+            PermitFormScreenDesignTemplateDetailBE model;
+
+            model = FormLogic.FetchPermitFormScreenDesignTemplateDetail(formID, fieldID);
+            if (model == null)
+            {
+                model = new PermitFormScreenDesignTemplateDetailBE();
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult EditPermitFormField(PermitFormScreenDesignTemplateDetailBE model)
+        {
+
+            bool success = false;
+            int id = 0;
+
+            PermitFormScreenDesignTemplateDetailBE permitFormScreenDesignTemplateDetail = FormLogic.FetchPermitFormScreenDesignTemplateDetail(model.FormID, model.Field);
+            if (permitFormScreenDesignTemplateDetail == null)
+            {
+                permitFormScreenDesignTemplateDetail = new PermitFormScreenDesignTemplateDetailBE();
+            }
+            permitFormScreenDesignTemplateDetail.FormID = model.FormID;
+            permitFormScreenDesignTemplateDetail.Field = model.Field;
+            permitFormScreenDesignTemplateDetail.FieldName = model.FieldName;
+            permitFormScreenDesignTemplateDetail.FieldType = model.FieldType;
+            permitFormScreenDesignTemplateDetail.Section = model.Section;
+            permitFormScreenDesignTemplateDetail.Sequence = model.Sequence;
+
+            if (model.Field <= 0)
+            {
+                success = FormLogic.AddPermitFormScreenDesignTemplateDetail(permitFormScreenDesignTemplateDetail);
+            }
+            else
+            {
+                success = FormLogic.UpdatePermitFormScreenDesignTemplateDetail(permitFormScreenDesignTemplateDetail);
+            }
+            return Json(new { success, id });
+        }
+
+        public JsonResult DeletePermitFormField(int formID, int fieldID)
+        {
+            bool success = false;
+
+            success = FormLogic.DeletePermitFormScreenDesignTemplateDetail(formID, fieldID);
+
+            return new JsonResult(new { Success = success });
+        }
+
         public ActionResult GetDigitalSignature(int signatureId)
         {
             string signature = FormLogic.GetDigitalSignature(signatureId);

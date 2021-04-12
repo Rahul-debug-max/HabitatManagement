@@ -154,8 +154,9 @@ namespace HabitatManagement.BusinessLogic
             return o;
         }
 
-        public static void AddPermitFormScreenDesignTemplateDetail(PermitFormScreenDesignTemplateDetailBE o)
+        public static bool AddPermitFormScreenDesignTemplateDetail(PermitFormScreenDesignTemplateDetailBE o)
         {
+            bool success = false;
             using (SqlConnection conn = new SqlConnection(_connectionstring))
             {
                 conn.Open();
@@ -165,12 +166,14 @@ namespace HabitatManagement.BusinessLogic
                 BusinessEntityHelper.ReplaceNullProperties<PermitFormScreenDesignTemplateDetailBE>(o);
                 FromPermitFormScreenDesignTemplateDetailBE(ref cmd, o);
                 cmd.ExecuteNonQuery();
-
+                success = true;
             }
+            return success;
         }
 
-        public static void UpdatePermitFormScreenDesignTemplateDetail(PermitFormScreenDesignTemplateDetailBE o)
+        public static bool UpdatePermitFormScreenDesignTemplateDetail(PermitFormScreenDesignTemplateDetailBE o)
         {
+            bool success = false;
             using (SqlConnection conn = new SqlConnection(_connectionstring))
             {
                 conn.Open();
@@ -181,8 +184,26 @@ namespace HabitatManagement.BusinessLogic
                 FromPermitFormScreenDesignTemplateDetailBE(ref cmd, o);
                 cmd.Parameters.AddWithValue("Field", o.Field);
                 cmd.ExecuteNonQuery();
-
+                success = true;
             }
+            return success;
+        }
+
+        public static bool DeletePermitFormScreenDesignTemplateDetail(int formID, int FieldID)
+        {
+            bool success = false;
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplateDetail_Delete", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("FormID", formID);
+                cmd.Parameters.AddWithValue("Field", FieldID);
+                cmd.ExecuteNonQuery();
+                success = true;
+            }
+            return success;
         }
 
         public static string GetDigitalSignature(int signatureId)

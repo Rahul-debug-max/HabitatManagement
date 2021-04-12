@@ -356,6 +356,124 @@
         }
     }
 
+    //  // Use this function for open any confirmation dialog that perform AJAX call on ok.
+    //dialogs.openConfirmationDialogWithAJAX = function (obj) {
+
+    //    var confirmationData = {
+    //        url: '',
+    //        type: 'POST',
+    //        timeout: 0,
+    //        formData: {},
+    //        cache: false,
+    //        traditional: false,
+    //        onSuccess: undefined,
+    //        onError: undefined,
+    //        onFail: undefined,
+    //        confirmationDialogTitle: '',
+    //        confirmationDeletionMessage: '',
+    //        yesButtonTitle: '',
+    //        noButtonTitle: ''
+    //    }
+
+    //    $.extend(confirmationData, obj);
+
+    //    var _confirmationDialogMessage = (confirmationData.confirmationDeletionMessage == '' || confirmationData.confirmationDeletionMessage == undefined) ?
+    //        defaults.confirmationDeletionMessage : confirmationData.confirmationDeletionMessage;
+
+    //    var _confirmationDialogTitle = (confirmationData.confirmationDialogTitle == '' || confirmationData.confirmationDialogTitle == undefined) ?
+    //        defaults.confirmationDialogTitle : confirmationData.confirmationDialogTitle;
+
+    //    var _yesButtonTitle = (confirmationData.yesButtonTitle == '' || confirmationData.okButtonTitle == undefined) ?
+    //        defaults.yesButtonTitle : confirmationData.yesButtonTitle;
+
+    //    var _noButtonTitle = (confirmationData.noButtonTitle == '' || confirmationData.noButtonTitle == undefined) ?
+    //        defaults.noButtonTitle : confirmationData.noButtonTitle;
+
+    //    var selectionDiv = $("<div id='ConfirmDeletionDialog'>" + _confirmationDialogMessage + "</div>");
+    //    if ($('#ConfirmDeletionDialog').dialog('instance') != undefined && $('#ConfirmDeletionDialog').dialog('instance').element != undefined) {
+    //        $('#ConfirmDeletionDialog').dialog('destroy');
+    //    }
+    //    selectionDiv.dialog({
+    //        title: _confirmationDialogTitle,
+    //        modal: true,
+    //        buttons: [
+    //            {
+    //                text: "",
+    //                id: "btnClose",
+    //                title: _noButtonTitle,
+    //                click: function () {
+    //                    $(this).dialog("close");
+    //                },
+    //                icons: { primary: "glyphicons glyphicons-remove" },
+    //                "class": "btn btn-danger dialog-btn-x1",
+    //                type: "button"
+    //            },
+    //            {
+    //                text: "",
+    //                id: "btnSelect",
+    //                title: _yesButtonTitle,
+    //                click: function () {
+
+    //                    $(this).dialog("close");
+
+    //                    $.ajax({
+    //                        type: confirmationData.type,
+    //                        cache: confirmationData.cache,
+    //                        data: confirmationData.formData,
+    //                        url: confirmationData.url,
+    //                        traditional: confirmationData.traditional,
+    //                        success: function (result) {
+    //                            if (confirmationData.onSuccess != undefined) {
+    //                                confirmationData.onSuccess(result);
+    //                            }
+    //                        },
+    //                        error: function (result) {
+    //                            if (confirmationData.onError != undefined) {
+    //                                confirmationData.onError(result);
+    //                            }
+    //                        },
+    //                        fail: function (result) {
+    //                            if (confirmationData.onFail != undefined) {
+    //                                confirmationData.onFail(result);
+    //                            }
+    //                        },
+    //                        beforeSend: function () { $("#wait").css("display", "block"); },
+    //                        complete: function () { $("#wait").css("display", "none"); }
+    //                    });
+
+    //                    if (confirmationData.onSelect != undefined) {
+    //                        confirmationData.onSelect();
+    //                    }
+    //                },
+    //                icons: { primary: "glyphicons glyphicons-tick" },
+    //                "class": "btn btn-success dialog-btn-x1",
+    //                type: "button"
+    //            },
+    //        ],
+    //        create: function () {
+    //            // Remove default css from jQuery dialog.
+    //            $('.ui-dialog-buttonset').children('button').removeClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary").
+    //                mouseover(function () { $(this).removeClass('ui-state-hover'); }).
+    //                mousedown(function () { $(this).removeClass('ui-state-active'); }).
+    //                focus(function () { $(this).removeClass('ui-state-focus'); });
+    //            $('.ui-dialog-buttonset button').children('span').removeClass("ui-button-icon-primary ui-icon ui-button-text");
+    //        },
+    //        open: function () {
+    //            // Remove default button focus on opening.
+    //            $('.ui-dialog-buttonset').children('button').blur();
+    //        },
+    //        close: function () {
+    //            if (confirmationData.onClose != undefined) {
+    //                confirmationData.onClose();
+    //            }
+    //            $(this).empty();
+    //            $(this).dialog('destroy');
+    //        }
+    //    });
+
+    //    adjustDialog();
+    //}
+
     //call this function on exit of page
     dialogs.confirmExit = function (obj) {
         var isFormDirty = false;

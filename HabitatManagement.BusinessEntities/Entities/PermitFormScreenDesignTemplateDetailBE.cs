@@ -19,5 +19,10 @@ namespace HabitatManagement.BusinessEntities
         public PromptFormSectionField Section { get; set; }
 
         public int Sequence { get; set; }
+
+
+        public string FieldTypeValue { get; set; }
+
+        public string SectionValue { get; set; }
     }
 }

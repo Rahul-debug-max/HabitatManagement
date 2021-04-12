@@ -143,6 +143,25 @@ GO
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_PermitFormScreenDesignTemplate_Fetch]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplate_Fetch]
 GO
+/****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplateDetail_Delete]    Script Date: 12-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_PermitFormScreenDesignTemplateDetail_Delete]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplateDetail_Delete]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplateDetail_Delete]    Script Date: 12-04-2021 15:51:54 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE dbo.[usp_PermitFormScreenDesignTemplateDetail_Delete]
+(
+	@FormID INT,  
+	@Field INT
+)
+AS
+BEGIN
+	DELETE FROM PermitFormScreenDesignTemplateDetail WHERE FormID = @FormID AND Field = @Field;
+END
+GO
 /****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplate_Fetch]    Script Date: 08-04-2021 15:51:54 ******/
 SET ANSI_NULLS ON
 GO
@@ -343,6 +362,11 @@ BEGIN
 
  DECLARE @Field BIGINT;  
  SELECT @Field = ISNULL(MAX(Field),0) + 1 FROM PermitFormScreenDesignTemplateDetail WHERE FormID = @FormID
+
+ IF(@Sequence = 0)
+ BEGIN
+     SELECT @Sequence = ISNULL(MAX([Sequence]),0) + 1 FROM PermitFormScreenDesignTemplateDetail WHERE FormID = @FormID AND [Section] = @Section;
+ END
 
      INSERT INTO PermitFormScreenDesignTemplateDetail    
         (FormID,    

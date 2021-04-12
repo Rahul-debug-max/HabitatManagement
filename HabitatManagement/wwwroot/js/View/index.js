@@ -1,6 +1,6 @@
 ﻿window.PermitFormTemplateList = (function () {
     var defaults = {
-        addEditPopupTitle: "PermitForms",
+        addEditPopupTitle: "Form",
         addEditURL: '',
         deleteURL: ''
     }
@@ -163,6 +163,7 @@
                 title: "Screen Design Details",
                 url: defaults.detailURL,
                 data: { formID: surrogateDate[0] },
+                modalDialogClass: "modal-xl",
                 buttons: [
                     {
                         Button: 'next', onClick: function () {                        
