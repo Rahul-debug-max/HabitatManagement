@@ -187,13 +187,18 @@ namespace HabitatManagement.Controllers
             return new JsonResult(new { Success = success, TemplateDetails = success ? model.TemplateDetails : null });
         }
 
-
         public ActionResult PermitFormTemplateFields(int formID)
         {
-            List<PermitFormScreenDesignTemplateDetailBE> templateDetails = FormLogic.FetchAllPermitFormScreenDesignTemplateDetail(formID);            
-            
-            return View();
+            List<PermitFormScreenDesignTemplateDetailBE> templateDetails = FormLogic.FetchAllPermitFormScreenDesignTemplateDetail(formID);
+            List<TemplateFormFieldDataBE> templateFormFieldData = FormLogic.FetchAllTemplateFormFieldData(formID);
+            FormDesignTemplateModelBE model = new FormDesignTemplateModelBE(templateDetails, templateFormFieldData);
+            return View(model);
         }
 
+        public ActionResult GetDigitalSignature(int signatureId)
+        {
+            string signature = FormLogic.GetDigitalSignature(signatureId);
+            return new JsonResult(new  { Signature = signature });
+        }
     }
 }

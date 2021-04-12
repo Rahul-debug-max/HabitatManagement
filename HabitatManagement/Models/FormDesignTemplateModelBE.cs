@@ -29,10 +29,17 @@ namespace HabitatManagement.Models
             // SetValues();
         }
 
+        public FormDesignTemplateModelBE(List<PermitFormScreenDesignTemplateDetailBE> fields, List<TemplateFormFieldDataBE> templateFormFieldDataList)
+          : this(fields)
+        {
+            _templateFormFieldDataList = templateFormFieldDataList;
+            // SetValues();
+        }
 
         #region Properties
 
         private TemplateFormFieldDataBE _templateFormFieldData = null;
+        private List<TemplateFormFieldDataBE> _templateFormFieldDataList = null;
 
         private bool _renderForDragnDrop = false;
 
@@ -51,13 +58,17 @@ namespace HabitatManagement.Models
         public string FormSectionFields()
         {
             StringBuilder sb = new StringBuilder();
-            var leftFields = _fields.OrderBy(o => o.Sequence).ToList();
+            var sectionGroupFields = _fields.GroupBy(o => o.Section).OrderBy(s=> s.Key).Select(x=> x).ToList();
 
-            if (leftFields != null)
+            if (sectionGroupFields != null)
             {
-                foreach (var field in leftFields)
+                sb.AppendFormat("<div class=\"formOuterStyle fontBold bgLightGray\">");
+                sb.Append("NOTE: This Permit is valid for one shift only");
+                sb.Append("</div>");
+
+                foreach (var sectionGroupField in sectionGroupFields)
                 {
-                    sb.Append(HtmlFields(field));
+                    sb.Append(HtmlFields(sectionGroupField));
                 }
             }
             return sb.ToString();
@@ -67,719 +78,125 @@ namespace HabitatManagement.Models
 
         #region Private Methods
 
-        private string HtmlFields(PermitFormScreenDesignTemplateDetailBE field)
+        private string HtmlFields(IGrouping<PromptFormSectionField, PermitFormScreenDesignTemplateDetailBE> groupingFields)
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("<div class=\"form-group\" data-field = \"{0}\" >", field.Field);
+            sb.AppendFormat("<div class=\"container-fluid formOuterStyle bgLightGray\" data-field = \"{0}\" >", groupingFields.Key);
 
-            switch (field.FieldType)
+            if (groupingFields.Key == PromptFormSectionField.SectionA)
             {
-                case FormFieldType.Textbox:
-                    sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
-                    sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-                    sb.AppendFormat("<input type=\"text\" id=\"{1}\" name=\"{1}\" value=\"{0}\" class=\"form-control\" \\>", _templateFormFieldData?.FieldValue, field.Field);
-                    sb.Append("</div>");
-                    break;
-                case FormFieldType.TextArea:
-                    sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
-                    sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-                    sb.AppendFormat("<textarea id=\"{1}\" name=\"{1}\" class=\"form-control textAreaVerticalResizing\" readonly=\"readonly\" rows=\"3\" >{0}</textarea>", _templateFormFieldData?.FieldValue, field.Field);
-                    sb.Append("</div>");
-                    break;
-                case FormFieldType.Date:
-
-                    sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"FormDate_DatePart_{1}\">{0}</label>", field.FieldName, field.Field);
-                    sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none conditiondate\">");
-                    DateTime dateTime;
-                    bool isSuccess = DateTime.TryParse(_templateFormFieldData?.FieldValue, out dateTime);
-                    sb.Append("<div style=\"width: 196px!important; display:inline-block; \" >");
-                    sb.Append("<div class=\"input-group \" >");
-                    sb.AppendFormat("<input  class=\"dateTextBox form-control\"  type=\"text\" name=\"FormDate_DatePart_{1}\" id=\"FormDate_DatePart_{1}\" value=\"{0}\"/>", dateTime != DateTime.MinValue ? dateTime.ToString() : "", field.Field);
-                    sb.Append("<span class=\"input-group-addon input-group-calendar-span\">");
-                    sb.AppendFormat("<span id=\"imgClearFormDateTime_{0}\" class=\"ui-datepicker-trigger glyphicons glyphicons-remove\" style=\"cursor: pointer !important;\" />", _templateFormFieldData?.FieldValue);
-                    sb.Append("</span>");
-                    sb.Append("</div>");
-                    sb.Append("</div>");
-                    sb.Append("</div>");
-
-                    break;
-                case FormFieldType.DateAndTime:
-
-                    sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"FormDate_DatePart_{1}\">{0}</label>", field.FieldName, field.Field);
-                    sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none conditiondate\">");
-                    DateTime dateAndTime;
-                    bool success = DateTime.TryParse(_templateFormFieldData?.FieldValue, out dateAndTime);
-                    sb.Append("<div style=\"width: 196px!important; display:inline-block; \" >");
-                    sb.Append("<div class=\"input-group \" >");
-                    sb.AppendFormat("<input  class=\"dateTextBox form-control\"  type=\"text\" name=\"FormDate_DatePart_{1}\" id=\"FormDate_DatePart_{1}\" value=\"{0}\"/>", dateAndTime != DateTime.MinValue ? dateAndTime.ToString() : "", field.Field);
-                    sb.Append("<span class=\"input-group-addon input-group-calendar-span\">");
-                    sb.AppendFormat("<span id=\"imgClearFormDateTime_{0}\" class=\"ui-datepicker-trigger glyphicons glyphicons-remove\" style=\"cursor: pointer !important;\" />", _templateFormFieldData?.FieldValue);
-                    sb.Append("</span>");
-                    sb.Append("</div>");
-                    sb.Append("</div>");
-                    sb.Append("<div style=\"width: 117px!important; display:inline-block;padding-left: 10px; \" >");
-                    sb.Append("<div class=\"timectrlwidth input-group \" >");
-                    sb.AppendFormat("<input  class=\"timeTextBox form-control\" type=\"text\" name=\"FormDate_TimePart_{1}\" id=\"FormDate_TimePart_{1}\" value=\"{0}\" />", dateAndTime != DateTime.MinValue ? dateAndTime.ToString() : "", field.Field);
-                    sb.Append("</div>");
-                    sb.Append("</div>");
-                    sb.Append("</div>");
-
-                    break;
-                case FormFieldType.Signature:
-
-                    sb.Append("<div class=\"col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none dvSignatureDataType\" >");
-                    sb.Append("<div class=\"panel panel-default\" style=\"margin-bottom:0px;\" >");
-                    sb.Append("<div class=\"panel-heading\" style=\"text-align:right;background-color: #f5f5f5; padding: 10px 15px;\" >");
-                    sb.AppendFormat("<button type=\"button\" class=\"btn btn-primary x1\" onclick=\"editDigitalSignature(this)\" title=\"{0}\" style=\"margin-right:5px;\" \"><span class=\"glyphicons glyphicons-edit\"></span></button>", "Edit");
-                    sb.AppendFormat("<button type=\"button\" class=\"btn btn-primary x1\" onclick=\"resetDigitalSignature(this)\" title=\"{0}\" \"><span class=\"glyphicons glyphicons-refresh\"></span></button>", "Reset");
-                    sb.Append("</div>");
-                    sb.Append("<div class=\"panel-body paddlftrght-none\" style=\"padding-bottom: 0; padding-top: 0;\" >");
-                    sb.AppendFormat("<div id=\"digitalcanvasouter_{0}\">", field.Field);
-                    sb.AppendFormat("<div class=\"conditionDigitalSignature\" id=\"digitalSignature_{0}\"></div>", field.Field);
-                    sb.Append("</div>");
-                    sb.Append("</div>");
-                    sb.Append("</div>");
-
-                    var digitalSignatureImage64BitString = FormLogic.GetDigitalSignature(Convert.ToInt32(_templateFormFieldData?.FieldValue));
-
-                    sb.AppendFormat("<input type=\"hidden\" id='SignatureResponse' readonly=\"readonly\" class=\"form-control\" value=\"{0}\"  />", digitalSignatureImage64BitString);
-                    sb.AppendFormat("<input type=\"hidden\" id='SignatureId' readonly=\"readonly\" class=\"form-control\" value=\"{0}\"  />", _templateFormFieldData?.FieldValue);
-                    sb.Append("</div>");
-
-                    break;
-
-                    //case FormFieldType.Label:
-                    //    sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\">{0}</label>", field.FieldName);
-                    //    sb.AppendFormat("<div class=\"col-sm-6 col-md-3 col-lg-3 paddrght-none\"><div class=\"form-control\" readonly>{0}</div></div>", _templateFormFieldData?.FieldValue);
-                    //    break;
-                    // case TaskFeedbackTemplateFormField.Comments:
-                    //case FormFieldType.Checkbox:
-                    // sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"ConditionComment\">{0}</label>", field.Field.GetLocalizedDisplayName());
-                    //     //if (RenderForDragnDrop)
-                    //     //{
-                    //     //    sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    //     //}
-                    //     //else
-                    //     //{
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-
-                    //         sb.AppendFormat("<textarea name=\"ConditionDataType\" class=\"form-control textAreaVerticalResizing\" readonly=\"readonly\" rows=\"3\" >{0}</textarea>", Functions.TrimRight(field.GetCustomDataValue<string>("Comments")));
-
-                    //         sb.Append("</div>");
-                    //     //}
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.CompletedDate:
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"ConditionDateRecorded_DatePart_{1}\">{0}</label>", field.Field.GetLocalizedDisplayName(), _taskCondition?.ConditionSurrogate);
-                    // if (RenderForDragnDrop)
-                    // {
-                    //     sb.Append("<div class=\"col-sm-6 col-md-4 col-lg-4\"><div class=\"form-control\" readonly></div></div>");
-                    //     sb.Append("<div class=\"col-sm-3 col-md-2 col-lg-2 paddlftrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    // }
-                    // else
-                    // {
-                    //     sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none conditiondate\">");
-
-                    //     DateTime completedDateTime = field.GetCustomDataValue<DateTime>("CompletedDate");
-
-                    //     sb.Append("<div style=\"width: 196px!important; display:inline-block; \" >");
-
-                    //     sb.Append("<div class=\"input-group \" >");
-
-                    //     sb.AppendFormat("<input  class=\"dateTextBox form-control\"  type=\"text\" name=\"ConditionDateRecorded_DatePart_{1}\" id=\"ConditionDateRecorded_DatePart_{1}\" value=\"{0}\"/>", completedDateTime != DateTime.MinValue ? ViewHelper.GetDateString(completedDateTime) : "", _taskCondition?.ConditionSurrogate);
-
-                    //     sb.Append("<span class=\"input-group-addon input-group-calendar-span\">");
-
-                    //     sb.AppendFormat("<span id=\"imgClearDesignTemplateFaultCompletedDateTime_{0}\" class=\"ui-datepicker-trigger glyphicons glyphicons-remove\" style=\"cursor: pointer !important;\" />", _taskCondition?.ConditionSurrogate);
-
-                    //     sb.Append("</span>");
-
-                    //     sb.Append("</div>");
-
-                    //     sb.Append("</div>");
-
-                    //     sb.Append("<div style=\"width: 117px!important; display:inline-block;padding-left: 10px; \" >");
-                    //     sb.Append("<div class=\"timectrlwidth input-group \" >");
-
-                    //     sb.AppendFormat("<input  class=\"timeTextBox form-control\" type=\"text\" name=\"ConditionDateRecorded_TimePart_{1}\" id=\"ConditionDateRecorded_TimePart_{1}\" value=\"{0}\" />", completedDateTime != DateTime.MinValue ? ViewHelper.GetTimeString(completedDateTime) : "", _taskCondition?.ConditionSurrogate);
-
-                    //     sb.Append("</div>");
-                    //     sb.Append("</div>");
-
-                    //     sb.Append("</div>");
-                    // }
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.RequiredBy:
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"ConditionComment\">{0}</label>", field.Field.GetLocalizedDisplayName());
-                    //     if (RenderForDragnDrop)
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    //     }
-                    //     else
-                    //     {
-                    //         DateTime requiredByDateTime = field.GetCustomDataValue<DateTime>("RequiredByDateTime");
-
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-                    //         sb.Append("<div class=\"col-xs-8 col-sm-9 col-md-8 col-lg-8 paddlftrght-none\">");
-                    //         sb.AppendFormat("<input type=\"text\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", ViewHelper.GetDateString(requiredByDateTime));
-                    //         sb.Append("</div>");
-                    //         sb.Append("<div class=\"col-xs-4 col-sm-3 col-md-4 col-lg-4 paddrght-none\">");
-                    //         sb.AppendFormat("<input type=\"text\"  value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", ViewHelper.GetTimeString(requiredByDateTime));
-                    //         sb.Append("</div>");
-
-                    //         sb.Append("</div>");
-                    //     }
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.UnitOfMeasure:
-
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"UOMDescription\">{0}</label>", field.Field.GetLocalizedDisplayName());
-                    //     if (RenderForDragnDrop)
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    //     }
-                    //     else
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-                    //         sb.Append("<div class=\"col-xs-8 col-sm-9 col-md-8 col-lg-8 paddlftrght-none\">");
-                    //         sb.AppendFormat("<input type=\"text\" name=\"UOMDescription\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<string>("UOMDescription")));
-                    //         sb.Append("</div>");
-                    //         sb.Append("<div class=\"col-xs-4 col-sm-3 col-md-4 col-lg-4 paddrght-none\">");
-                    //         sb.AppendFormat("<input type=\"text\" name=\"UnitOfMeasure\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<string>("UnitOfMeasure")));
-                    //         sb.Append("</div>");
-                    //         sb.Append("</div>");
-                    //     }
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.ExpectedValue:
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"ConditionExpectedValue\">{0}</label>", field.Field.GetLocalizedDisplayName());
-                    //     if (RenderForDragnDrop)
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    //     }
-                    //     else
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-                    //         sb.Append("<div class=\"col-xs-4 col-sm-3 col-md-4 col-lg-4 paddlftrght-none\">");
-
-                    //         sb.AppendFormat("<input type=\"text\" name=\"ConditionExpectedValue\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", field.GetCustomDataValue<double>("ExpectedValue"));
-
-                    //         sb.Append("</div>");
-                    //         sb.Append("</div>");
-                    //     }
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.Feedback:
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"ConditionComment\">{0}</label>", field.Field.GetLocalizedDisplayName());
-                    //     if (RenderForDragnDrop)
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    //     }
-                    //     else
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-                    //         sb.AppendFormat("<textarea name=\"ConditionResponse_{2}\" class=\"form-control textAreaVerticalResizing\" {1} rows=\"3\" >{0}</textarea>", Functions.TrimRight(field.GetCustomDataValue<string>("Feedback")), canEdit ? "" : "readonly=\"readonly\" ", _taskCondition?.ConditionSurrogate);
-
-                    //         sb.Append("</div>");
-                    //     }
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.MinMaxValue:
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"ConditionMaximumValue\">{0}</label>", Functions.GetLabel("lblMaxValue"));
-                    //     if (RenderForDragnDrop)
-                    //     {
-                    //         sb.Append("<div class=\"col-xs-4 col-sm-3 col-md-3 col-lg-3 paddrght-none\">");
-                    //         sb.Append("<div class=\"form-control\" readonly></div>");
-                    //         sb.Append("</div>");
-
-                    //         sb.AppendFormat("<label class=\"col-xs-12 col-sm-12 col-md-2 col-lg-2 control-label paddrght-none text-right smtxtlft\" for=\"ConditionMinimumValue\">{0}</label>", Functions.GetLabel("lblMinValue"));
-                    //         sb.Append("<div class=\"col-xs-4 col-sm-3 col-md-3 col-lg-3 paddrght-none\">");
-                    //         sb.Append("<div class=\"form-control\" readonly></div>");
-                    //         sb.Append("</div>");
-                    //     }
-                    //     else
-                    //     {
-                    //         sb.Append("<div class=\"col-xs-4 col-sm-3 col-md-3 col-lg-3 paddrght-none\">");
-                    //         sb.AppendFormat("<input type=\"text\"  value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", field.GetCustomDataValue<double>("MaxValue"), _taskCondition?.ConditionSurrogate);
-                    //         sb.Append("</div>");
-
-                    //         sb.AppendFormat("<label class=\"col-xs-12 col-sm-12 col-md-2 col-lg-2 control-label paddrght-none text-right smtxtlft\" >{0}</label>", Functions.GetLabel("lblMinValue"));
-                    //         sb.Append("<div class=\"col-xs-4 col-sm-3 col-md-3 col-lg-3 paddrght-none\">");
-
-                    //         sb.AppendFormat("<input type=\"text\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", field.GetCustomDataValue<double>("MinValue"), _taskCondition?.ConditionSurrogate);
-
-                    //         sb.AppendFormat("<input type=\"hidden\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<bool>("ConditionMinimumZero")), _taskCondition?.ConditionSurrogate);
-                    //         sb.AppendFormat("<input type=\"hidden\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<bool>("ConditionMaximumZero")), _taskCondition?.ConditionSurrogate);
-
-                    //         sb.Append("</div>");
-                    //     }
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.Function:
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" >{0}</label>", field.Field.GetLocalizedDisplayName());
-                    //     if (RenderForDragnDrop)
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    //     }
-                    //     else
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-
-                    //         sb.AppendFormat("<input type=\"text\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<string>("Function")));
-
-                    //         sb.Append("</div>");
-                    //     }
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.MachinePart:
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" >{0}</label>", field.Field.GetLocalizedDisplayName());
-                    //     if (RenderForDragnDrop)
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    //     }
-                    //     else
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-
-                    //         sb.AppendFormat("<input type=\"text\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<string>("MachinePart")));
-
-                    //         sb.Append("</div>");
-                    //     }
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.Priority:
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" >{0}</label>", field.Field.GetLocalizedDisplayName());
-                    //     if (RenderForDragnDrop)
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    //     }
-                    //     else
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-                    //         sb.Append("<div class=\"col-xs-8 col-sm-9 col-md-8 col-lg-8 paddlftrght-none\">");
-                    //         sb.AppendFormat("<input type=\"text\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<string>("PriorityDescription")));
-                    //         sb.Append("</div>");
-                    //         sb.Append("<div class=\"col-xs-4 col-sm-3 col-md-4 col-lg-4 paddrght-none\">");
-                    //         sb.AppendFormat("<input type=\"text\"  value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<string>("Priority")));
-                    //         sb.Append("</div>");
-
-                    //         sb.Append("</div>");
-                    //     }
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.PlanningConstraint:
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" >{0}</label>", field.Field.GetLocalizedDisplayName());
-                    //     if (RenderForDragnDrop)
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    //     }
-                    //     else
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-                    //         sb.Append("<div class=\"col-xs-8 col-sm-9 col-md-8 col-lg-8 paddlftrght-none\">");
-                    //         sb.AppendFormat("<input type=\"text\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<string>("PlanningConstraintDescription")));
-                    //         sb.Append("</div>");
-                    //         sb.Append("<div class=\"col-xs-4 col-sm-3 col-md-4 col-lg-4 paddrght-none\">");
-                    //         sb.AppendFormat("<input type=\"text\"  value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<string>("PlanningConstraint")));
-                    //         sb.Append("</div>");
-
-                    //         sb.Append("</div>");
-                    //     }
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.Constraint:
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" >{0}</label>", field.Field.GetLocalizedDisplayName());
-                    //     if (RenderForDragnDrop)
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    //     }
-                    //     else
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-                    //         sb.Append("<div class=\"col-xs-8 col-sm-9 col-md-8 col-lg-8 paddlftrght-none\">");
-                    //         sb.AppendFormat("<input type=\"text\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<string>("ConstraintDescription")));
-                    //         sb.Append("</div>");
-                    //         sb.Append("<div class=\"col-xs-4 col-sm-3 col-md-4 col-lg-4 paddrght-none\">");
-                    //         sb.AppendFormat("<input type=\"text\"  value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<string>("Constraint")));
-                    //         sb.Append("</div>");
-
-                    //         sb.Append("</div>");
-                    //     }
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.Instrument:
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" >{0}</label>", field.Field.GetLocalizedDisplayName());
-                    //     if (RenderForDragnDrop)
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    //     }
-                    //     else
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-
-                    //         sb.AppendFormat("<input type=\"text\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<string>("Instrument")));
-
-                    //         sb.Append("</div>");
-                    //     }
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.StandardTolerance:
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" >{0}</label>", field.Field.GetLocalizedDisplayName());
-                    //     if (RenderForDragnDrop)
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    //     }
-                    //     else
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-
-                    //         sb.AppendFormat("<input type=\"text\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<string>("StandardTolerance")));
-
-                    //         sb.Append("</div>");
-                    //     }
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.ToolsMaterialMethods:
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" >{0}</label>", field.Field.GetLocalizedDisplayName());
-                    //     if (RenderForDragnDrop)
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    //     }
-                    //     else
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-
-                    //         sb.AppendFormat("<input type=\"text\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<string>("ToolsMaterialMethods")));
-
-                    //         sb.Append("</div>");
-                    //     }
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.RecommendedAction:
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" >{0}</label>", field.Field.GetLocalizedDisplayName());
-                    //     if (RenderForDragnDrop)
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    //     }
-                    //     else
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-
-                    //         sb.AppendFormat("<input type=\"text\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<string>("RecommendedAction")));
-
-                    //         sb.Append("</div>");
-                    //     }
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.ActivityType:
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" >{0}</label>", field.Field.GetLocalizedDisplayName());
-                    //     if (RenderForDragnDrop)
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    //     }
-                    //     else
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-                    //         sb.Append("<div class=\"col-xs-8 col-sm-9 col-md-8 col-lg-8 paddlftrght-none\">");
-                    //         sb.AppendFormat("<input type=\"text\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<string>("ActivityTypeDescription")));
-                    //         sb.Append("</div>");
-                    //         sb.Append("<div class=\"col-xs-4 col-sm-3 col-md-4 col-lg-4 paddrght-none\">");
-                    //         sb.AppendFormat("<input type=\"text\"  value=\"{0}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<string>("ActivityType")));
-                    //         sb.Append("</div>");
-
-                    //         sb.Append("</div>");
-                    //     }
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.Duration:
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" >{0}</label>", field.Field.GetLocalizedDisplayName());
-                    //     if (RenderForDragnDrop)
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    //     }
-                    //     else
-                    //     {
-                    //         sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\">");
-
-                    //         sb.Append("<div class=\"col-xs-2 col-sm-1 col-md-1 col-lg-1  paddlftrght-none\" style=\"width: 70px; \">");
-
-                    //         sb.AppendFormat("<input type=\"text\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" maxlength='4' \\ />", field.GetCustomDataValue<double>("Duration"));
-
-                    //         sb.Append("</div>");
-
-                    //         sb.Append("</div>");
-                    //     }
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.Equipment:
-                    //     var equipments = field.GetCustomData("Equipments");
-
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\">{0}</label>", field.Field.GetLocalizedDisplayName());
-
-                    //     sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" style=\"height: 120px; overflow: auto;\">");
-
-                    //     if (equipments != null)
-                    //     {
-                    //         var equipmentList = (List<EquipmentBE>)(equipments);
-
-                    //         foreach (var equipment in equipmentList)
-                    //         {
-
-                    //             sb.AppendFormat("<div class=\"{0}\">", RenderForDragnDrop ? "" : "divicon");
-                    //             sb.Append("<div class=\"form-group\">");
-                    //             sb.AppendFormat("<a href=\"javascript:void(0);\" title=\"{0}\" >", equipment.Comments);
-                    //             if (string.IsNullOrEmpty(equipment.Image64BitString))
-                    //             {
-                    //                 sb.Append("<div style=\"text-align: center; font-size: 68px; height: 68px; color: #428bca;\">");
-                    //                 sb.Append("<span class=\"glyphicons glyphicons-alert\" style=\"vertical-align: top; line-height: 78px; \"></span>");
-                    //                 sb.Append("</div>");
-                    //             }
-                    //             else
-                    //             {
-                    //                 sb.Append("<div style=\"text-align: center; height: 68px;\">");
-                    //                 sb.AppendFormat("<img style=\"height: 68px; width: 68px; \" src=\"{0}\" />", equipment.Image64BitString);
-                    //                 sb.Append("</div>");
-                    //             }
-                    //             sb.AppendFormat("<div class=\"txt truncate\" style=\"color: #222222;\">{0}</div>", equipment.EquipmentName);
-                    //             sb.Append("</a>");
-                    //             sb.Append("</div>");
-                    //             sb.Append("<div class=\"clearfix\"></div>");
-                    //             sb.Append("</div>");
-                    //         }
-                    //     }
-                    //     sb.Append("</div></div>");
-                    //     break;
-                    // case TaskFeedbackTemplateFormField.ConditionImage:
-                    //     var images = field.GetCustomData("ConditionImage");
-
-                    //     sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" >{0}</label>", field.Field.GetLocalizedDisplayName());
-
-                    //     sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" style=\"height: 88px; overflow: auto;\">");
-
-                    //     if (images != null)
-                    //     {
-                    //         var imageList = (List<TaskConditionImageBE>)(images);
-
-                    //         foreach (var image in imageList)
-                    //         {
-                    //             sb.AppendFormat("<div class=\"{0}\">", RenderForDragnDrop ? "" : "divicon");
-                    //             sb.Append("<div class=\"form-group\">");
-                    //             sb.Append("<a href=\"javascript:void(0);\" >");
-
-                    //             if (string.IsNullOrEmpty(image.Image64BitString))
-                    //             {
-                    //                 sb.Append("<div style=\"text-align: center; font-size: 68px; height: 68px; color: #428bca;\">");
-                    //                 sb.Append("<span class=\"glyphicons glyphicons-alert\" style=\"vertical-align: top; line-height: 78px; \"></span>");
-                    //                 sb.Append("</div>");
-                    //             }
-                    //             else
-                    //             {
-                    //                 sb.Append("<div style=\"text-align: center; height: 68px;\">");
-                    //                 sb.AppendFormat("<img style=\"height: 68px; width: 68px; \" src=\"{0}\" />", image.Image64BitString);
-                    //                 sb.Append("</div>");
-                    //             }
-                    //             sb.Append("</a>");
-                    //             sb.Append("</div>");
-                    //             sb.Append("<div class=\"clearfix\"></div>");
-                    //             sb.Append("</div>");
-                    //         }
-                    //     }
-
-                    //     sb.Append("</div></div>");
-                    //     break;
-                    //case TaskFeedbackTemplateFormField.Response:
-                    //    sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" >{0}</label>", field.Field.GetLocalizedDisplayName());
-                    //    if (RenderForDragnDrop)
-                    //    {
-                    //        sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\"><div class=\"form-control\" readonly></div></div>");
-                    //    }
-                    //    else
-                    //    {
-                    //        sb.AppendFormat("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none\" id=\"dvDataType\" >");
-
-                    //        if (_taskCondition != null)
-                    //        {
-                    //            switch (_taskCondition.ConditionDataType)
-                    //            {
-                    //                case ConditionDataTypeField.Character:
-                    //                    sb.AppendFormat("<input type=\"text\" name=\"CharacterValue_{1}\" {2} class=\"form-control\" value=\"{0}\"   maxlength=\"256\" />", Functions.TrimRight(field.GetCustomDataValue<string>("Response")), _taskCondition?.ConditionSurrogate, canEdit ? "" : "readonly=\"readonly\" ");
-                    //                    break;
-                    //                case ConditionDataTypeField.Numeric:
-                    //                    sb.AppendFormat("<input type=\"text\" name=\"NumericValue_{1}\" {2} class=\"form-control\" value=\"{0}\"  />", field.GetCustomData("Response") != null ? field.GetCustomDataValue<decimal>("Response").ToString() : "", _taskCondition?.ConditionSurrogate, canEdit ? "" : "readonly=\"readonly\" ");
-
-                    //                    sb.AppendFormat("<input type=\"hidden\" value=\"{0}\" id=\"ConditionMinimumValue_{1}\" class=\"form-control\" readonly=\"readonly\" \\>", field.GetCustomData("MinValue"), _taskCondition?.ConditionSurrogate);
-
-                    //                    sb.AppendFormat("<input type=\"hidden\" value=\"{0}\" id=\"ConditionMaximumValue_{1}\" class=\"form-control\" readonly=\"readonly\" \\>", field.GetCustomData("MaxValue"), _taskCondition?.ConditionSurrogate);
-
-                    //                    sb.AppendFormat("<input type=\"hidden\" value=\"{0}\" id=\"ConditionMinimumZero_{1}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<bool>("ConditionMinimumZero")), _taskCondition?.ConditionSurrogate);
-
-                    //                    sb.AppendFormat("<input type=\"hidden\" value=\"{0}\" id=\"ConditionMaximumZero_{1}\" class=\"form-control\" readonly=\"readonly\" \\>", Functions.TrimRight(field.GetCustomDataValue<bool>("ConditionMaximumZero")), _taskCondition?.ConditionSurrogate);
-
-                    //                    break;
-                    //                case ConditionDataTypeField.Boolen:
-                    //                    if (canEdit)
-                    //                    {
-                    //                        sb.Append("<div class=\"input-group\" >");
-                    //                        sb.AppendFormat("<input type=\"text\" name=\"BoolenValueDescription_{1}\" id=\"BoolenValueDescription_{1}\" class=\"form-control\" value=\"{0}\"  />", Functions.TrimRight(field.GetCustomDataValue<string>("ResponseDescription")), _taskCondition?.ConditionSurrogate);
-                    //                        sb.Append("<div class=\"input-group-addon\" >");
-                    //                        sb.AppendFormat("<span class=\"glyphicon glyphicon-chevron-down\" style=\"cursor: pointer\" onclick=\"openDropDown('BoolenValueDescription_{0}');\" ></span>", _taskCondition?.ConditionSurrogate);
-                    //                        sb.Append("</div>");
-                    //                        sb.Append("</div>");
-                    //                    }
-                    //                    else
-                    //                    {
-                    //                        sb.AppendFormat("<input type=\"text\" name=\"BoolenValueDescription_{0}\" readonly=\"readonly\" class=\"form-control\" value=\"{1}\"  />", _taskCondition?.ConditionSurrogate, Functions.TrimRight(field.GetCustomDataValue<string>("ResponseDescription")));
-                    //                    }
-
-                    //                    sb.AppendFormat("<input type=\"hidden\" name=\"BoolenValue_{0}\" id=\"BoolenValue_{0}\" readonly=\"readonly\" class=\"form-control\" value=\"{1}\"  />", _taskCondition?.ConditionSurrogate, field.GetCustomData("Response").ToString());
-
-                    //                    break;
-                    //                case ConditionDataTypeField.Status:
-                    //                    if (canEdit)
-                    //                    {
-                    //                        sb.Append("<div class=\"input-group\" id=\"dvDataTypeStatus\" >");
-                    //                        sb.AppendFormat("<input type=\"text\" name=\"StatusValue_{1}\" id=\"StatusValue_{1}\" class=\"form-control\" value=\"{0}\"  />", Functions.TrimRight(field.GetCustomDataValue<string>("Response")), _taskCondition?.ConditionSurrogate);
-                    //                        sb.Append("<div class=\"input-group-addon\" >");
-                    //                        sb.AppendFormat("<span class=\"glyphicon glyphicon-chevron-down\" style=\"cursor: pointer\" onclick=\"openDropDown('StatusValue_{0}');\" ></span>", _taskCondition?.ConditionSurrogate);
-                    //                        sb.AppendFormat("<input type=\"hidden\" name=\"WarningStatus_{0}\" id=\"WarningStatus_{0}\" readonly=\"readonly\" class=\"form-control\" />", _taskCondition?.ConditionSurrogate);
-                    //                        sb.Append("</div>");
-                    //                        sb.Append("</div>");
-                    //                    }
-                    //                    else
-                    //                    {
-                    //                        sb.AppendFormat("<input type=\"text\" name=\"StatusValue_{0}\" readonly=\"readonly\" class=\"form-control\" value=\"{1}\"  />", _taskCondition?.ConditionSurrogate, Functions.TrimRight(field.GetCustomDataValue<string>("Response")));
-                    //                    }
-
-                    //                    break;
-                    //                case ConditionDataTypeField.Date:
-                    //                    var date = field.GetCustomDataValue<DateTime>("Response");
-                    //                    if (canEdit)
-                    //                    {
-                    //                        sb.Append("<div style=\"width: 196px!important; display:inline-block; \" >");
-
-                    //                        sb.Append("<div class=\"input-group \" >");
-
-                    //                        sb.AppendFormat("<input  class=\"dateTextBox form-control\"  type=\"text\" name=\"Date_DatePart_{1}\" value=\"{0}\"/>", ViewHelper.GetDateString(date), _taskCondition?.ConditionSurrogate);
-
-                    //                        sb.Append("<span class=\"input-group-addon input-group-calendar-span\">");
-
-                    //                        sb.AppendFormat("<span id=\"imgClearDate_{0}\" class=\"ui-datepicker-trigger glyphicons glyphicons-remove\" style=\"cursor: pointer !important;\" />", _taskCondition?.ConditionSurrogate);
-
-                    //                        sb.Append("</span>");
-
-                    //                        sb.Append("</div>");
-
-                    //                        sb.Append("</div>");
-
-                    //                    }
-                    //                    else
-                    //                    {
-                    //                        sb.Append("<div style=\"width: 196px!important; display:inline-block; \" >");
-
-                    //                        sb.AppendFormat("<input type=\"text\" name=\"Date_{1}\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" />", ViewHelper.GetDateString(date), _taskCondition?.ConditionSurrogate);
-
-                    //                        sb.Append("</div>");
-
-                    //                    }
-                    //                    break;
-                    //                case ConditionDataTypeField.DateTime:
-                    //                    var dateTime = field.GetCustomDataValue<DateTime>("Response");
-                    //                    if (canEdit)
-                    //                    {
-                    //                        sb.Append("<div style=\"width: 196px!important; display:inline-block; \" >");
-
-                    //                        sb.Append("<div class=\"input-group \" >");
-
-                    //                        sb.AppendFormat("<input  class=\"dateTextBox form-control \"  type=\"text\" name=\"DateTime_DatePart_{1}\" value=\"{0}\"/>", ViewHelper.GetDateString(dateTime), _taskCondition?.ConditionSurrogate);
-
-                    //                        sb.Append("<span class=\"input-group-addon input-group-calendar-span\">");
-
-                    //                        sb.AppendFormat("<span id=\"imgClearDesignDateTime_{0}\" class=\"ui-datepicker-trigger glyphicons glyphicons-remove\" style=\"cursor: pointer !important;\" />", _taskCondition?.ConditionSurrogate);
-
-                    //                        sb.Append("</span>");
-
-                    //                        sb.Append("</div>");
-
-                    //                        sb.Append("</div>");
-
-                    //                        sb.Append("<div style=\"width: 117px!important; display:inline-block;padding-left: 10px; \" >");
-                    //                        sb.Append("<div class=\"timectrlwidth input-group \" >");
-
-                    //                        sb.AppendFormat("<input  class=\"timeTextBox form-control \" type=\"text\" name=\"DateTime_TimePart_{1}\" value=\"{0}\" />", ViewHelper.GetTimeString(dateTime), _taskCondition?.ConditionSurrogate);
-
-                    //                        sb.Append("</div>");
-                    //                        sb.Append("</div>");
-                    //                    }
-                    //                    else
-                    //                    {
-                    //                        sb.Append("<div style=\"width: 196px!important; display:inline-block; \" >");
-
-                    //                        sb.AppendFormat("<input type=\"text\" name=\"DateTime_DatePart_{1}\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" />", ViewHelper.GetDateString(dateTime), _taskCondition?.ConditionSurrogate);
-
-                    //                        sb.Append("</div>");
-
-                    //                        sb.Append("<div style=\"width: 117px!important; display:inline-block;padding-left: 10px; \" >");
-                    //                        sb.AppendFormat("<input type=\"text\" name=\"DateTime_TimePart_{1}\" value=\"{0}\" class=\"form-control\" readonly=\"readonly\" />", ViewHelper.GetTimeString(dateTime), _taskCondition?.ConditionSurrogate);
-
-                    //                        sb.Append("</div>");
-                    //                    }
-                    //                    break;
-                    //                case ConditionDataTypeField.Signature:
-                    //                    sb.Append("<div class=\"col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none dvSignatureDataType\" >");
-                    //                    sb.Append("<div class=\"panel panel-default\" style=\"margin-bottom:0px;\" >");
-                    //                    sb.Append("<div class=\"panel-heading\" style=\"text-align:right;background-color: #f5f5f5; padding: 10px 15px;\" >");
-                    //                    if (canEdit)
-                    //                    {
-
-                    //                        sb.AppendFormat("<button type=\"button\" class=\"btn btn-primary x1\" onclick=\"editDigitalSignature(this)\" title=\"{0}\" style=\"margin-right:5px;\" \"><span class=\"glyphicons glyphicons-edit\"></span></button>", Functions.GetLabel("lblEdit"));
-                    //                        sb.AppendFormat("<button type=\"button\" class=\"btn btn-primary x1\" onclick=\"resetDigitalSignature(this)\" title=\"{0}\" \"><span class=\"glyphicons glyphicons-refresh\"></span></button>", Functions.GetLabel("lblReset"));
-                    //                    }
-                    //                    sb.Append("</div>");
-                    //                    sb.Append("<div class=\"panel-body paddlftrght-none\" style=\"padding-bottom: 0; padding-top: 0;\" >");
-                    //                    sb.AppendFormat("<div id=\"digitalcanvasouter_{0}\">", _taskCondition?.ConditionSurrogate);
-                    //                    sb.AppendFormat("<div class=\"conditionDigitalSignature\" id=\"digitalSignature_{0}\"></div>", _taskCondition?.ConditionSurrogate);
-                    //                    sb.Append("</div>");
-                    //                    sb.Append("</div>");
-
-                    //                    sb.Append("</div>");
-
-                    //                    sb.AppendFormat("<input type=\"hidden\" id='SignatureResponse' readonly=\"readonly\" class=\"form-control\" value=\"{0}\"  />", Functions.TrimRight(field.GetCustomData("Response")));
-
-                    //                    sb.AppendFormat("<input type=\"hidden\" id='SignatureId' readonly=\"readonly\" class=\"form-control\" value=\"{0}\"  />", Functions.TrimRight(field.GetCustomData("SignatureID")));
-
-                    //                    sb.Append("</div>");
-                    //                    break;
-                    //                case ConditionDataTypeField.PassFail:
-                    //                    if (canEdit)
-                    //                    {
-                    //                        sb.Append("<div class=\"input-group\" >");
-                    //                        sb.AppendFormat("<input type=\"text\" id=\"PassFailDescription_{1}\" name=\"PassFailDescription_{1}\" class=\"form-control\" value=\"{0}\"  />", Functions.TrimRight(field.GetCustomDataValue<string>("ResponseDescription")), _taskCondition?.ConditionSurrogate);
-                    //                        sb.Append("<div class=\"input-group-addon\" >");
-                    //                        sb.AppendFormat("<span class=\"glyphicon glyphicon-chevron-down\" style=\"cursor: pointer\" onclick=\"openDropDown('PassFailDescription_{0}');\" ></span>", _taskCondition?.ConditionSurrogate);
-                    //                        sb.Append("</div>");
-                    //                        sb.Append("</div>");
-                    //                    }
-                    //                    else
-                    //                    {
-                    //                        sb.AppendFormat("<input type=\"text\" name=\"PassFailDescription_{0}\"  id=\"PassFailDescription_{0}\" readonly=\"readonly\" class=\"form-control\" value=\"{1}\"  />", _taskCondition?.ConditionSurrogate, Functions.TrimRight(field.GetCustomDataValue<string>("ResponseDescription")));
-                    //                    }
-
-                    //                    sb.AppendFormat("<input type=\"hidden\" name=\"PassFail_{0}\" id=\"PassFail_{0}\" readonly=\"readonly\" class=\"form-control\" value=\"{1}\"  />", _taskCondition?.ConditionSurrogate, field.GetCustomData("Response").ToString());
-                    //                    break;
-                    //                case ConditionDataTypeField.OKNOK:
-                    //                    if (canEdit)
-                    //                    {
-                    //                        sb.Append("<div class=\"input-group\" >");
-                    //                        sb.AppendFormat("<input type=\"text\" name=\"OKNOKDescription_{1}\"   id=\"OKNOKDescription_{1}\"class=\"form-control\" value=\"{0}\"  />", Functions.TrimRight(field.GetCustomDataValue<string>("ResponseDescription")), _taskCondition?.ConditionSurrogate);
-                    //                        sb.Append("<div class=\"input-group-addon\" >");
-                    //                        sb.AppendFormat("<span class=\"glyphicon glyphicon-chevron-down\" style=\"cursor: pointer\" onclick=\"openDropDown('OKNOKDescription_{0}');\" ></span>", _taskCondition?.ConditionSurrogate);
-                    //                        sb.Append("</div>");
-                    //                        sb.Append("</div>");
-                    //                    }
-                    //                    else
-                    //                    {
-                    //                        sb.AppendFormat("<input type=\"text\" name=\"OKNOKDescription_{0}\" readonly=\"readonly\" class=\"form-control\" value=\"{1}\"  />", _taskCondition?.ConditionSurrogate, Functions.TrimRight(field.GetCustomDataValue<string>("ResponseDescription")));
-                    //                    }
-
-                    //                    sb.AppendFormat("<input type=\"hidden\" name=\"OKNOK_{0}\" id=\"OKNOK_{0}\" readonly=\"readonly\" class=\"form-control\" value=\"{1}\"  />", _taskCondition?.ConditionSurrogate, field.GetCustomData("Response").ToString());
-                    //                    break;
-                    //        }
-                    //    }
-                    //    else
-                    //    {
-                    //        sb.Append("<input type=\"text\" readonly=\"readonly\" class=\"form-control\" />");
-                    //    }
-
-                    //    sb.Append("</div>");
-                    //}
-                    //break;
+                sb.AppendFormat("<label class=\"col-lg-12 col-form-label fontBold\">{0}</label>", "PART A – PREPARATION");
+            }
+            else if (groupingFields.Key == PromptFormSectionField.SectionB)
+            {
+                sb.AppendFormat("<label class=\"col-lg-12 col-form-label fontBold\">{0}</label>", "PART B – PRECAUTIONS CHECKLIST");
+            }
+            else if (groupingFields.Key == PromptFormSectionField.SectionC)
+            {
+                sb.AppendFormat("<label class=\"col-lg-12 col-form-label fontBold\">{0}</label>", "PART C – AUTHORISATION");
+            }
+            else if (groupingFields.Key == PromptFormSectionField.SectionD)
+            {
+                sb.AppendFormat("<label class=\"col-lg-12 col-form-label fontBold\">{0}</label>", "PART D – ACCEPTANCE OF PERMIT");
+            }
+            else if (groupingFields.Key == PromptFormSectionField.SectionE)
+            {
+                sb.AppendFormat("<label class=\"col-lg-12 col-form-label fontBold\">{0}</label>", "PART E – COMPLETION OF WORK");
+            }
+            else if (groupingFields.Key == PromptFormSectionField.SectionF)
+            {
+                sb.AppendFormat("<label class=\"col-lg-12 col-form-label fontBold\">{0}</label>", "PART F – SUPERCEDED PERMIT");
             }
 
-            sb.Append("<div class=\"clearfix\"></div>");
+            foreach (var field in groupingFields)
+            {
+                switch (field.FieldType)
+                {
+                    case FormFieldType.Textbox:
+                        _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
+                        sb.AppendFormat("<div class=\"form-group row\">");
+                        sb.AppendFormat("<label class=\"col-lg-3 text-right col-form-label paddlftrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
+                        sb.Append("<div class=\"col-lg-7\">");
+                        sb.AppendFormat("<input type=\"text\" id=\"{1}\" name=\"{1}\" value=\"{0}\" class=\"form-control\" \\>", _templateFormFieldData?.FieldValue, field.Field);
+                        sb.Append("</div>");
+                        sb.Append("</div>");
+                        break;
+                    case FormFieldType.TextArea:
+                        _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
+                        sb.AppendFormat("<div class=\"form-group row\">");
+                        sb.AppendFormat("<label class=\"col-lg-3 text-right col-form-label paddlftrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
+                        sb.Append("<div class=\"col-lg-7\">");
+                        sb.AppendFormat("<textarea id=\"{1}\" name=\"{1}\" class=\"form-control textAreaVerticalResizing\" readonly=\"readonly\" rows=\"3\" >{0}</textarea>", _templateFormFieldData?.FieldValue, field.Field);
+                        sb.Append("</div>");
+                        sb.Append("</div>");
+                        break;
+                    case FormFieldType.Date:
+                        _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
+                        sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"FormDate_DatePart_{1}\">{0}</label>", field.FieldName, field.Field);
+                        sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none conditiondate\">");
+                        DateTime dateTime;
+                        bool isSuccess = DateTime.TryParse(_templateFormFieldData?.FieldValue, out dateTime);
+                        sb.Append("<div style=\"width: 196px!important; display:inline-block; \" >");
+                        sb.Append("<div class=\"input-group \" >");
+                        sb.AppendFormat("<input  class=\"dateTextBox form-control\"  type=\"text\" name=\"FormDate_DatePart_{1}\" id=\"FormDate_DatePart_{1}\" value=\"{0}\"/>", dateTime != DateTime.MinValue ? dateTime.ToString() : "", field.Field);
+                        sb.Append("<span class=\"input-group-addon input-group-calendar-span\">");
+                        sb.AppendFormat("<span id=\"imgClearFormDateTime_{0}\" class=\"ui-datepicker-trigger glyphicons glyphicons-remove\" style=\"cursor: pointer !important;\" />", _templateFormFieldData?.FieldValue);
+                        sb.Append("</span>");
+                        sb.Append("</div>");
+                        sb.Append("</div>");
+                        sb.Append("</div>");
+
+                        break;
+                    case FormFieldType.DateAndTime:
+                        _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
+                        sb.AppendFormat("<label class=\"col-sm-12 col-md-4 col-lg-4 control-label paddrght-none text-right smtxtlft\" for=\"FormDate_DatePart_{1}\">{0}</label>", field.FieldName, field.Field);
+                        sb.Append("<div class=\"col-sm-12 col-md-8 col-lg-8 paddrght-none conditiondate\">");
+                        DateTime dateAndTime;
+                        bool success = DateTime.TryParse(_templateFormFieldData?.FieldValue, out dateAndTime);
+                        sb.Append("<div style=\"width: 196px!important; display:inline-block; \" >");
+                        sb.Append("<div class=\"input-group \" >");
+                        sb.AppendFormat("<input  class=\"dateTextBox form-control\"  type=\"text\" name=\"FormDate_DatePart_{1}\" id=\"FormDate_DatePart_{1}\" value=\"{0}\"/>", dateAndTime != DateTime.MinValue ? dateAndTime.ToString() : "", field.Field);
+                        sb.Append("<span class=\"input-group-addon input-group-calendar-span\">");
+                        sb.AppendFormat("<span id=\"imgClearFormDateTime_{0}\" class=\"ui-datepicker-trigger glyphicons glyphicons-remove\" style=\"cursor: pointer !important;\" />", _templateFormFieldData?.FieldValue);
+                        sb.Append("</span>");
+                        sb.Append("</div>");
+                        sb.Append("</div>");
+                        sb.Append("<div style=\"width: 117px!important; display:inline-block;padding-left: 10px; \" >");
+                        sb.Append("<div class=\"timectrlwidth input-group \" >");
+                        sb.AppendFormat("<input  class=\"timeTextBox form-control\" type=\"text\" name=\"FormDate_TimePart_{1}\" id=\"FormDate_TimePart_{1}\" value=\"{0}\" />", dateAndTime != DateTime.MinValue ? dateAndTime.ToString() : "", field.Field);
+                        sb.Append("</div>");
+                        sb.Append("</div>");
+                        sb.Append("</div>");
+
+                        break;
+                    case FormFieldType.Signature:
+                        _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
+                        sb.Append("<div class=\"col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none dvSignatureDataType\" >");
+                        sb.Append("<div class=\"panel panel-default\" style=\"margin-bottom:0px;\" >");
+                        sb.Append("<div class=\"panel-heading\" style=\"text-align:right;background-color: #f5f5f5; padding: 10px 15px;\" >");
+                        sb.AppendFormat("<button type=\"button\" class=\"btn btn-primary x1\" onclick=\"editDigitalSignature(this)\" title=\"{0}\" style=\"margin-right:5px;\" \"><span class=\"glyphicons glyphicons-edit\"></span></button>", "Edit");
+                        sb.AppendFormat("<button type=\"button\" class=\"btn btn-primary x1\" onclick=\"resetDigitalSignature(this)\" title=\"{0}\" \"><span class=\"glyphicons glyphicons-refresh\"></span></button>", "Reset");
+                        sb.Append("</div>");
+                        sb.Append("<div class=\"panel-body paddlftrght-none\" style=\"padding-bottom: 0; padding-top: 0;\" >");
+                        sb.AppendFormat("<div id=\"digitalcanvasouter_{0}\">", field.Field);
+                        sb.AppendFormat("<div class=\"conditionDigitalSignature\" id=\"digitalSignature_{0}\"></div>", field.Field);
+                        sb.Append("</div>");
+                        sb.Append("</div>");
+                        sb.Append("</div>");
+
+                        var digitalSignatureImage64BitString = FormLogic.GetDigitalSignature(Convert.ToInt32(_templateFormFieldData?.FieldValue));
+
+                        sb.AppendFormat("<input type=\"hidden\" id='SignatureResponse' readonly=\"readonly\" class=\"form-control\" value=\"{0}\"  />", digitalSignatureImage64BitString);
+                        sb.AppendFormat("<input type=\"hidden\" id='SignatureId' readonly=\"readonly\" class=\"form-control\" value=\"{0}\"  />", _templateFormFieldData?.FieldValue);
+                        sb.Append("</div>");
+
+                        break;
+                }
+            }
+
             sb.Append("</div>");
+            sb.Append("<p></p>");
+
             return sb.ToString();
         }
 
@@ -1247,6 +664,7 @@ namespace HabitatManagement.Models
         //    }
         //    return hasValue;
         //}
+
         #endregion
     }
 }

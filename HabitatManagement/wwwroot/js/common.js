@@ -303,7 +303,7 @@
         var defaults = {
             title: '',
             modalDialogClass: '',
-            width: Math.min(700, $(window).width() - 50),
+            width: Math.min(900, $(window).width() - 50),
             height: ($(window).height() - 20),
             traditional: false,
             position: { my: "top", at: "top+5", of: window },

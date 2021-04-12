@@ -277,8 +277,36 @@ namespace HabitatManagement.BusinessLogic
             }
         }
 
+        public static List<TemplateFormFieldDataBE> FetchAllTemplateFormFieldData(int formId)
+        {
+            List<TemplateFormFieldDataBE> list = new List<TemplateFormFieldDataBE>();
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("usp_TemplateFormFieldData_FetchAll", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("FormId", formId);
+                using (SqlDataReader sqlDataReader = cmd.ExecuteReader())
+                {
+                    while (sqlDataReader.Read())
+                    {
+                        list.Add(ToTemplateFormFieldDataBE(sqlDataReader));
+                    }
+                }
+            }
+            return list;
+        }
 
         #region Private Methods
+
+        private static TemplateFormFieldDataBE ToTemplateFormFieldDataBE(SqlDataReader rdr)
+        {
+            TemplateFormFieldDataBE o = new TemplateFormFieldDataBE();
+            o.FormID = Convert.ToInt32(rdr["FormID"]);
+            o.Field = Convert.ToInt32(rdr["Field"]);
+            o.FieldValue = Convert.ToString(rdr["FieldValue"]);
+            return o;
+        }
 
         private static DigitalSignatureBE ToDigitalSignatureBE(SqlDataReader rdr)
         {

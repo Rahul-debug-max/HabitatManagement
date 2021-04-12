@@ -209,6 +209,7 @@
                 title: "Permit Form Layout",
                 url: defaults.screenLayoutURL,
                 data: { formID: $("#FormID").val() },
+                modalDialogClass: "modal-lg",
                 buttons: [
                     {
                         Button: 'prev', onClick: function () {

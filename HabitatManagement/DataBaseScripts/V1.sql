@@ -561,6 +561,19 @@ SET [UserID] = @UserID
 WHERE SignatureID = @SignatureID  
 GO
 
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TemplateFormFieldData_FetchAll]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].usp_TemplateFormFieldData_FetchAll
+GO
+CREATE PROCEDURE [dbo].usp_TemplateFormFieldData_FetchAll      
+(      
+ @FormID INT      
+)     
+AS       
+BEGIN      
+SET NOCOUNT ON;       
+   SELECT t.* FROM TemplateFormFieldData AS t  WHERE t.FormID = @FormID    
+END    
+GO
 
 -------------------------------------------------------------------------------------------------------------------------------
 /* 7TRIGGERS */
