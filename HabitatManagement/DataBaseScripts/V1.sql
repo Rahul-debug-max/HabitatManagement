@@ -90,6 +90,17 @@ PRIMARY KEY CLUSTERED
 END
 GO
 
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[TemplateFormSection]') AND TYPE in (N'U'))
+BEGIN
+
+CREATE TABLE [dbo].TemplateFormSection(
+	[FormID] [int] NOT NULL,
+	[SectionName] [nvarchar](max) NOT NULL,
+	[SectionDescription] [nvarchar](max) NULL,
+	[Sequence] [int] NULL
+)
+END
+GO
 
 -------------------------------------------------------------------------------------------------------------------------------
 /* 2DVF */
@@ -598,6 +609,95 @@ SET NOCOUNT ON;
    SELECT t.* FROM TemplateFormFieldData AS t  WHERE t.FormID = @FormID    
 END    
 GO
+
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TemplateFormSection_FetchAll]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].usp_TemplateFormSection_FetchAll
+GO
+CREATE PROCEDURE [dbo].usp_TemplateFormSection_FetchAll        
+(        
+ @FormID INT        
+)       
+AS         
+BEGIN        
+SET NOCOUNT ON;         
+   SELECT t.* FROM TemplateFormSection AS t  WHERE t.FormID = @FormID      
+END      
+GO
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TemplateFormSection_Fetch]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_TemplateFormSection_Fetch]
+GO
+CREATE PROCEDURE [dbo].[usp_TemplateFormSection_Fetch]        
+ @FormID [int] NULL,
+ @SectionName [nvarchar](max) NULL  
+AS    
+BEGIN    
+SET NOCOUNT ON;        
+   SELECT t.* FROM TemplateFormSection AS t  WHERE t.FormID = @FormID AND t.SectionName = @SectionName  
+END    
+GO
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TemplateFormSection_Add]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_TemplateFormSection_Add]
+GO
+CREATE PROCEDURE [dbo].[usp_TemplateFormSection_Add]    
+ @FormID [int] NULL,
+ @SectionName [nvarchar](max) NULL,
+ @SectionDescription [nvarchar](max) NULL,
+ @Sequence int NULL  
+AS    
+BEGIN
+
+INSERT INTO [dbo].TemplateFormSection    
+([FormID],    
+[SectionName],    
+[SectionDescription],    
+[Sequence]
+)      
+VALUES (    
+@FormID,    
+@SectionName,    
+@SectionDescription,    
+@Sequence
+)  
+END
+GO
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TemplateFormSection_Update]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_TemplateFormSection_Update]
+GO
+CREATE PROCEDURE [dbo].[usp_TemplateFormSection_Update]    
+ @FormID [int] NULL,
+ @SectionName [nvarchar](max) NULL,
+ @SectionDescription [nvarchar](max) NULL,
+ @Sequence int NULL  
+AS    
+BEGIN
+
+Update [dbo].TemplateFormSection    
+set [SectionDescription] = @SectionDescription,    
+[Sequence] = @Sequence
+WHERE FormID = @FormID AND SectionName = @SectionName
+
+END
+GO
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TemplateFormSection_Delete]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_TemplateFormSection_Delete]
+GO
+CREATE PROCEDURE [dbo].[usp_TemplateFormSection_Delete]  
+ @FormID [int] NULL,
+ @SectionName [nvarchar](max) NULL  
+AS  
+BEGIN
+
+DELETE FROM TemplateFormSection WHERE FormID = @FormID AND SectionName = @SectionName 
+
+END  
+GO
+
+
 
 -------------------------------------------------------------------------------------------------------------------------------
 /* 7TRIGGERS */

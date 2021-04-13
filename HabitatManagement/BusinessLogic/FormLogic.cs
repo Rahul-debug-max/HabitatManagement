@@ -318,7 +318,113 @@ namespace HabitatManagement.BusinessLogic
             return list;
         }
 
+        #region Template Form Section
+
+        public static List<TemplateFormSectionBE> FetchAllTemplateFormSection(int formId)
+        {
+            List<TemplateFormSectionBE> list = new List<TemplateFormSectionBE>();
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("usp_TemplateFormSection_FetchAll", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("FormId", formId);
+                using (SqlDataReader sqlDataReader = cmd.ExecuteReader())
+                {
+                    while (sqlDataReader.Read())
+                    {
+                        list.Add(ToTemplateFormSectionBE(sqlDataReader));
+                    }
+                }
+            }
+            return list;
+        }
+
+        public TemplateFormSectionBE FetchTemplateFormSection(int formId, string sectionName)
+        {
+            TemplateFormSectionBE o = null;
+
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_TemplateFormSection_Fetch", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("FormID", formId);
+                cmd.Parameters.AddWithValue("SectionName", sectionName);
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                        o = ToTemplateFormSectionBE(reader);
+                }
+            }
+            return o;
+        }
+
+        public void AddTemplateFormSection(TemplateFormSectionBE o)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_TemplateFormSection_Add", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                BusinessEntityHelper.ReplaceNullProperties<TemplateFormSectionBE>(o);
+                FromTemplateFormSectionBE(ref cmd, o);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void UpdateTemplateFormSection(TemplateFormSectionBE o)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_TemplateFormSection_Update", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                BusinessEntityHelper.ReplaceNullProperties<TemplateFormSectionBE>(o);
+                FromTemplateFormSectionBE(ref cmd, o);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void DeleteTemplateFormSection(int formId, string sectionName)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_TemplateFormSection_Delete", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("FormID", formId);
+                cmd.Parameters.AddWithValue("SectionName", sectionName);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        #endregion
+
         #region Private Methods
+
+        private static TemplateFormSectionBE ToTemplateFormSectionBE(SqlDataReader rdr)
+        {
+            TemplateFormSectionBE o = new TemplateFormSectionBE();
+            o.FormID = Functions.ToInt(rdr["FormID"]);
+            o.SectionName = Functions.TrimRight(rdr["SectionName"]);
+            o.SectionDescription = Functions.TrimRight(rdr["SectionDescription"]);
+            o.Sequence = Functions.ToInt(rdr["Sequence"]);
+            return o;
+        }
+
+        private void FromTemplateFormSectionBE(ref SqlCommand cmd, TemplateFormSectionBE o)
+        {
+            cmd.Parameters.AddWithValue("FormID", o.FormID);
+            cmd.Parameters.AddWithValue("SectionName", o.SectionName);
+            cmd.Parameters.AddWithValue("SectionDescription", o.SectionDescription);
+            cmd.Parameters.AddWithValue("Sequence", o.Sequence);
+        }
 
         private static TemplateFormFieldDataBE ToTemplateFormFieldDataBE(SqlDataReader rdr)
         {

@@ -7,7 +7,7 @@ namespace HabitatManagement.BusinessEntities
 {
     public enum FormFieldType
     {
-        //Label = 1,
+        //None = 0,
         Textbox = 1,
         Checkbox = 2,
         Radio = 3,
@@ -20,5 +20,6 @@ namespace HabitatManagement.BusinessEntities
         Table = 10,
         Email = 11,
         Image = 12,
+        Label = 13,
     }
 }
