@@ -105,6 +105,26 @@ namespace HabitatManagement.Models
                 sb.AppendFormat("<label class=\"col-lg-12 col-form-label fontBold\">{0}</label>", "PART F – SUPERCEDED PERMIT");
             }
 
+            List<PermitFormScreenDesignTemplateDetailBE> permitFormScreenDesignTemplateDetailsCheckList = groupingFields.Where(s => s.FieldType == FormFieldType.CheckList).Select(s=> s).ToList();
+
+            if (permitFormScreenDesignTemplateDetailsCheckList != null && permitFormScreenDesignTemplateDetailsCheckList.Count > 0)
+            {
+                sb.AppendFormat("<div class=\"dvCheckList\" style=\"margin-bottom: 10px;padding-top: 5px;\">");
+                sb.Append("<table class=\"tableCheckList\"><tr><th></th><th style=\"width: 50px;text-align:center;\"> Yes </th><th style=\"width: 50px;text-align:center;\"> No </th></tr>");
+
+                foreach (var permitFormScreenDesignTemplateDetail in permitFormScreenDesignTemplateDetailsCheckList)
+                {
+                    _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == permitFormScreenDesignTemplateDetail.Field).FirstOrDefault();
+                    sb.AppendFormat("<tr> <td> {0} </td>", permitFormScreenDesignTemplateDetail.FieldName);
+                    sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" name=\"checkListEntityType\" {0}></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "");
+                    sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" name=\"checkListEntityType\" {0}></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && !Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "");
+                    sb.Append("</tr>");
+                }
+
+                sb.Append("</table>");
+                sb.Append("</div>");
+            }
+
             foreach (var field in groupingFields)
             {
                 switch (field.FieldType)
@@ -204,8 +224,6 @@ namespace HabitatManagement.Models
             }
 
             sb.Append("</div>");
-            //sb.Append("<p></p>");
-
             return sb.ToString();
         }
 

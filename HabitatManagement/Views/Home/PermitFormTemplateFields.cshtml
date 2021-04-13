@@ -28,6 +28,23 @@
         background-color: white !important;
     }
 
+    .tableCheckList td, .tableCheckList th {
+        border: 1px solid black;
+    }
+
+    .dvCheckList table tr th:first-child, .dvCheckList table tr:first-child td, .dvCheckList table {
+        border: none !important;
+    }
+
+    .tableCheckList {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .bgColorWhite {
+        background-color: white;
+    }
+
 </style>
 
 <script src="~/js/JSignature/jSignature.js"></script>
@@ -67,6 +84,12 @@
         }, 1000);
 
         setDateTimePicker();
+
+        $('.dvCheckList').find('input[type="checkbox"]').on('change', function () {
+            var isChecked = $(this).is(":checked");
+            $(this).closest("tr").find('input:checkbox').prop('checked', false);
+            $(this).prop("checked", isChecked);
+        });
     });
 
     function getDigitalSignature() {
