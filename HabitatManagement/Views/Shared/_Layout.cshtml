@@ -17,13 +17,20 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/css/Style.css" />
+    <link href="~/lib/bootstrapDateTimePicker/css/bootstrap-datetimepicker.css" rel="stylesheet" />
+
     <script src="~/js/common.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/gridToolbarFlexisel.js"></script>
     <script src="~/lib/jqGrid-4.6.0/js/jquery.jqGrid.js"></script>
     <script src="~/lib/jqGrid-4.6.0/js/i18n/grid.locale-en.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="~/lib/moments/moment.min.js"></script>
+    <script src="~/lib/moments/moment-with-locales.js"></script>
+    <script src="~/lib/bootstrapDateTimePicker/js/bootstrap-datetimepicker.min.js"></script>
 </head>
 <body>
     <header>
@@ -50,6 +57,7 @@
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
+            @{Html.RenderPartial("_DateTimePicker");}
         </main>
     </div>
 
@@ -60,7 +68,6 @@
     </footer>
 
     @await RenderSectionAsync("Scripts", required: false)
-
 
 </body>
 </html>

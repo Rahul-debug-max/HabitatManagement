@@ -23,36 +23,12 @@
         background-color: lightgray;
     }
 
-    #digitalSignature canvas {
+    .conditionDigitalSignature canvas {
         height: 97px !important;
+        background-color: white !important;
     }
 
-    /*  .sectionStyle {
-        outline: 1px dashed red !important;
-        outline-offset: -3px;
-        padding: 10px;
-    }
-
-        .sectionStyle:hover * {
-            cursor: move;
-        }
-
-    .mrgright {
-        margin-right: 2px;
-    }
-
-    .mrgleft {
-        margin-left: 2px;
-    }
-
-    .form-control[readonly] {
-        cursor: move;
-        background-color: #eee !important;
-        opacity: 1;
-    }*/
 </style>
-
-@*<script src="~/js/View/FormTemplateFields.js"></script>*@
 
 <script src="~/js/JSignature/jSignature.js"></script>
 <script src="~/js/JSignature/jSignature.CompressorBase30.js"></script>
@@ -74,6 +50,7 @@
             }
         });
 
+        $(window).trigger('resize');
         $(window).resize(function () {
             hasStopTimer = false;
             setTimeout(function () {
@@ -82,6 +59,14 @@
                 }
             }, 1000);
         });
+
+        setTimeout(function () {
+            if (!hasStopTimer) {
+                getDigitalSignature();
+            }
+        }, 1000);
+
+        setDateTimePicker();
     });
 
     function getDigitalSignature() {
@@ -101,9 +86,9 @@
                 data: { signatureId: $(signatureId).val() != "" && $(signatureId).val() != null ? $(signatureId).val() : 0 },
                 url: '@Url.Action("GetDigitalSignature", "Home")',
                 success: function (result) {
-                    if (result.Signature) {
-                        $(digitalSignature).jSignature("importData", result.Signature);
-                        $(digitalSignatureImage64BitString).val(result.Signature);
+                    if (result.signature) {
+                        $(digitalSignature).jSignature("importData", result.signature);
+                        $(digitalSignatureImage64BitString).val(result.signature);
                     }
                 },
                 error: function () {
@@ -115,7 +100,6 @@
             });
         });
     }
-
 
     function editDigitalSignature(obj) {
         var singnatureDv = $(obj).closest('.dvSignatureDataType').find('div[id^="digitalSignature_"]');
@@ -132,16 +116,16 @@
         if (singnatureDv.length > 0) {
             $(singnatureDv).jSignature("clear");
             $(singnatureDv).jSignature("disable");
-            //$(singnatureDv).removeClass("digitalcanvasedit");
             var image64BitString = $(obj).closest('.dvSignatureDataType').find('#SignatureResponse');
             if ($.trim($(image64BitString).val()) != "") {
                 $(singnatureDv).jSignature("importData", $(image64BitString).val());
             }
+
+            getDigitalSignature();
         }
     }
 
 </script>
-
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftght-none">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none xspaddrght">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none xspaddrght sortable_list connectedSortable sectionStyle" data-section="">
