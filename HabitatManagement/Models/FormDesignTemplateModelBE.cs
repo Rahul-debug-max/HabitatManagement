@@ -204,7 +204,7 @@ namespace HabitatManagement.Models
             }
 
             sb.Append("</div>");
-            sb.Append("<p></p>");
+            //sb.Append("<p></p>");
 
             return sb.ToString();
         }
