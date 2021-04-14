@@ -16,13 +16,16 @@ namespace HabitatManagement.BusinessEntities
 
         public FormFieldType FieldType { get; set; }
 
-        public PromptFormSectionField Section { get; set; }
+        [MaxFieldLength(20)]
+        public string Section { get; set; }
 
         public int Sequence { get; set; }
 
 
         public string FieldTypeValue { get; set; }
 
-        public string SectionValue { get; set; }
+        public string SectionDescription { get; set; }
+
+        public int SectionSequence { get; set; }
     }
 }

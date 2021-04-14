@@ -12,7 +12,10 @@
             addEditURL: '@Url.Action("EditPermitFormField", "Home")',
             deleteURL: '@Url.Action("DeletePermitFormField", "Home")',
             jqGridDataURL: '@Url.Action("GetFieldDesignerData", "Home")',
-            jqGridColumnURL: '@Url.Action("GetFieldDesignerColumnNames", "Home")'
+            jqGridColumnURL: '@Url.Action("GetFieldDesignerColumnNames", "Home")',
+            addEditSectionURL: '@Url.Action("TemplateSection", "Home")',
+            deleteSectionURL: '@Url.Action("DeleteTemplateSection", "Home")',
+            getSectionListURL: '@Url.Action("TemplateSectionList", "Home")'
         });
     });
 </script>
@@ -20,6 +23,10 @@
     .modal {
         position: absolute !important;
         overflow: auto !important;
+    }
+
+    .card-header {
+        cursor: pointer;
     }
 </style>
 
@@ -40,22 +47,48 @@
             @Html.TextBox("Description", Model.Description, new { @class = "form-control", @disabled = "disabled", @maxlength = "60" })
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
-    </div>    
+    </div>
 </div>
 
-<div class="col-lg-12">
+<div id="accordion" class="col-lg-12">
     <div class="card">
-        <div class="card-header">
+        <div class="card-header" data-toggle="collapse" data-parent="#accordion" data-target="#collapseOne">
+
+            <label style="margin:0;"><h4>Section</h4></label>
+
+
+            <div style="float: right; display: inline;margin-top: -3px;">
+                <button type="button" class="btn btn-primary x1" id="AddSection" value="Add" title="Add"><span class="glyphicons glyphicons-plus"></span></button>
+                <button type="button" class="btn btn-primary x1" id="EditSection" value="Edit" title="Edit"><span class="glyphicons glyphicons-edit"></span></button>
+                <button type="button" class="btn btn-primary x1" id="DeleteSection" value="Delete" title="Delete"><span class="glyphicons glyphicons-bin"></span></button>
+            </div>
+        </div>
+        <div id="collapseOne" class="collapse">
+            <div class="card-body">
+                <div class="col-xs-12" style="padding-bottom: 15px;" id="dvSectionDetail">
+                    @{
+                        await Html.RenderPartialAsync("TemplateSectionList");
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="card">
+        <div class="card-header" data-toggle="collapse" data-parent="#accordion" data-target="#collapseTwo">
+            <label style="margin:0;"><h4>Field</h4></label>
             <div style="float: right; display: inline;margin-top: -3px;">
                 <button type="button" class="btn btn-primary x1" id="Add" value="Add" title="Add"><span class="glyphicons glyphicons-plus"></span></button>
                 <button type="button" class="btn btn-primary x1" id="Edit" value="Edit" title="Edit"><span class="glyphicons glyphicons-edit"></span></button>
                 <button type="button" class="btn btn-primary x1" id="Delete" value="Delete" title="Delete"><span class="glyphicons glyphicons-bin"></span></button>
             </div>
         </div>
-        <div class="card-body">
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding-bottom: 15px;">
-                <div class="jqgrid-table">
-                    <table id="tblFieldDesigner"></table>                   
+        <div id="collapseTwo" class="collapse">
+            <div class="card-body">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding-bottom: 15px;">
+                    <div class="jqgrid-table">
+                        <table id="tblFieldDesigner"></table>
+                    </div>
                 </div>
             </div>
         </div>

@@ -340,7 +340,7 @@ namespace HabitatManagement.BusinessLogic
             return list;
         }
 
-        public TemplateFormSectionBE FetchTemplateFormSection(int formId, string sectionName)
+        public static TemplateFormSectionBE FetchTemplateFormSection(int formId, string section)
         {
             TemplateFormSectionBE o = null;
 
@@ -351,7 +351,7 @@ namespace HabitatManagement.BusinessLogic
                 SqlCommand cmd = new SqlCommand("usp_TemplateFormSection_Fetch", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("FormID", formId);
-                cmd.Parameters.AddWithValue("SectionName", sectionName);
+                cmd.Parameters.AddWithValue("Section", section);
 
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
@@ -362,8 +362,9 @@ namespace HabitatManagement.BusinessLogic
             return o;
         }
 
-        public void AddTemplateFormSection(TemplateFormSectionBE o)
+        public static bool AddTemplateFormSection(TemplateFormSectionBE o)
         {
+            bool success = false;
             using (SqlConnection conn = new SqlConnection(_connectionstring))
             {
                 conn.Open();
@@ -371,13 +372,16 @@ namespace HabitatManagement.BusinessLogic
                 SqlCommand cmd = new SqlCommand("usp_TemplateFormSection_Add", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 BusinessEntityHelper.ReplaceNullProperties<TemplateFormSectionBE>(o);
-                FromTemplateFormSectionBE(ref cmd, o);
+                FromTemplateFormSection(ref cmd, o);
                 cmd.ExecuteNonQuery();
+                success = true;
             }
+            return success;
         }
 
-        public void UpdateTemplateFormSection(TemplateFormSectionBE o)
+        public static bool UpdateTemplateFormSection(TemplateFormSectionBE o)
         {
+            bool success = false;
             using (SqlConnection conn = new SqlConnection(_connectionstring))
             {
                 conn.Open();
@@ -385,13 +389,16 @@ namespace HabitatManagement.BusinessLogic
                 SqlCommand cmd = new SqlCommand("usp_TemplateFormSection_Update", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 BusinessEntityHelper.ReplaceNullProperties<TemplateFormSectionBE>(o);
-                FromTemplateFormSectionBE(ref cmd, o);
+                FromTemplateFormSection(ref cmd, o);
                 cmd.ExecuteNonQuery();
+                success = true;
             }
+            return success;
         }
 
-        public void DeleteTemplateFormSection(int formId, string sectionName)
+        public static bool DeleteTemplateFormSection(int formId, string section)
         {
+            bool success = false;
             using (SqlConnection conn = new SqlConnection(_connectionstring))
             {
                 conn.Open();
@@ -399,9 +406,11 @@ namespace HabitatManagement.BusinessLogic
                 SqlCommand cmd = new SqlCommand("usp_TemplateFormSection_Delete", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("FormID", formId);
-                cmd.Parameters.AddWithValue("SectionName", sectionName);
+                cmd.Parameters.AddWithValue("Section", section);
                 cmd.ExecuteNonQuery();
+                success = true;
             }
+            return success;
         }
 
         #endregion
@@ -412,17 +421,17 @@ namespace HabitatManagement.BusinessLogic
         {
             TemplateFormSectionBE o = new TemplateFormSectionBE();
             o.FormID = Functions.ToInt(rdr["FormID"]);
-            o.SectionName = Functions.TrimRight(rdr["SectionName"]);
-            o.SectionDescription = Functions.TrimRight(rdr["SectionDescription"]);
+            o.Section = Functions.TrimRight(rdr["Section"]);
+            o.Description = Functions.TrimRight(rdr["Description"]);
             o.Sequence = Functions.ToInt(rdr["Sequence"]);
             return o;
         }
 
-        private void FromTemplateFormSectionBE(ref SqlCommand cmd, TemplateFormSectionBE o)
+        private static void FromTemplateFormSection(ref SqlCommand cmd, TemplateFormSectionBE o)
         {
             cmd.Parameters.AddWithValue("FormID", o.FormID);
-            cmd.Parameters.AddWithValue("SectionName", o.SectionName);
-            cmd.Parameters.AddWithValue("SectionDescription", o.SectionDescription);
+            cmd.Parameters.AddWithValue("Section", o.Section);
+            cmd.Parameters.AddWithValue("Description", o.Description);
             cmd.Parameters.AddWithValue("Sequence", o.Sequence);
         }
 
@@ -448,7 +457,7 @@ namespace HabitatManagement.BusinessLogic
             return o;
         }
 
-        private void FromDigitalSignatureBE(ref SqlCommand cmd, DigitalSignatureBE o)
+        private static void FromDigitalSignatureBE(ref SqlCommand cmd, DigitalSignatureBE o)
         {
             cmd.Parameters.AddWithValue("SignatureID", o.SignatureID);
             cmd.Parameters.AddWithValue("UserID", o.UserID);
@@ -472,8 +481,10 @@ namespace HabitatManagement.BusinessLogic
             o.Field = Convert.ToInt32(rdr["Field"]);
             o.FieldName = Convert.ToString(rdr["FieldName"]);
             o.FieldType = (FormFieldType)Convert.ToInt32(rdr["FieldType"]);
-            o.Section = (PromptFormSectionField)Convert.ToInt32(rdr["Section"]);
+            o.Section = Convert.ToString(rdr["Section"]);
             o.Sequence = Convert.ToInt32(rdr["Sequence"]);
+            o.SectionDescription = Convert.ToString(rdr["SectionDescription"]);
+            o.SectionSequence = Convert.ToInt32(rdr["SectionSequence"]);
             return o;
         }
 
@@ -482,7 +493,7 @@ namespace HabitatManagement.BusinessLogic
             cmd.Parameters.AddWithValue("FormID", o.FormID);
             cmd.Parameters.AddWithValue("FieldName", o.FieldName);
             cmd.Parameters.AddWithValue("FieldType", (int)o.FieldType);
-            cmd.Parameters.AddWithValue("Section", (int)o.Section);
+            cmd.Parameters.AddWithValue("Section", o.Section);
             cmd.Parameters.AddWithValue("Sequence", o.Sequence);
         }
 

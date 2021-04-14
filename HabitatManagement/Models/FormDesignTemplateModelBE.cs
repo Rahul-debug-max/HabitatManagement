@@ -55,14 +55,10 @@ namespace HabitatManagement.Models
         public string FormSectionFields()
         {
             StringBuilder sb = new StringBuilder();
-            var sectionGroupFields = _fields.GroupBy(o => o.Section).OrderBy(s=> s.Key).Select(x=> x).ToList();
+            var sectionGroupFields = _fields.GroupBy(o => o.Section).OrderBy(s => s.Key).Select(x => x).ToList();
 
             if (sectionGroupFields != null && sectionGroupFields.Count > 0)
             {
-                sb.AppendFormat("<div class=\"formOuterStyle fontBold bgLightGray\">");
-                sb.Append("NOTE: This Permit is valid for one shift only");
-                sb.Append("</div>");
-
                 foreach (var sectionGroupField in sectionGroupFields)
                 {
                     sb.Append(HtmlFields(sectionGroupField));
@@ -75,38 +71,16 @@ namespace HabitatManagement.Models
 
         #region Private Methods
 
-        private string HtmlFields(IGrouping<PromptFormSectionField, PermitFormScreenDesignTemplateDetailBE> groupingFields)
+        private string HtmlFields(IGrouping<string, PermitFormScreenDesignTemplateDetailBE> groupingFields)
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat("<div class=\"container-fluid formOuterStyle bgLightGray sortable_list connectedSortable\" data-section = \"{0}\" >", groupingFields.Key);
 
-            if (groupingFields.Key == PromptFormSectionField.SectionA)
-            {
-                sb.AppendFormat("<label class=\"col-lg-12 col-form-label fontBold\">{0}</label>", "PART A – PREPARATION");
-            }
-            else if (groupingFields.Key == PromptFormSectionField.SectionB)
-            {
-                sb.AppendFormat("<label class=\"col-lg-12 col-form-label fontBold\">{0}</label>", "PART B – PRECAUTIONS CHECKLIST");
-            }
-            else if (groupingFields.Key == PromptFormSectionField.SectionC)
-            {
-                sb.AppendFormat("<label class=\"col-lg-12 col-form-label fontBold\">{0}</label>", "PART C – AUTHORISATION");
-            }
-            else if (groupingFields.Key == PromptFormSectionField.SectionD)
-            {
-                sb.AppendFormat("<label class=\"col-lg-12 col-form-label fontBold\">{0}</label>", "PART D – ACCEPTANCE OF PERMIT");
-            }
-            else if (groupingFields.Key == PromptFormSectionField.SectionE)
-            {
-                sb.AppendFormat("<label class=\"col-lg-12 col-form-label fontBold\">{0}</label>", "PART E – COMPLETION OF WORK");
-            }
-            else if (groupingFields.Key == PromptFormSectionField.SectionF)
-            {
-                sb.AppendFormat("<label class=\"col-lg-12 col-form-label fontBold\">{0}</label>", "PART F – SUPERCEDED PERMIT");
-            }
-
             var sortableGroupingFields = groupingFields.OrderBy(s => s.Sequence).ToList() ?? new List<PermitFormScreenDesignTemplateDetailBE>();
-            List<PermitFormScreenDesignTemplateDetailBE> permitFormScreenDesignTemplateDetailsCheckList = sortableGroupingFields.Where(s => s.FieldType == FormFieldType.CheckList).Select(s=> s).ToList();
+
+            sb.AppendFormat("<label class=\"col-lg-12 col-form-label fontBold\">{0}</label>", sortableGroupingFields[0].SectionDescription);
+
+            List<PermitFormScreenDesignTemplateDetailBE> permitFormScreenDesignTemplateDetailsCheckList = sortableGroupingFields.Where(s => s.FieldType == FormFieldType.CheckList).Select(s => s).ToList();
 
             if (permitFormScreenDesignTemplateDetailsCheckList != null && permitFormScreenDesignTemplateDetailsCheckList.Count > 0)
             {
@@ -240,7 +214,7 @@ namespace HabitatManagement.Models
                         sb.Append("</div>");
                         sb.Append("</div>");
                         sb.Append("</div>");
- 
+
                         break;
                     case FormFieldType.Signature:
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();

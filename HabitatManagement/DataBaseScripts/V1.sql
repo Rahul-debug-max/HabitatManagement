@@ -49,7 +49,7 @@ CREATE TABLE [dbo].PermitFormScreenDesignTemplateDetail(
 	[Field] [int] NOT NULL,
 	[FieldName] [nvarchar](max) NULL,
 	[FieldType] [int] NOT NULL,
-	[Section] [int] NULL,
+	[Section] [nvarchar](20) NOT NULL,
 	[Sequence] [int] NOT NULL DEFAULT ((0)),
  CONSTRAINT [PK_PermitFormScreenDesignTemplateDetail] PRIMARY KEY CLUSTERED 
 (
@@ -95,8 +95,8 @@ BEGIN
 
 CREATE TABLE [dbo].TemplateFormSection(
 	[FormID] [int] NOT NULL,
-	[SectionName] [nvarchar](max) NOT NULL,
-	[SectionDescription] [nvarchar](max) NULL,
+	[Section] [nvarchar](20) NOT NULL,
+	[Description] [nvarchar](max) NOT NULL,
 	[Sequence] [int] NULL
 )
 END
@@ -362,11 +362,11 @@ GO
   
 CREATE PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplateDetail_Add]    
 (    
- @FormID INT,    
- @FieldName nvarchar(max),    
- @FieldType INT,     
- @Section INT,    
- @Sequence INT    
+    @FormID INT,    
+    @FieldName nvarchar(max),    
+    @FieldType INT,     
+    @Section nvarchar(20),    
+    @Sequence INT
 )    
 AS    
 BEGIN    
@@ -421,13 +421,15 @@ GO
   
 CREATE PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplateDetail_FetchAll]  
 (  
- @FormID INT  
+	@FormID INT  
 )   
 AS  
 BEGIN  
 SET NOCOUNT ON;  
    
- SELECT * FROM PermitFormScreenDesignTemplateDetail WHERE [FormID] = @FormID  
+	SELECT t.*, t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence 
+	FROM PermitFormScreenDesignTemplateDetail t JOIN TemplateFormSection t1 
+	ON t.Section = t1.Section WHERE t.[FormID] = @FormID ORDER BY t1.[Sequence], t.[Sequence]
 
 END  
 GO
@@ -439,12 +441,12 @@ GO
   
 CREATE PROCEDURE  [dbo].[usp_PermitFormScreenDesignTemplateDetail_Update]  
 (  
- @FormID INT,  
- @Field INT,    
- @FieldName nvarchar(max),    
- @FieldType INT,     
- @Section INT,    
- @Sequence INT  
+    @FormID INT,  
+    @Field INT,    
+    @FieldName nvarchar(max),    
+    @FieldType INT,     
+    @Section nvarchar(20),      
+    @Sequence INT  
 )  
 AS  
 BEGIN  
@@ -630,11 +632,11 @@ DROP PROCEDURE [dbo].[usp_TemplateFormSection_Fetch]
 GO
 CREATE PROCEDURE [dbo].[usp_TemplateFormSection_Fetch]        
  @FormID [int] NULL,
- @SectionName [nvarchar](max) NULL  
+ @Section [nvarchar](20) NULL  
 AS    
 BEGIN    
 SET NOCOUNT ON;        
-   SELECT t.* FROM TemplateFormSection AS t  WHERE t.FormID = @FormID AND t.SectionName = @SectionName  
+   SELECT t.* FROM TemplateFormSection AS t  WHERE t.FormID = @FormID AND t.Section = @Section
 END    
 GO
 
@@ -643,23 +645,24 @@ DROP PROCEDURE [dbo].[usp_TemplateFormSection_Add]
 GO
 CREATE PROCEDURE [dbo].[usp_TemplateFormSection_Add]    
  @FormID [int] NULL,
- @SectionName [nvarchar](max) NULL,
- @SectionDescription [nvarchar](max) NULL,
+ @Section [nvarchar](20) NULL,
+ @Description [nvarchar](max) NULL,
  @Sequence int NULL  
 AS    
 BEGIN
 
 INSERT INTO [dbo].TemplateFormSection    
-([FormID],    
-[SectionName],    
-[SectionDescription],    
-[Sequence]
+(
+    [FormID],    
+    [Section],    
+    [Description],    
+    [Sequence]
 )      
 VALUES (    
-@FormID,    
-@SectionName,    
-@SectionDescription,    
-@Sequence
+    @FormID,    
+    @Section,    
+    @Description,    
+    @Sequence
 )  
 END
 GO
@@ -668,17 +671,17 @@ IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_T
 DROP PROCEDURE [dbo].[usp_TemplateFormSection_Update]
 GO
 CREATE PROCEDURE [dbo].[usp_TemplateFormSection_Update]    
- @FormID [int] NULL,
- @SectionName [nvarchar](max) NULL,
- @SectionDescription [nvarchar](max) NULL,
- @Sequence int NULL  
+    @FormID [int] NULL,
+    @Section [nvarchar](20) NULL,
+    @Description [nvarchar](max) NULL,
+    @Sequence int NULL  
 AS    
 BEGIN
 
-Update [dbo].TemplateFormSection    
-set [SectionDescription] = @SectionDescription,    
-[Sequence] = @Sequence
-WHERE FormID = @FormID AND SectionName = @SectionName
+    Update [dbo].TemplateFormSection    
+    SET [Description] = @Description,    
+    [Sequence] = @Sequence
+    WHERE FormID = @FormID AND Section = @Section
 
 END
 GO
@@ -687,12 +690,12 @@ IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_T
 DROP PROCEDURE [dbo].[usp_TemplateFormSection_Delete]
 GO
 CREATE PROCEDURE [dbo].[usp_TemplateFormSection_Delete]  
- @FormID [int] NULL,
- @SectionName [nvarchar](max) NULL  
+    @FormID [int] NULL,
+    @Section [nvarchar](20) NULL  
 AS  
 BEGIN
 
-DELETE FROM TemplateFormSection WHERE FormID = @FormID AND SectionName = @SectionName 
+    DELETE FROM TemplateFormSection WHERE FormID = @FormID AND Section = @Section
 
 END  
 GO

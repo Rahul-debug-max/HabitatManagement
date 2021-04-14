@@ -11,6 +11,8 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 
 namespace HabitatManagement.Controllers
 {
@@ -176,8 +178,10 @@ namespace HabitatManagement.Controllers
                 model.Description = permitFormScreenDesignTemplate.Description;
                 model.Active = permitFormScreenDesignTemplate.Active;
             }
+            model.TemplateSectionDetail = FormLogic.FetchAllTemplateFormSection(model.FormID);
             return View(model);
         }
+
 
         [HttpPost]
         public ActionResult PermitFormScreenDesignTemplateDetail(PermitFormScreenDesignTemplateDetailModelBE model)
@@ -185,6 +189,62 @@ namespace HabitatManagement.Controllers
             bool success = false;
             //success = FormLogic.Save(model.TemplateDetails);
             return new JsonResult(new { Success = success, TemplateDetails = success ? model.TemplateDetails : null });
+        }
+
+        public ActionResult TemplateSectionList(int formID)
+        {
+            PermitFormScreenDesignTemplateDetailModelBE model = new PermitFormScreenDesignTemplateDetailModelBE();
+            model.TemplateSectionDetail = FormLogic.FetchAllTemplateFormSection(formID);
+            return PartialView("TemplateSectionList", model);
+        }
+
+        public ActionResult TemplateSection(int formID, string sectionName)
+        {
+            TemplateFormSectionBE model;
+
+            model = FormLogic.FetchTemplateFormSection(formID, sectionName ?? "");
+            if (model == null)
+            {
+                model = new TemplateFormSectionBE();
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult TemplateSection(TemplateFormSectionBE model)
+        {
+
+            bool success = false;
+            int id = 0;
+            bool sectionExist = true;
+            TemplateFormSectionBE templateFormSection = FormLogic.FetchTemplateFormSection(model.FormID, model.Section);
+            if (templateFormSection == null)
+            {
+                sectionExist = false;
+                templateFormSection = new TemplateFormSectionBE();
+            }
+            templateFormSection.FormID = model.FormID;
+            templateFormSection.Section = model.Section.ToUpper();
+            templateFormSection.Description = model.Description;
+            if (!sectionExist)
+            {
+                success = FormLogic.AddTemplateFormSection(templateFormSection);
+            }
+            else
+            {
+                success = FormLogic.UpdateTemplateFormSection(templateFormSection);
+            }
+            return Json(new { success, id });
+        }
+
+        public JsonResult DeleteTemplateSection(int formID, string sectionName)
+        {
+            bool success = false;
+
+            success = FormLogic.DeleteTemplateFormSection(formID, sectionName);
+
+            return new JsonResult(new { Success = success });
         }
 
         public ActionResult PermitFormTemplateFields(int formID)
@@ -243,7 +303,7 @@ namespace HabitatManagement.Controllers
                                                   Field = obj.Field,
                                                   FieldName = obj.FieldName,
                                                   FieldTypeValue = obj.FieldType.ToString(),
-                                                  SectionValue = obj.Section.ToString(),
+                                                  Section = obj.Section,
                                                   Sequence = obj.Sequence
                                               }).ToList();
 
@@ -275,6 +335,12 @@ namespace HabitatManagement.Controllers
             {
                 model = new PermitFormScreenDesignTemplateDetailBE();
             }
+
+            ViewData["SectionList"] = FormLogic.FetchAllTemplateFormSection(formID).Select(m => new SelectListItem()
+            {
+                Text = m.Section,
+                Value = m.Section
+            });
 
             return View(model);
         }

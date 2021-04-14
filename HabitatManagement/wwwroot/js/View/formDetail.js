@@ -7,53 +7,127 @@
     }
 
     var selectedRow = [];
+    var selectedSectionRow = [];
 
     var onInit = function (obj) {
         $.extend(defaults, obj);
-        
+
         window.setTimeout(PermitFormFieldDetail.reloadGridForPositioner, 200);
 
-        $('#Add').off('click').on('click', function () {
+        $('#AddSection').off('click').on('click', function (e) {            
+            e.stopPropagation();
+            fireonClick('addSection');
+        });
+
+        $('#EditSection').off('click').on('click', function (e) {
+            e.stopPropagation();
+            fireonClick('editSection', true);
+        });
+
+        $('#DeleteSection').off('click').on('click', function (e) {
+            e.stopPropagation();
+            fireonClick('delSection', true);
+        });
+
+        $('#Add').off('click').on('click', function (e) {
+            e.stopPropagation();
             fireonClick('add');
         });
 
-        $('#Edit').off('click').on('click', function () {
+        $('#Edit').off('click').on('click', function (e) {
+            e.stopPropagation();
             fireonClick('edit', true);
         });
 
-        $('#Delete').off('click').on('click', function () {
+        $('#Delete').off('click').on('click', function (e) {
+            e.stopPropagation();
             fireonClick('del', true);
         });
     }
 
     var fireonClick = function (clickFor, selectionRequired) {
         var isValid = true;
-        //if (selectionRequired) {
-        //    if (checkBoxSelectionData.length <= 0 && selectedRow.length <= 0) {
-        //        WCMDialog.openOkBtnDialog({
-        //            requiredDialogTitle: defaults.requiredDialogTitle,
-        //            requiredDialogMessage: defaults.requiredDialogMessage
-        //        });
-        //        isValid = false;
-        //    }
-        //}
+        if (selectionRequired) {
+            if (selectedRow.length <= 0) {
+                WCMDialog.openOkBtnDialog({
+                    requiredDialogTitle: "Entity not selected",
+                    requiredDialogMessage: "Select entity"
+                });
+                isValid = false;
+            }
+        }
 
         if (isValid) {
+            debugger;
             var surrogateDate = selectedRow;
+            var surrogateSectionDate = selectedSectionRow;
             switch (clickFor) {
+                case 'delSection':
+                    WCMDialog.openConfirmationDialogWithAJAX({
+                        url: defaults.deleteSectionURL,
+                        formData: surrogateSectionDate[0],
+                        traditional: true,
+                        onSuccess: function (result) {
+                            if (!result.success) {
+                                showAndDismissAlert('danger', wcmVariables.dataSaveErrMsg);
+                            }
+                            else {
+                                selectedRow = [];
+                                reloadGridForPositioner();
+                            }
+                        },
+                        onError: function (result) {
+                            showAndDismissAlert('danger', wcmVariables.dataSaveErrMsg);
+                        }
+                    });
+                    break;
+                case 'addSection':
+                    WCMDialog.RenderPageInDialogAndOpen({
+                        title: defaults.addEditPopupTitle,
+                        modalDialogClass: "modal-lg",
+                        url: defaults.addEditSectionURL,
+                        data: { formID: defaults.formID, sectionName: "" },
+                        buttons: [
+                            {
+                                Button: 'save', onClick: function () {
+                                    var dialogID = $(this).attr("aria-modalID");
+                                    saveSectionDetail(dialogID);
+                                }
+                            }
+                        ],
+                        onOpen: function (instance) {
+
+                        }
+                    });
+                    break;
+                case 'editSection':
+                    WCMDialog.RenderPageInDialogAndOpen({
+                        title: defaults.addEditPopupTitle,
+                        modalDialogClass: "modal-lg",
+                        url: defaults.addEditSectionURL,
+                        data: surrogateSectionDate[0],
+                        buttons: [
+                            {
+                                Button: 'save', onClick: function () {
+                                    var dialogID = $(this).attr("aria-modalID");
+                                    saveSectionDetail(dialogID);
+                                }
+                            }
+                        ]
+                    });
+                    break;
                 case 'del':
                     WCMDialog.openConfirmationDialogWithAJAX({
                         url: defaults.deleteURL,
                         formData: { formID: defaults.formID, fieldID: surrogateDate[0] },
                         traditional: true,
                         onSuccess: function (result) {
-                            if (!result.Success) {
+                            if (!result.success) {
                                 showAndDismissAlert('danger', wcmVariables.dataSaveErrMsg);
                             }
                             else {
-                                checkBoxSelectionData = [];
                                 selectedRow = [];
-                                reloadGridForPositioner(true);
+                                reloadGridForPositioner();
                             }
                         },
                         onError: function (result) {
@@ -80,7 +154,7 @@
                         }
                     });
                     break;
-                case 'edit':                   
+                case 'edit':
                     WCMDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-lg",
@@ -100,6 +174,54 @@
         }
     }
 
+    var saveSectionDetail = function (dialogID) {
+        var ajx = $.ajax({
+            type: 'POST',
+            cache: false,
+            url: defaults.addEditSectionURL,
+            dataType: 'JSON',
+            data: $('#TemplateSectionForm').serialize(),
+            success: function (result) {
+                if (result.success) {
+                    $("#" + dialogID).modal("hide");
+                    selectedSectionRow = [];
+                    renderSectionList();
+                }
+                else if (result.Success != undefined && !result.Success) {
+                    showAndDismissAlert('danger', wcmVariables.dataSaveErrMsg);
+                }
+            },
+            error: function () {
+            },
+            beforeSend: function () { $("#wait").css("display", "block"); },
+            complete: function () {
+                $("#wait").css("display", "none");
+            }
+        });
+        return ajx;
+    }
+
+    var renderSectionList = function () {
+        debugger;
+        $.ajax({
+            url: defaults.getSectionListURL,
+            cache: false,            
+            data: { formID: defaults.formID },
+            success: function (result) {
+                debugger;
+                $("#dvSectionDetail").html(result);               
+            },
+            error: function () {
+
+            },
+            beforeSend: function () { $("#wait").css("display", "block"); },
+            complete: function () {
+                $("#wait").css("display", "none");
+            }
+        });
+    }
+
+
     var saveFormField = function (dialogID) {
         var ajx = $.ajax({
             type: 'POST',
@@ -107,9 +229,10 @@
             url: defaults.addEditURL,
             dataType: 'JSON',
             data: $('#PermitFormField').serialize(),
-            success: function (result) {               
+            success: function (result) {
                 if (result.success) {
                     $("#" + dialogID).modal("hide");
+                    selectedRow = [];
                     reloadGridForPositioner();
                 }
                 else if (result.Success != undefined && !result.Success) {
@@ -160,7 +283,7 @@
                 { key: false, name: 'field', index: 'field', search: false, hidden: true },
                 { key: false, name: 'fieldName', index: 'fieldName', search: false },
                 { key: false, name: 'fieldTypeValue', index: 'fieldTypeValue', search: false },
-                { key: false, name: 'sectionValue', index: 'sectionValue', search: false },
+                { key: false, name: 'section', index: 'section', search: false },
                 { key: false, name: 'sequence', index: 'sequence', search: false }
             ],
             rowNum: 10,
@@ -200,7 +323,7 @@
 
     var getSelectedTemplate = function () {
         var gr = $("#tblFieldDesigner").getGridParam('selrow');
-        if (gr != null) {          
+        if (gr != null) {
             var surrogate = $("#tblFieldDesigner").getRowData(gr).field;
             selectedRow = [];
             selectedRow.push(surrogate);

@@ -33,23 +33,15 @@
 
     var fireonClick = function (clickFor, selectionRequired) {        
         var isValid = true;
-        //if (selectionRequired) {
-        //    if (checkBoxSelectionData.length <= 0 && selectedRow.length <= 0) {
-        //        WCMDialog.openOkBtnDialog({
-        //            requiredDialogTitle: defaults.requiredDialogTitle,
-        //            requiredDialogMessage: defaults.requiredDialogMessage
-        //        });
-        //        isValid = false;
-        //    }
-        //}
-
-        //if (checkBoxSelectionData.length > 1 && (clickFor == 'edit')) {
-        //    WCMDialog.openOkBtnDialog({
-        //        requiredDialogTitle: defaults.multipleSelectionDialogTitle,
-        //        requiredDialogMessage: defaults.multipleSelectionDialogMessage
-        //    });
-        //    isValid = false;
-        //}
+        if (selectionRequired) {
+            if (checkBoxSelectionData.length <= 0 && selectedRow.length <= 0) {
+                WCMDialog.openOkBtnDialog({
+                    requiredDialogTitle: "Entity not selected",
+                    requiredDialogMessage: "Select entity"
+                });
+                isValid = false;
+            }
+        }
 
         if (isValid) {
             var surrogateDate = checkBoxSelectionData.length > 0 ? checkBoxSelectionData : selectedRow;
@@ -163,7 +155,7 @@
                 title: "Screen Design Details",
                 url: defaults.detailURL,
                 data: { formID: surrogateDate[0] },
-                modalDialogClass: "modal-xl",
+                modalDialogClass: "modal-lg",
                 buttons: [
                     {
                         Button: 'next', onClick: function () {                        
@@ -210,7 +202,7 @@
                 title: "Permit Form Layout",
                 url: defaults.screenLayoutURL,
                 data: { formID: $("#FormID").val() },
-                modalDialogClass: "modal-lg",
+                modalDialogClass: "modal-xl",
                 buttons: [
                     {
                         Button: 'prev', onClick: function () {

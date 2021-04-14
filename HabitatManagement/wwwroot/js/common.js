@@ -269,6 +269,7 @@
                 buttonHtml += "<button type='button' class='btn " + (buttons[i].class || "") + "' aria-modalID = '" + modalID + "' name='btn" + modalID + "' id = '" + buttons[i].id + dialogID + "' title = '" + buttons[i].title + "'>" + (buttons[i].text || "<span class='" + buttons[i].icons + "'></span>") + "</button>";
             }
         }
+        debugger;
         dialog.Div.find('.modal-footer').html(buttonHtml);
         dialog.Div.find('.modal-dialog').addClass(dialog.dialogDefaults.modalDialogClass);
         dialog.Div.find('.modal-title').text(dialog.dialogDefaults.title);
@@ -281,7 +282,7 @@
         for (var i = 0; i < btns.length; i++) {
             $("#" + btns[i].id).on("click", buttons[i].click);
         }
-       
+
         dialog.Open = function () {
             dialog.Div.modal();
             dialog.Div.on('hidden.bs.modal', function () {
@@ -290,7 +291,7 @@
             ++dialogID;
         }
         dialog.Close = function () {
-            dialog.Div.modal("hide");            
+            dialog.Div.modal("hide");
             --dialogID;
         }
         return dialog;
@@ -356,123 +357,211 @@
         }
     }
 
-    //  // Use this function for open any confirmation dialog that perform AJAX call on ok.
-    //dialogs.openConfirmationDialogWithAJAX = function (obj) {
+    // Use this function for open any confirmation dialog that perform AJAX call on ok.
+    dialogs.openConfirmationDialogWithAJAX = function (obj) {
 
-    //    var confirmationData = {
-    //        url: '',
-    //        type: 'POST',
-    //        timeout: 0,
-    //        formData: {},
-    //        cache: false,
-    //        traditional: false,
-    //        onSuccess: undefined,
-    //        onError: undefined,
-    //        onFail: undefined,
-    //        confirmationDialogTitle: '',
-    //        confirmationDeletionMessage: '',
-    //        yesButtonTitle: '',
-    //        noButtonTitle: ''
-    //    }
+        var dialog = {};
 
-    //    $.extend(confirmationData, obj);
+        var confirmationData = {
+            url: '',
+            type: 'POST',
+            timeout: 0,
+            formData: {},
+            cache: false,
+            traditional: false,
+            onSuccess: undefined,
+            onError: undefined,
+            onFail: undefined,
+            confirmationDialogTitle: 'Confirm',
+            confirmationDeletionMessage: 'Confirm deletion',
+            yesButtonTitle: 'Yes',
+            noButtonTitle: 'No'
+        }
 
-    //    var _confirmationDialogMessage = (confirmationData.confirmationDeletionMessage == '' || confirmationData.confirmationDeletionMessage == undefined) ?
-    //        defaults.confirmationDeletionMessage : confirmationData.confirmationDeletionMessage;
+        $.extend(confirmationData, obj);
 
-    //    var _confirmationDialogTitle = (confirmationData.confirmationDialogTitle == '' || confirmationData.confirmationDialogTitle == undefined) ?
-    //        defaults.confirmationDialogTitle : confirmationData.confirmationDialogTitle;
+        var _confirmationDialogMessage = (confirmationData.confirmationDeletionMessage == '' || confirmationData.confirmationDeletionMessage == undefined) ?
+            defaults.confirmationDeletionMessage : confirmationData.confirmationDeletionMessage;
 
-    //    var _yesButtonTitle = (confirmationData.yesButtonTitle == '' || confirmationData.okButtonTitle == undefined) ?
-    //        defaults.yesButtonTitle : confirmationData.yesButtonTitle;
+        var _confirmationDialogTitle = (confirmationData.confirmationDialogTitle == '' || confirmationData.confirmationDialogTitle == undefined) ?
+            defaults.confirmationDialogTitle : confirmationData.confirmationDialogTitle;
 
-    //    var _noButtonTitle = (confirmationData.noButtonTitle == '' || confirmationData.noButtonTitle == undefined) ?
-    //        defaults.noButtonTitle : confirmationData.noButtonTitle;
+        var _yesButtonTitle = (confirmationData.yesButtonTitle == '' || confirmationData.okButtonTitle == undefined) ?
+            defaults.yesButtonTitle : confirmationData.yesButtonTitle;
 
-    //    var selectionDiv = $("<div id='ConfirmDeletionDialog'>" + _confirmationDialogMessage + "</div>");
-    //    if ($('#ConfirmDeletionDialog').dialog('instance') != undefined && $('#ConfirmDeletionDialog').dialog('instance').element != undefined) {
-    //        $('#ConfirmDeletionDialog').dialog('destroy');
-    //    }
-    //    selectionDiv.dialog({
-    //        title: _confirmationDialogTitle,
-    //        modal: true,
-    //        buttons: [
-    //            {
-    //                text: "",
-    //                id: "btnClose",
-    //                title: _noButtonTitle,
-    //                click: function () {
-    //                    $(this).dialog("close");
-    //                },
-    //                icons: { primary: "glyphicons glyphicons-remove" },
-    //                "class": "btn btn-danger dialog-btn-x1",
-    //                type: "button"
-    //            },
-    //            {
-    //                text: "",
-    //                id: "btnSelect",
-    //                title: _yesButtonTitle,
-    //                click: function () {
+        var _noButtonTitle = (confirmationData.noButtonTitle == '' || confirmationData.noButtonTitle == undefined) ?
+            defaults.noButtonTitle : confirmationData.noButtonTitle;
 
-    //                    $(this).dialog("close");
 
-    //                    $.ajax({
-    //                        type: confirmationData.type,
-    //                        cache: confirmationData.cache,
-    //                        data: confirmationData.formData,
-    //                        url: confirmationData.url,
-    //                        traditional: confirmationData.traditional,
-    //                        success: function (result) {
-    //                            if (confirmationData.onSuccess != undefined) {
-    //                                confirmationData.onSuccess(result);
-    //                            }
-    //                        },
-    //                        error: function (result) {
-    //                            if (confirmationData.onError != undefined) {
-    //                                confirmationData.onError(result);
-    //                            }
-    //                        },
-    //                        fail: function (result) {
-    //                            if (confirmationData.onFail != undefined) {
-    //                                confirmationData.onFail(result);
-    //                            }
-    //                        },
-    //                        beforeSend: function () { $("#wait").css("display", "block"); },
-    //                        complete: function () { $("#wait").css("display", "none"); }
-    //                    });
+        var dialogButtons =
+        {
 
-    //                    if (confirmationData.onSelect != undefined) {
-    //                        confirmationData.onSelect();
-    //                    }
-    //                },
-    //                icons: { primary: "glyphicons glyphicons-tick" },
-    //                "class": "btn btn-success dialog-btn-x1",
-    //                type: "button"
-    //            },
-    //        ],
-    //        create: function () {
-    //            // Remove default css from jQuery dialog.
-    //            $('.ui-dialog-buttonset').children('button').removeClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary").
-    //                mouseover(function () { $(this).removeClass('ui-state-hover'); }).
-    //                mousedown(function () { $(this).removeClass('ui-state-active'); }).
-    //                focus(function () { $(this).removeClass('ui-state-focus'); });
-    //            $('.ui-dialog-buttonset button').children('span').removeClass("ui-button-icon-primary ui-icon ui-button-text");
-    //        },
-    //        open: function () {
-    //            // Remove default button focus on opening.
-    //            $('.ui-dialog-buttonset').children('button').blur();
-    //        },
-    //        close: function () {
-    //            if (confirmationData.onClose != undefined) {
-    //                confirmationData.onClose();
-    //            }
-    //            $(this).empty();
-    //            $(this).dialog('destroy');
-    //        }
-    //    });
+            SelectBtn: {
+                text: "",
+                id: "btnSelect",
+                title: _yesButtonTitle,
+                click: function () {
+                    dialog.Close();
 
-    //    adjustDialog();
-    //}
+                    $.ajax({
+                        type: confirmationData.type,
+                        cache: confirmationData.cache,
+                        data: confirmationData.formData,
+                        url: confirmationData.url,
+                        traditional: confirmationData.traditional,
+                        success: function (result) {
+                            if (confirmationData.onSuccess != undefined) {
+                                confirmationData.onSuccess(result);
+                            }
+                        },
+                        error: function (result) {
+                            if (confirmationData.onError != undefined) {
+                                confirmationData.onError(result);
+                            }
+                        },
+                        fail: function (result) {
+                            if (confirmationData.onFail != undefined) {
+                                confirmationData.onFail(result);
+                            }
+                        },
+                        beforeSend: function () { $("#wait").css("display", "block"); },
+                        complete: function () { $("#wait").css("display", "none"); }
+                    });
+
+                    if (confirmationData.onSelect != undefined) {
+                        confirmationData.onSelect();
+                    }
+                },
+                icons: "glyphicons glyphicons-check",
+                "class": "btn btn-info",
+                type: "button"
+            },
+            CloseBtn: {
+                text: "",
+                id: "btnClose",
+                title: _noButtonTitle,
+                click: function () {
+                    dialog.Close();
+                },
+                icons: "glyphicons glyphicons-remove",
+                "class": "btn btn-danger",
+                type: "button"
+            }
+        };
+
+        var buttons = [];
+        var modalID = 'model-id-' + dialogID;
+        $.each(dialogButtons, function (i) {
+            buttons.push(dialogButtons[i]);
+        });
+        var divDetail = "<div class='modal fade' role='dialog' data-backdrop = 'static' id='" + modalID + "'><div class='modal-dialog'><div class='modal-content'>" +
+            "<div class='modal-header'><h4 class='modal-title'>" + _confirmationDialogTitle + "</h4><button type='button' class='close'>&times;</button></div>" +
+            "<div class='modal-body'>" + _confirmationDialogMessage + "</div><div class='modal-footer'></div></div></div></div>";
+
+        dialog.Div = $(divDetail);
+        var buttonHtml = "";
+        if (buttons != undefined && buttons.length > 0) {
+            for (var i = 0; i < buttons.length; i++) {
+                buttonHtml += "<button type='button' class='btn " + (buttons[i].class || "") + "' aria-modalID = '" + modalID + "' name='btn" + modalID + "' id = '" + buttons[i].id + dialogID + "' title = '" + buttons[i].title + "'>" + (buttons[i].text || "<span class='" + buttons[i].icons + "'></span>") + "</button>";
+            }
+        }
+        dialog.Div.find('.modal-footer').html(buttonHtml);
+
+        dialog.Div.find('.modal-header').find('.close').on("click", function () {
+            dialog.Close();
+        });
+
+        document.body.append(dialog.Div[0]);
+        var btns = $("button[name='btn" + modalID + "']");
+        for (var i = 0; i < btns.length; i++) {
+            $("#" + btns[i].id).on("click", buttons[i].click);
+        }
+
+        dialog.Open = function () {
+            dialog.Div.modal();
+            dialog.Div.on('hidden.bs.modal', function () {
+                $(this).remove();
+            });
+            ++dialogID;
+        }
+        dialog.Close = function () {
+            dialog.Div.modal("hide");
+            --dialogID;
+        }
+        dialog.Open();
+    }
+
+    // Use this function for required or no record found dialog. 
+    dialogs.openOkBtnDialog = function (obj) {
+        var dialog = {};
+
+        var dialogInits = {
+            requiredDialogTitle: '',
+            requiredDialogMessage: '',
+            okButtonTitle: 'Ok',
+            onClose: undefined,
+        }
+
+        $.extend(dialogInits, obj);
+
+        var _requiredDialogMessage = (dialogInits.requiredDialogMessage == '' || dialogInits.requiredDialogMessage == undefined) ?
+            defaults.requiredDialogMessage : dialogInits.requiredDialogMessage;
+
+        var _requiredDialogTitle = (dialogInits.requiredDialogTitle == '' || dialogInits.requiredDialogTitle == undefined) ?
+            defaults.requiredDialogTitle : dialogInits.requiredDialogTitle;
+
+        var _okButtonTitle = (dialogInits.okButtonTitle == '' || dialogInits.okButtonTitle == undefined) ?
+            defaults.okButtonTitle : dialogInits.okButtonTitle;
+
+        var buttons = [{
+            text: "",
+            id: "btnSelect",
+            title: _okButtonTitle,
+            click: function () {
+                dialog.Close();
+            },
+            icons: "glyphicons glyphicons-ok",
+            "class": "btn btn-primary",
+            type: "button"
+        }];
+        debugger;
+        var modalID = 'model-id-' + dialogID;
+        var divDetail = "<div class='modal fade' role='dialog' data-backdrop = 'static' id='" + modalID + "'><div class='modal-dialog'><div class='modal-content'>" +
+            "<div class='modal-header'><h4 class='modal-title'>" + _requiredDialogTitle + "</h4><button type='button' class='close'>&times;</button></div>" +
+            "<div class='modal-body'>" + _requiredDialogMessage + "</div><div class='modal-footer'></div></div></div></div>";
+
+        dialog.Div = $(divDetail);
+        var buttonHtml = "";
+        if (buttons != undefined && buttons.length > 0) {
+            for (var i = 0; i < buttons.length; i++) {
+                buttonHtml += "<button type='button' class='btn " + (buttons[i].class || "") + "' aria-modalID = '" + modalID + "' name='btn" + modalID + "' id = '" + buttons[i].id + dialogID + "' title = '" + buttons[i].title + "'>" + (buttons[i].text || "<span class='" + buttons[i].icons + "'></span>") + "</button>";
+            }
+        }
+        dialog.Div.find('.modal-footer').html(buttonHtml);
+
+        dialog.Div.find('.modal-header').find('.close').on("click", function () {
+            dialog.Close();
+        });
+
+        document.body.append(dialog.Div[0]);
+        var btns = $("button[name='btn" + modalID + "']");
+        for (var i = 0; i < btns.length; i++) {
+            $("#" + btns[i].id).on("click", buttons[i].click);
+        }
+
+        dialog.Open = function () {
+            dialog.Div.modal();
+            dialog.Div.on('hidden.bs.modal', function () {
+                $(this).remove();
+            });
+            ++dialogID;
+        }
+        dialog.Close = function () {
+            dialog.Div.modal("hide");
+            --dialogID;
+        }
+        dialog.Open();
+    }
 
     //call this function on exit of page
     dialogs.confirmExit = function (obj) {
