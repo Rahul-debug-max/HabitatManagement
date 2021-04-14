@@ -53,17 +53,14 @@
 <div id="accordion" class="col-lg-12">
     <div class="card">
         <div class="card-header" data-toggle="collapse" data-parent="#accordion" data-target="#collapseOne">
-
             <label style="margin:0;"><h4>Section</h4></label>
-
-
             <div style="float: right; display: inline;margin-top: -3px;">
                 <button type="button" class="btn btn-primary x1" id="AddSection" value="Add" title="Add"><span class="glyphicons glyphicons-plus"></span></button>
                 <button type="button" class="btn btn-primary x1" id="EditSection" value="Edit" title="Edit"><span class="glyphicons glyphicons-edit"></span></button>
                 <button type="button" class="btn btn-primary x1" id="DeleteSection" value="Delete" title="Delete"><span class="glyphicons glyphicons-bin"></span></button>
             </div>
         </div>
-        <div id="collapseOne" class="collapse">
+        <div id="collapseOne" class="collapse show">
             <div class="card-body">
                 <div class="col-xs-12" style="padding-bottom: 15px;" id="dvSectionDetail">
                     @{
@@ -83,9 +80,9 @@
                 <button type="button" class="btn btn-primary x1" id="Delete" value="Delete" title="Delete"><span class="glyphicons glyphicons-bin"></span></button>
             </div>
         </div>
-        <div id="collapseTwo" class="collapse">
+        <div id="collapseTwo" class="collapse show">
             <div class="card-body">
-                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding-bottom: 15px;">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <div class="jqgrid-table">
                         <table id="tblFieldDesigner"></table>
                     </div>

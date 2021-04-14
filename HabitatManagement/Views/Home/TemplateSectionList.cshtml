@@ -1,29 +1,72 @@
 ﻿
 @model HabitatManagement.Models.PermitFormScreenDesignTemplateDetailModelBE
 
-<div class="col-xs-12 paddlftrght-none">
-    <table class="table table-hover table-bordered table-condensed">
-        <thead>
-            <tr class='ui-state-default ui-th-column ui-th-ltr ui-sortable-handle'>
-                <th class='text-center table-heading'>Section</th>
-                <th class='text-center table-heading'>Section Description</th>
-            </tr>
-        </thead>
-        <tbody id="dvSectionList">
-            @for (int index = 0; index < Model.TemplateSectionDetail.Count; index++)
-            {
-                <tr class='table-row'>
-                    <td style="vertical-align: middle; width: 110px;">
-                        @Model.TemplateSectionDetail[index].Section
-                        <input type="hidden" name="TemplateDetails[@index].FormID" value="@Model.TemplateSectionDetail[index].FormID" />
-                        <input type="hidden" name="TemplateDetails[@index].SectionName" value="@Model.TemplateSectionDetail[index].Section" />
-                        <input type="hidden" name="TemplateDetails[@index].Sequence" value="@Model.TemplateSectionDetail[index].Sequence" />
-                    </td>
-                    <td class="text-center" style="width: 67px;">
-                        @Model.TemplateSectionDetail[index].Description
-                    </td>
-                </tr>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $('#dvSectionList').sortable({
+            items: "tr:not(td)",
+            containment: 'document',
+            placeholder: "ui-state-highlight",
+            forcePlaceholderSize: true,
+            cursor: "move",
+            stop: function (event, ui) {
+                var newSequenceNumber = 1;
+                $(ui.item).closest('tbody').find('tr').each(function (inx, ele) {
+                    $(ele).first('td').find('input[name$="Sequence"]').val(newSequenceNumber++);
+                });
+                saveSectionSequence();
             }
-        </tbody>
-    </table>
-</div>
+        });
+
+        var saveSectionSequence = function () {
+            var postData = $('#TemplateSectionListForm').serialize();
+            $.ajax({
+                type: 'POST',
+                cache: false,
+                url: '@Url.Action("TemplateSectionList", "Home")',
+                traditional: true,
+                data: postData,
+                success: function (result) {
+                    if (result.success != undefined && !result.success) {
+                        alert('Unable to save. Please contact administrator.')
+                    }
+                },
+                error: function () {
+                },
+                beforeSend: function () { $("#wait").css("display", "block"); },
+                complete: function () {
+                    $("#wait").css("display", "none");
+                }
+            });
+        }
+    });
+</script>
+<form id="TemplateSectionListForm" asp-controller="Home" asp-action="TemplateSection">
+    <div class="col-xs-12 paddlftrght-none">
+        <table class="table table-hover table-bordered table-condensed">
+            <thead>
+                <tr class='ui-state-default ui-th-column ui-th-ltr ui-sortable-handle'>
+                    <th class='text-center table-heading'>Section</th>
+                    <th class='text-center table-heading'>Section Description</th>
+                </tr>
+            </thead>
+            <tbody id="dvSectionList">
+                @for (int index = 0; index < Model.TemplateSectionDetail.Count; index++)
+                {
+                    <tr class='table-row'>
+                        <td style="vertical-align: middle; width: 110px;">
+                            @Model.TemplateSectionDetail[index].Section
+                            <input type="hidden" name="TemplateDetails[@index].FormID" value="@Model.TemplateSectionDetail[index].FormID" />
+                            <input type="hidden" name="TemplateDetails[@index].SectionName" value="@Model.TemplateSectionDetail[index].Section" />
+                            <input type="hidden" name="TemplateDetails[@index].Sequence" value="@Model.TemplateSectionDetail[index].Sequence" />
+                        </td>
+                        <td class="text-center" style="width: 67px;">
+                            @Model.TemplateSectionDetail[index].Description
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</form>

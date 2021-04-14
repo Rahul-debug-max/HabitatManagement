@@ -37,7 +37,7 @@ namespace HabitatManagement.Controllers
         public JsonResult GetFormDesignerColumnNames()
         {
             try
-            {               
+            {
                 string[] columnNames =
                 {
                     "Id",
@@ -78,17 +78,17 @@ namespace HabitatManagement.Controllers
                 else
                 {
                     var resultFormTemplate = (from permitFormScreenDesignTemplateObj in listPermitFormScreenDesignTemplate
-                                            select new PermitFormScreenDesignTemplateModel
-                                            {
-                                                FormID = permitFormScreenDesignTemplateObj.FormID.ToString(),
-                                                Design = permitFormScreenDesignTemplateObj.Design,
-                                                Description = permitFormScreenDesignTemplateObj.Description,
-                                                Active = permitFormScreenDesignTemplateObj.Active.ToString(),
-                                                CreatedDateTime = permitFormScreenDesignTemplateObj.CreatedDateTime.ToString(),
-                                                LastUpdatedDateTime = permitFormScreenDesignTemplateObj.LastUpdatedDateTime.ToString(),
-                                                CreatedBy = permitFormScreenDesignTemplateObj.CreatedBy,
-                                                UpdatedBy = permitFormScreenDesignTemplateObj.UpdatedBy
-                                            }).ToList();
+                                              select new PermitFormScreenDesignTemplateModel
+                                              {
+                                                  FormID = permitFormScreenDesignTemplateObj.FormID.ToString(),
+                                                  Design = permitFormScreenDesignTemplateObj.Design,
+                                                  Description = permitFormScreenDesignTemplateObj.Description,
+                                                  Active = permitFormScreenDesignTemplateObj.Active.ToString(),
+                                                  CreatedDateTime = permitFormScreenDesignTemplateObj.CreatedDateTime.ToString(),
+                                                  LastUpdatedDateTime = permitFormScreenDesignTemplateObj.LastUpdatedDateTime.ToString(),
+                                                  CreatedBy = permitFormScreenDesignTemplateObj.CreatedBy,
+                                                  UpdatedBy = permitFormScreenDesignTemplateObj.UpdatedBy
+                                              }).ToList();
 
                     var totalPages = (int)Math.Ceiling((float)totalRecords / (float)rows);
 
@@ -167,7 +167,7 @@ namespace HabitatManagement.Controllers
         public ActionResult PermitFormScreenDesignTemplateDetail(int formID)
         {
             PermitFormScreenDesignTemplateDetailModelBE model = new PermitFormScreenDesignTemplateDetailModelBE();
-           
+
             model.TemplateDetails = new List<PermitFormScreenDesignTemplateDetailBE>();
 
             PermitFormScreenDesignTemplateBE permitFormScreenDesignTemplate = FormLogic.FetchPermitFormScreenDesignTemplate(formID);
@@ -245,6 +245,25 @@ namespace HabitatManagement.Controllers
             success = FormLogic.DeleteTemplateFormSection(formID, sectionName);
 
             return new JsonResult(new { Success = success });
+        }
+
+
+        [HttpPost]
+        public ActionResult TemplateSectionList(PermitFormScreenDesignTemplateDetailModelBE model)
+        {
+            bool success = true;
+
+            if(model.TemplateSectionDetail != null && model.TemplateSectionDetail.Count > 0)
+            {
+                foreach(var se in model.TemplateSectionDetail)
+                {
+                    if(success)
+                    {
+                        success = FormLogic.UpdateTemplateFormSection(se);
+                    }
+                }                
+            }           
+            return Json(new { Success = success });
         }
 
         public ActionResult PermitFormTemplateFields(int formID)
@@ -387,7 +406,7 @@ namespace HabitatManagement.Controllers
         public ActionResult GetDigitalSignature(int signatureId)
         {
             string signature = FormLogic.GetDigitalSignature(signatureId);
-            return new JsonResult(new  { Signature = signature });
+            return new JsonResult(new { Signature = signature });
         }
 
         public ActionResult PermitFormScreenDesignTemplateDetailFields(PermitFormScreenDesignTemplateDetailBE formDetail)

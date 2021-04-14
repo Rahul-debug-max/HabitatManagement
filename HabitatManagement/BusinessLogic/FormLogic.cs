@@ -477,14 +477,14 @@ namespace HabitatManagement.BusinessLogic
         private static PermitFormScreenDesignTemplateDetailBE ToPermitFormScreenDesignTemplateDetailBE(SqlDataReader rdr)
         {
             PermitFormScreenDesignTemplateDetailBE o = new PermitFormScreenDesignTemplateDetailBE();
-            o.FormID = Convert.ToInt32(rdr["FormID"]);
-            o.Field = Convert.ToInt32(rdr["Field"]);
-            o.FieldName = Convert.ToString(rdr["FieldName"]);
-            o.FieldType = (FormFieldType)Convert.ToInt32(rdr["FieldType"]);
-            o.Section = Convert.ToString(rdr["Section"]);
-            o.Sequence = Convert.ToInt32(rdr["Sequence"]);
-            o.SectionDescription = Convert.ToString(rdr["SectionDescription"]);
-            o.SectionSequence = Convert.ToInt32(rdr["SectionSequence"]);
+            o.FormID = Functions.ToInt(rdr["FormID"]);
+            o.Field = Functions.ToInt(rdr["Field"]);
+            o.FieldName = Functions.TrimRight(rdr["FieldName"]);
+            o.FieldType = (FormFieldType)Functions.ToInt(rdr["FieldType"]);
+            o.Section = Functions.TrimRight(rdr["Section"]);
+            o.Sequence = Functions.ToInt(rdr["Sequence"]);
+            o.SectionDescription = Functions.TrimRight(rdr["SectionDescription"]);
+            o.SectionSequence = Functions.ToInt(rdr["SectionSequence"]);
             return o;
         }
 

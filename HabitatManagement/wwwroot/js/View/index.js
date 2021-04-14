@@ -53,7 +53,7 @@
                         traditional: true,
                         onSuccess: function (result) {
                             if (!result.Success) {
-                                showAndDismissAlert('danger', wcmVariables.dataSaveErrMsg);
+                                alert('Unable to save. Please contact administrator.')
                             }
                             else {
                                 checkBoxSelectionData = [];
@@ -62,14 +62,14 @@
                             }
                         },
                         onError: function (result) {
-                            showAndDismissAlert('danger', wcmVariables.dataSaveErrMsg);
+                            alert('Unable to save. Please contact administrator.')
                         }
                     });
                     break;
                 case 'add':
                     WCMDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
-                        modalDialogClass: "modal-lg",
+                        modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,
                         data: { formID: 0 },
                         buttons: [
@@ -92,7 +92,7 @@
                 case 'edit':
                     WCMDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
-                        modalDialogClass: "modal-lg",
+                        modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,
                         data: { formID: surrogateDate[0] },
                         buttons: [
@@ -133,7 +133,7 @@
                     }
                 }
                 else if (result.Success != undefined && !result.Success) {
-                    showAndDismissAlert('danger', wcmVariables.dataSaveErrMsg);
+                    alert('Unable to save. Please contact administrator.')
                 }
             },
             error: function () {
@@ -155,7 +155,7 @@
                 title: "Screen Design Details",
                 url: defaults.detailURL,
                 data: { formID: surrogateDate[0] },
-                modalDialogClass: "modal-lg",
+                modalDialogClass: "modal-xl",
                 buttons: [
                     {
                         Button: 'next', onClick: function () {                        
@@ -173,27 +173,7 @@
 
     var onNextClick = function (currentDialogID) {
         $(currentDialogID).modal("hide");
-        openTaskFeedbackScreenLayout();
-        //var postData = $('#TaskFeedBackTemplateDetailsForm').serialize();
-        //$.ajax({
-        //    type: 'POST',
-        //    cache: false,
-        //    url: defaults.detailURL,
-        //    data: postData,
-        //    success: function (result) {
-        //        if (result.Success != undefined && !result.Success) {
-        //            showAndDismissAlert('danger', wcmVariables.dataSaveErrMsg);
-        //            $("#wait").css("display", "none");
-        //        }
-        //        else {
-        //            $(currentDialogID).dialog('close');
-        //            openTaskFeedbackScreenLayout();
-        //        }
-        //    },
-        //    error: function () {
-        //    },
-        //    beforeSend: function () { $("#wait").css("display", "block"); }
-        //});
+        openTaskFeedbackScreenLayout();        
     }
 
     var openTaskFeedbackScreenLayout = function () {

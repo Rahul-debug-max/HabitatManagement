@@ -411,8 +411,8 @@ CREATE PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplateDetail_Fetch]
 AS     
 BEGIN 
 	SELECT t.*, t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence 
-	FROM PermitFormScreenDesignTemplateDetail t JOIN TemplateFormSection t1 
-	ON t.Section = t1.Section WHERE t.[FormID] = @FormID AND [Field] = @Field ORDER BY t1.[Sequence], t.[Sequence]  
+	FROM PermitFormScreenDesignTemplateDetail t RIGHT JOIN TemplateFormSection t1 
+	ON t.Section = t1.Section WHERE t1.[FormID] = @FormID AND [Field] = @Field ORDER BY t1.[Sequence], t.[Sequence]  
 END  
 GO
 /****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplateDetail_FetchAll]    Script Date: 08-04-2021 15:51:54 ******/
@@ -430,8 +430,8 @@ BEGIN
 SET NOCOUNT ON;  
    
 	SELECT t.*, t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence 
-	FROM PermitFormScreenDesignTemplateDetail t JOIN TemplateFormSection t1 
-	ON t.Section = t1.Section WHERE t.[FormID] = @FormID ORDER BY t1.[Sequence], t.[Sequence]
+	FROM PermitFormScreenDesignTemplateDetail t RIGHT JOIN TemplateFormSection t1 
+	ON t.Section = t1.Section WHERE t1.[FormID] = @FormID ORDER BY t1.[Sequence], t.[Sequence]
 
 END  
 GO
