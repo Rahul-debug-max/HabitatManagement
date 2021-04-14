@@ -192,6 +192,8 @@ namespace HabitatManagement.Controllers
             List<PermitFormScreenDesignTemplateDetailBE> templateDetails = FormLogic.FetchAllPermitFormScreenDesignTemplateDetail(formID);
             List<TemplateFormFieldDataBE> templateFormFieldData = FormLogic.FetchAllTemplateFormFieldData(formID);
             FormDesignTemplateModelBE model = new FormDesignTemplateModelBE(templateDetails, templateFormFieldData);
+            model.FormID = formID;
+            model.RenderForDragnDrop = true;
             return View(model);
         }
 
@@ -320,6 +322,22 @@ namespace HabitatManagement.Controllers
         {
             string signature = FormLogic.GetDigitalSignature(signatureId);
             return new JsonResult(new  { Signature = signature });
+        }
+
+        public ActionResult PermitFormScreenDesignTemplateDetailFields(PermitFormScreenDesignTemplateDetailBE formDetail)
+        {
+            bool success = true;
+            if (formDetail != null)
+            {
+                PermitFormScreenDesignTemplateDetailBE permitFormScreenDesignTemplateDetailBE = FormLogic.FetchPermitFormScreenDesignTemplateDetail(formDetail.FormID, formDetail.Field);
+                if (permitFormScreenDesignTemplateDetailBE != null)
+                {
+                    permitFormScreenDesignTemplateDetailBE.Section = formDetail.Section;
+                    permitFormScreenDesignTemplateDetailBE.Sequence = formDetail.Sequence;
+                    success = FormLogic.UpdatePermitFormScreenDesignTemplateDetail(permitFormScreenDesignTemplateDetailBE);
+                }
+            }
+            return Json(new { Success = success });
         }
     }
 }

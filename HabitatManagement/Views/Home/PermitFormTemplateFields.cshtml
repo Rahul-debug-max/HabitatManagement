@@ -45,8 +45,34 @@
         background-color: white;
     }
 
-</style>
 
+    .sectionStyle {
+        outline: 1px dashed red !important;
+        outline-offset: -3px;
+        padding: 10px;
+    }
+
+    .sectionStyle:hover * {
+        cursor: move;
+    }
+
+    .mrgright {
+        margin-right: 2px;
+    }
+
+    .mrgleft {
+        margin-left: 2px;
+    }
+
+    .form-control[readonly] {
+        cursor: move;
+        background-color: #eee !important;
+        opacity: 1;
+    }
+</style>
+<script src="~/lib/jquery/dist/jquery-ui-1.11.0.custom.js"></script>
+
+<script src="~/js/View/FormTemplateFields.js"></script>
 <script src="~/js/JSignature/jSignature.js"></script>
 <script src="~/js/JSignature/jSignature.CompressorBase30.js"></script>
 <script src="~/js/JSignature/jSignature.CompressorSVG.js"></script>
@@ -55,6 +81,12 @@
 <script type="text/javascript">
     var hasStopTimer = false;
     $(document).ready(function () {
+
+        FormTemplateFields.onInit({
+            formId: JSON.parse('@Model.FormID'),
+            saveDataURL: '@Url.Action("PermitFormScreenDesignTemplateDetailFields", "Home")'
+        });
+
         $('.dvSignatureDataType').each(function (i, ele) {
             var singnatureDv = $(ele).find('div[id^="digitalSignature_"]');
             if ($(singnatureDv).find('canvas').length == 0) {
@@ -90,6 +122,10 @@
             $(this).closest("tr").find('input:checkbox').prop('checked', false);
             $(this).prop("checked", isChecked);
         });
+
+        @*if ('@Model.RenderForDragnDrop' == 'True') {
+            $('.conditionDigitalSignature canvas').css({ 'background-color': '#eeeeee !important;' });
+        }*@
     });
 
     function getDigitalSignature() {
@@ -151,7 +187,7 @@
 </script>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftght-none">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none xspaddrght">
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none xspaddrght sortable_list connectedSortable sectionStyle" data-section="">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none xspaddrght sectionStyle" data-section="">
             @Html.Raw(Model.FormSectionFields())
         </div>
     </div>

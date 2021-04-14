@@ -1,60 +1,45 @@
-﻿window.TaskFeedbackTemplateFields = (function () {
+﻿window.FormTemplateFields = (function () {
     var defaults = {
         renderForDragnDrop: false,
-        templateID: 0
+        formId: 0
     }
     var onInit = function (obj) {
         $.extend(defaults, obj);
-
-       // if (defaults.renderForDragnDrop) {
-            makeDivSortable();
-        //}
+        makeDivSortable();
     }
 
     var makeDivSortable = function () {
-        $('#dvTopSection').sortable({
-            items: $("#dvTopSection div.form-group"),
-            appendTo: $('#dvTopSection'),
-            placeholder: "ui-state-highlight",
-            forcePlaceholderSize: true,
-            stop: function (event, ui) {
-                saveTemplateFieldDetails(ui);
-            },
-            containment: 'document',
-            cursor: "move"
-        });
 
         $(".sortable_list").sortable({
+            items: $("div.form-group"),
             connectWith: ".connectedSortable",
             containment: 'document',
             placeholder: "ui-state-highlight",   
-            forcePlaceholderSize: true ,
+            forcePlaceholderSize: true,
             cursor: "move",
             stop: function (event, ui) {
-                saveTemplateFieldDetails(ui);
+                saveFormFieldDetails(ui);
             }
         });
     }
 
-    var saveTemplateFieldDetails = function (ui) {
+    var saveFormFieldDetails = function (ui) {
         var currentSection = $(ui.item).parent().attr('data-section');
         var newSequence = $(ui.item).index() + 1;
         var field = $(ui.item).attr('data-field');
         var data = {
-            TemplateID: defaults.templateID,
+            FormID: defaults.formId,
             Field: field,
             Section: currentSection,
             Sequence: newSequence,
         };
-        $('#wait').show();
+
         $.post(defaults.saveDataURL, data, function (result) {
-            if (!result.Success) {
-                showAndDismissAlert('danger', wcmVariables.dataSaveErrMsg);
+            if (!result.success) {
+                alert('Unable to save. Please contact administrator.')
             }
-            $('#wait').hide();
         });
     }
-
 
     return {
         onInit: onInit,
