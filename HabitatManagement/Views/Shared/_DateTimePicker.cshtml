@@ -8,9 +8,11 @@
             $(".time input").attr("type", "time");
         } else {
             // if desktop device, use DateTimePicker
-            $("#datepicker, #datetimepicker").datetimepicker({
+          //  $("#datepicker, #datetimepicker").datetimepicker({
+            $('div[name="datetimepicker"]').datetimepicker({
                 useCurrent: false,
                 format: "L",
+                locale: "en-au",
                 //showTodayButton: true,
                 //showClear: true,
                 //toolbarPlacement: 'bottom',
@@ -21,7 +23,8 @@
                     today: "todayText"
                 }
             });
-            $("#timepicker").datetimepicker({
+            $('div[name="timepicker"]').datetimepicker({
+            //$("#timepicker").datetimepicker({
                 format: 'HH:mm',
                 icons: {
                     up: "glyphicons glyphicons-chevron-up",

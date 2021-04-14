@@ -82,52 +82,48 @@
 <script type="text/javascript">
     var hasStopTimer = false;
     $(document).ready(function () {
-       if ('@Model.RenderForDragnDrop' == 'True') {
+        if ('@Model.RenderForDragnDrop' == 'True') {
             FormTemplateFields.onInit({
-            formId: JSON.parse('@Model.FormID'),
+                formId: JSON.parse('@Model.FormID'),
                 saveDataURL: '@Url.Action("PermitFormScreenDesignTemplateDetailFields", "Home")'
             });
         }
 
         $('.dvSignatureDataType').each(function (i, ele) {
-        var singnatureDv = $(ele).find('div[id^="digitalSignature_"]');
-        if ($(singnatureDv).find('canvas').length == 0) {
-            var $digSigdiv = singnatureDv.jSignature({ 'UndoButton': false, 'cssclass': 'digitalcanvas' });
-            var image64BitString = $(ele).find('#SignatureResponse');
-            if ($.trim($(image64BitString).val()) != "") {
+            var singnatureDv = $(ele).find('div[id^="digitalSignature_"]');
+            if ($(singnatureDv).find('canvas').length == 0) {
+                var $digSigdiv = singnatureDv.jSignature({ 'UndoButton': false, 'cssclass': 'digitalcanvas' });
+                var image64BitString = $(ele).find('#SignatureResponse');
+                if ($.trim($(image64BitString).val()) != "") {
                     $(singnatureDv).jSignature("importData", $(image64BitString).val());
-            }
+                }
                 $digSigdiv.jSignature("disable");
-        }
-    });
+            }
+        });
 
         $(window).trigger('resize');
         $(window).resize(function () {
-        hasStopTimer = false;
+            hasStopTimer = false;
+            setTimeout(function () {
+                if (!hasStopTimer) {
+                    getDigitalSignature();
+                }
+            }, 1000);
+        });
+
         setTimeout(function () {
             if (!hasStopTimer) {
                 getDigitalSignature();
             }
         }, 1000);
-    });
 
-    setTimeout(function () {
-        if (!hasStopTimer) {
-            getDigitalSignature();
-        }
-    }, 1000);
-
-    setDateTimePicker();
+        setDateTimePicker();
 
         $('.dvCheckList').find('input[type="checkbox"]').on('change', function () {
-        var isChecked = $(this).is(":checked");
+            var isChecked = $(this).is(":checked");
             $(this).closest("tr").find('input:checkbox').prop('checked', false);
             $(this).prop("checked", isChecked);
-    });
-
-        @*if ('@Model.RenderForDragnDrop' == 'True') {
-            $('.conditionDigitalSignature canvas').css({ 'background-color': '#eeeeee !important;' });
-        }*@
+        });
     });
 
     function getDigitalSignature() {
@@ -188,9 +184,7 @@
 
 </script>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftght-none">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none xspaddrght">
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none xspaddrght">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none xspaddrght dvFormFeedbackData">
             @Html.Raw(Model.FormSectionFields())
-        </div>
     </div>
 </div>

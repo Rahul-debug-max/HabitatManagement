@@ -431,7 +431,7 @@ SET NOCOUNT ON;
    
 	SELECT t.*, t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence 
 	FROM PermitFormScreenDesignTemplateDetail t RIGHT JOIN TemplateFormSection t1 
-	ON t.Section = t1.Section WHERE t1.[FormID] = @FormID ORDER BY t1.[Sequence], t.[Sequence]
+	ON t.Section = t1.Section WHERE t1.[FormID] = @FormID AND t.FormID IS NOT NULL ORDER BY t1.[Sequence], t.[Sequence]
 
 END  
 GO
@@ -722,6 +722,93 @@ END
 GO
 
 
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TemplateFormFieldData_Update]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_TemplateFormFieldData_Update]
+GO
+CREATE PROCEDURE [dbo].[usp_TemplateFormFieldData_Update]      
+(      
+    @FormID INT,      
+    @Field INT,      
+    @FieldValue NVARCHAR(max),        
+    @ErrorOccured BIT OUTPUT      
+)      
+AS    
+BEGIN    
+ BEGIN TRY    
+  BEGIN TRANSACTION trans      
+      
+  IF EXISTS (select 1 from TemplateFormFieldData WHERE FormID = @FormID AND Field = @Field)
+  BEGIN
+
+  UPDATE TemplateFormFieldData      
+  SET FieldValue = @FieldValue
+  WHERE FormID = @FormID AND Field = @Field    
+
+  END
+  ELSE BEGIN
+
+   INSERT INTO TemplateFormFieldData (FormID, Field, FieldValue)      
+     SELECT @FormID, @Field, @FieldValue
+
+  END
+
+
+  COMMIT Transaction trans      
+      
+  SET @ErrorOccured = 1;     
+ END TRY      
+ BEGIN CATCH      
+  IF (@@TRANCOUNT > 0)    
+  BEGIN    
+   ROLLBACK      
+  END    
+    
+  SET @ErrorOccured = 0;      
+      
+  DECLARE @ErrorMessage nvarchar(4000);      
+  DECLARE @ErrorSeverity int;         
+  DECLARE @ErrorState int;      
+      
+  SELECT      
+  @ErrorMessage = ERROR_MESSAGE(),      
+  @ErrorSeverity = ERROR_SEVERITY(),      
+  @ErrorState = ERROR_STATE();      
+      
+  RAISERROR (@ErrorMessage, -- Message text.        
+  @ErrorSeverity, -- Severity.        
+  @ErrorState -- State.        
+  );      
+      
+ END CATCH    
+END    
+GO
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_PermitFormScreenDesignTemplateDetail_BlockFetch]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplateDetail_BlockFetch]
+GO
+CREATE PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplateDetail_BlockFetch]        
+ @FormID INT,                    
+ @PageIndex INT = 1,        
+ @PageSize INT = 10,  
+ @RecordCount INT OUTPUT    
+AS         
+BEGIN       
+ IF(@PageIndex IS NULL)      
+ BEGIN      
+  SET @PageIndex = 1         
+ END      
+  
+ SELECT @RecordCount = COUNT(*)  FROM PermitFormScreenDesignTemplateDetail t RIGHT JOIN TemplateFormSection t1   
+ ON t.Section = t1.Section WHERE t1.[FormID] = @FormID AND t.FormID IS NOT NULL
+        
+ SELECT t.*, t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence   
+ FROM PermitFormScreenDesignTemplateDetail t RIGHT JOIN TemplateFormSection t1   
+ ON t.Section = t1.Section WHERE t1.[FormID] = @FormID AND t.FormID IS NOT NULL
+ ORDER BY t1.[Sequence], t.[Sequence]           
+ OFFSET @PageSize * (@PageIndex - 1) ROWS FETCH NEXT @PageSize ROWS ONLY;    
+
+END      
+GO
 
 -------------------------------------------------------------------------------------------------------------------------------
 /* 7TRIGGERS */

@@ -11,5 +11,7 @@ namespace HabitatManagement.BusinessEntities
         public int FormID { get; set; }
         public int Field { get; set; }
         public string FieldValue { get; set; }
+        public string DigitalSignatureImage64BitString { get; set; }
+        public string FieldType { get; set; }
     }
 }

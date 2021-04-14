@@ -312,7 +312,7 @@ namespace HabitatManagement.Controllers
 
             try
             {
-                IEnumerable<PermitFormScreenDesignTemplateDetailBE> list = FormLogic.FetchAllPermitFormScreenDesignTemplateDetail(formID);
+                IEnumerable<PermitFormScreenDesignTemplateDetailBE> list = FormLogic.BlockFetchPermitFormScreenDesignTemplateDetail(formID, page, rows, out int totalRecords);
 
                 if (list == null)
                 {
@@ -330,11 +330,13 @@ namespace HabitatManagement.Controllers
                                                   Sequence = obj.Sequence
                                               }).ToList();
 
+                    var totalPages = (int)Math.Ceiling((float)totalRecords / (float)rows);
+
                     jsonData = new
                     {
-                        total = 1,
+                        total = totalPages,
                         page,
-                        records = int.MaxValue,
+                        records = totalRecords,
                         rows = resultFormTemplate
                     };
                 }

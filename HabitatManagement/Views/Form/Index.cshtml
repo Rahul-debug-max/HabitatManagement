@@ -7,32 +7,125 @@
 <script type="text/javascript">
     $(document).ready(function () {
 
-        $('SELECT').on('change', function () {
+        $('.formFeedbackSelector').on('change', function () {
             if ($(this).val() == "-1") {
                 $(".dvFeedbackSection").hide();
                 $('#dvFormFeedback').html("");
             }
             else {
-                $.ajax({
-                    cache: false,
-                    async: false,
-                    data: { formID: $(this).val(), isRenderForDragnDrop: false },
-                    url: '@Url.Action("PermitFormTemplateFields", "Home")',
-                    success: function (result) {
-                        $(".dvFeedbackSection").show();
-                        $('#dvFormFeedback').html(result);
-                    },
-                    error: function () {
-                    },
-                    beforeSend: function () { $("#wait").css("display", "block"); },
-                    complete: function () { $("#wait").css("display", "none"); }
-                });
+                loadFormFeedback($(this).val());
             }
         });
 
+        function loadFormFeedback(formId) {
+            $.ajax({
+                cache: false,
+                async: false,
+                data: { formID: formId, isRenderForDragnDrop: false },
+                url: '@Url.Action("PermitFormTemplateFields", "Home")',
+                success: function (result) {
+                    $(".dvFeedbackSection").show();
+                    $('#dvFormFeedback').html(result);
+                },
+                error: function () {
+                },
+                beforeSend: function () { $("#wait").css("display", "block"); },
+                complete: function () { $("#wait").css("display", "none"); }
+            });
+        }
+
         $("#SaveFormFeedabck").click(function () {
 
+            var data = [];
+            $('.dvFormFeedbackData').find("div[data-field]").each(function (inx, ele) {
 
+                var field = 0;
+                var fieldValue = '';
+                var digitalSignatureImage64BitString = '';
+
+                obj = $(ele);
+                var field = obj.attr('data-field');
+                var fieldType = obj.attr('field-Type');
+
+                if (fieldType == '@Convert.ToInt32(FormFieldType.CheckList)') {
+                    $(obj).find('.checkListTR').each(function (inx, ele) {
+                        var checked = '';
+                        var yesCheckBox = $(ele).find('input')[0];
+                        var noCheckBox = $(ele).find('input')[1];
+                        field = $(yesCheckBox).attr('name');
+
+                        if ($(yesCheckBox).is(":checked")) {
+                            checked = 1;
+                        }
+                        else if ($(noCheckBox).is(":checked")) {
+                            checked = 0;
+                        }
+                        data.push({
+                            FormID: $('.formFeedbackSelector').val(),
+                            Field: field,
+                            FieldValue: checked,
+                            DigitalSignatureImage64BitString: "",
+                            FieldType: ""
+                        });
+                    });
+                }
+                else if (fieldType == '@Convert.ToInt32(FormFieldType.Textbox)') {
+                    fieldValue = $(obj).find('input[name^=' + field + ']').val();
+                }
+                else if (fieldType == '@Convert.ToInt32(FormFieldType.Date)') {
+                    fieldValue = $(obj).find('input[name^=' + field + ']').val();
+                }
+                else if (fieldType == '@Convert.ToInt32(FormFieldType.DateAndTime)') {
+                    var date = $(obj).find('input[name^=' + field + ']').val();
+                    var time = $(obj).find('.time').find('input').val()
+                    fieldValue = date + " " + time;
+                }
+                else if (fieldType == '@Convert.ToInt32(FormFieldType.Signature)') {
+                    var singnatureDv = $(obj).find('div[id^="digitalSignature_"]');
+                    if (singnatureDv.length > 0) {
+                        digitalSignatureImage64BitString = $(singnatureDv).jSignature('getData');
+                    }
+                    fieldValue = $(obj).find('#SignatureId').val();
+                }
+                else if (fieldType == '@Convert.ToInt32(FormFieldType.TextArea)') {
+                    fieldValue = $(objParent).find('textarea[name^=' + field + ']').val();
+                }
+                if (fieldType != '@Convert.ToInt32(FormFieldType.CheckList)') {
+                    data.push({
+                        FormID: $('.formFeedbackSelector').val(),
+                        Field: field,
+                        FieldValue: fieldValue,
+                        DigitalSignatureImage64BitString: digitalSignatureImage64BitString,
+                        FieldType: fieldType == '@Convert.ToInt32(FormFieldType.Signature)' ? '@FormFieldType.Signature.ToString()' : ''
+                    });
+                }
+            });
+
+            var ajx = $.ajax({
+                type: 'Post',
+                url: '@Url.Action("SaveFormFeedback", "Form")',
+                cache: false,
+                data: { data: JSON.stringify(data) },
+                dataType: 'Json',
+                success: function (result) {
+                    if (result != null && !result.success) {
+                        alert('Unable to save. Please contact administrator.');
+                        return;
+                    }
+                    else {
+                        loadFormFeedback($('.formFeedbackSelector').val());
+                    }
+                },
+                error: function (jqXHR, feedback, eToStringToStringrrorThrown) {
+                },
+                beforeSend: function () {
+                    $('#wait').show();
+                },
+                complete: function () {
+                    $('#wait').hide();
+                }
+            });
+            return ajx;
         });
     });
 </script>
@@ -61,7 +154,7 @@
         <div class="form-group row col-lg-6">
             <label class="col-sm-2 text-right col-form-label" asp-for="Form" id="lblSection">Form</label>
             <div class="col-sm-10">
-                <select asp-for="Form" asp-items="@ViewBag.FormList" class="form-control"></select>
+                <select asp-for="Form" asp-items="@ViewBag.FormList" class="form-control formFeedbackSelector"></select>
             </div>
         </div>
 
@@ -73,7 +166,3 @@
         </div>
     </div>
 </form>
-
-
-
-

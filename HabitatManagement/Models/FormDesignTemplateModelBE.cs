@@ -84,7 +84,7 @@ namespace HabitatManagement.Models
 
             if (permitFormScreenDesignTemplateDetailsCheckList != null && permitFormScreenDesignTemplateDetailsCheckList.Count > 0)
             {
-                sb.AppendFormat("<div class=\"dvCheckList form-group\" style=\"margin-bottom: 10px;padding-top: 5px;\" data-field = \"{0}\">", permitFormScreenDesignTemplateDetailsCheckList[0].Field);
+                sb.AppendFormat("<div class=\"dvCheckList form-group\" style=\"margin-bottom: 10px;padding-top: 5px;\" data-field = \"{0}\" field-Type = \"{1}\">", permitFormScreenDesignTemplateDetailsCheckList[0].Field, (int)FormFieldType.CheckList);
                 sb.Append("<table class=\"tableCheckList\"><tr><th></th><th style=\"width: 50px;text-align:center;\"> Yes </th><th style=\"width: 50px;text-align:center;\"> No </th></tr>");
 
                 foreach (var permitFormScreenDesignTemplateDetail in permitFormScreenDesignTemplateDetailsCheckList)
@@ -99,9 +99,9 @@ namespace HabitatManagement.Models
                     else
                     {
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == permitFormScreenDesignTemplateDetail.Field).FirstOrDefault();
-                        sb.AppendFormat("<tr> <td> {0} </td>", permitFormScreenDesignTemplateDetail.FieldName);
-                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" name=\"checkListEntityType\" {0}></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "");
-                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" name=\"checkListEntityType\" {0}></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && !Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "");
+                        sb.AppendFormat("<tr class=\"checkListTR\"> <td data-field = \"{1}\"> {0} </td>", permitFormScreenDesignTemplateDetail.FieldName, permitFormScreenDesignTemplateDetail.Field);
+                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" forType=\"yes\" name=\"{1}\" {0}></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "", permitFormScreenDesignTemplateDetail.Field);
+                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" forType=\"no\" name=\"{1}\" {0}></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && !Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "", permitFormScreenDesignTemplateDetail.Field);
                         sb.Append("</tr>");
                     }
                 }
@@ -116,13 +116,13 @@ namespace HabitatManagement.Models
                 {
                     case FormFieldType.Label:
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
-                        sb.AppendFormat("<div class=\"form-group row\" style=\"padding-left: 25px;padding-right: 20px;text-align: justify;\" data-field = \"{0}\">", field.Field);
+                        sb.AppendFormat("<div class=\"form-group row\" style=\"padding-left: 25px;padding-right: 20px;text-align: justify;\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
                         sb.AppendFormat("<label class=\"col-form-label\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
                         sb.Append("</div>");
                         break;
                     case FormFieldType.Textbox:
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
-                        sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\">", field.Field);
+                        sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
                         sb.AppendFormat("<label class=\"col-lg-4 text-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
                         sb.Append("<div class=\"col-lg-8 pr-5\">");
                         if (RenderForDragnDrop)
@@ -138,7 +138,7 @@ namespace HabitatManagement.Models
                         break;
                     case FormFieldType.TextArea:
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
-                        sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\">", field.Field);
+                        sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
                         sb.AppendFormat("<label class=\"col-lg-4 text-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
                         sb.Append("<div class=\"col-lg-8 pr-5\">");
                         if (RenderForDragnDrop)
@@ -156,18 +156,18 @@ namespace HabitatManagement.Models
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
                         DateTime dateTime;
                         bool isSuccess = DateTime.TryParse(_templateFormFieldData?.FieldValue, out dateTime);
-                        sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\">", field.Field);
+                        sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
                         sb.AppendFormat("<label class=\"col-lg-4 text-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
                         sb.Append("<div class=\"col-lg-8 pr-5\">");
-                        sb.AppendFormat("<div class=\"input-group date col-lg-6 paddlft-none\" id=\"datepicker\">");
+                        sb.AppendFormat("<div class=\"input-group date col-lg-4 paddlft-none\" name=\"datetimepicker\">");
 
                         if (RenderForDragnDrop)
                         {
-                            sb.AppendFormat("<input class=\"form-control\" readonly=\"readonly\" placeholder=\"MM/DD/YYYY\" />");
+                            sb.AppendFormat("<input class=\"form-control\" readonly=\"readonly\" placeholder=\"DD/MM/YYYY\" />");
                         }
                         else
                         {
-                            sb.AppendFormat("<input class=\"form-control\" placeholder=\"MM/DD/YYYY\" value=\"{0}\"/>", dateTime != DateTime.MinValue ? dateTime.ToString("MM/dd/yyyy") : "");
+                            sb.AppendFormat("<input class=\"form-control\" name=\"{1}\" placeholder=\"DD/MM/YYYY\" value=\"{0}\"/>", dateTime != DateTime.MinValue ? dateTime.ToShortDateString() : "", field.Field);
                         }
                         sb.Append("<span class=\"input-group-append input-group-addon\">");
                         sb.Append("<span class=\"input-group-text\"><i class=\"glyphicons glyphicons-calendar\"></i></span>");
@@ -181,17 +181,17 @@ namespace HabitatManagement.Models
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
                         DateTime dateAndTime;
                         bool success = DateTime.TryParse(_templateFormFieldData?.FieldValue, out dateAndTime);
-                        sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\">", field.Field);
+                        sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
                         sb.AppendFormat("<label class=\"col-lg-4 text-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
-                        sb.Append("<div class=\"col-lg-4 pr-5\">");
-                        sb.AppendFormat("<div class=\"input-group date paddlft-none\" id=\"datetimepicker\">");
+                        sb.Append("<div class=\"col-lg-3 pr-5\">");
+                        sb.AppendFormat("<div class=\"input-group date paddlft-none\" name=\"datetimepicker\">");
                         if (RenderForDragnDrop)
                         {
-                            sb.AppendFormat("<input class=\"form-control\" type=\"text\" placeholder=\"MM/DD/YYYY\" readonly=\"readonly\" />");
+                            sb.AppendFormat("<input class=\"form-control\" type=\"text\" placeholder=\"DD/MM/YYYY\" readonly=\"readonly\" />");
                         }
                         else
                         {
-                            sb.AppendFormat("<input class=\"form-control\" type=\"text\" placeholder=\"MM/DD/YYYY\" value=\"{0}\"/>", dateAndTime != DateTime.MinValue ? dateAndTime.ToString("MM/dd/yyyy") : "");
+                            sb.AppendFormat("<input class=\"form-control\" name=\"{1}\" type=\"text\" placeholder=\"DD/MM/YYYY\" value=\"{0}\"/>", dateAndTime != DateTime.MinValue ? dateAndTime.ToShortDateString() : "", field.Field);
                         }
                         sb.Append("<span class=\"input-group-append input-group-addon\">");
                         sb.Append("<span class=\"input-group-text\"><i class=\"glyphicons glyphicons-calendar\"></i></span>");
@@ -199,7 +199,7 @@ namespace HabitatManagement.Models
                         sb.Append("</div>");
                         sb.Append("</div>");
                         sb.Append("<div class=\"col-lg-3 ml-lg-n5\">");
-                        sb.Append("<div class=\"input-group time\" id=\"timepicker\" style=\"width:134px;\">");
+                        sb.Append("<div class=\"input-group time\" name=\"timepicker\" style=\"width:134px;\">");
                         if (RenderForDragnDrop)
                         {
                             sb.AppendFormat("<input class=\"form-control\" placeholder=\"HH: MM\" readonly=\"readonly\" />");
@@ -218,7 +218,7 @@ namespace HabitatManagement.Models
                         break;
                     case FormFieldType.Signature:
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
-                        sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\">", field.Field);
+                        sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
                         sb.AppendFormat("<label class=\"col-lg-4 text-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
                         sb.Append("<div class=\"col-lg-8 pr-5\">");
                         sb.Append("<div class=\"col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none dvSignatureDataType\" >");

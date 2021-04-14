@@ -283,6 +283,7 @@
                 { key: false, name: 'section', index: 'section', search: false },
                 { key: false, name: 'sequence', index: 'sequence', search: false }
             ],
+            pager: jQuery('#pagerFieldDesigner'),
             rowNum: 10,
             rowList: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
             height: '100%',
@@ -313,7 +314,7 @@
             },
             gridComplete: function (e) {
             },
-        })
+        }).navGrid('#pagerFieldDesigner', { edit: false, add: false, del: false, search: false, refresh: false })
 
         $("#tblFieldDesigner").jqGrid('setLabel', 'Select', '', { 'text-align': 'center' });
     }

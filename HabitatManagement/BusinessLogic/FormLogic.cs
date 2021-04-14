@@ -133,6 +133,36 @@ namespace HabitatManagement.BusinessLogic
             return list;
         }
 
+        public static List<PermitFormScreenDesignTemplateDetailBE> BlockFetchPermitFormScreenDesignTemplateDetail(int formId, int pageIndex, int pageSize, out int totalRecords)
+        {
+            totalRecords = 0;
+            List<PermitFormScreenDesignTemplateDetailBE> list = new List<PermitFormScreenDesignTemplateDetailBE>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplateDetail_BlockFetch", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("FormId", formId);
+                cmd.Parameters.AddWithValue("PageIndex", pageIndex);
+                cmd.Parameters.AddWithValue("PageSize", pageSize);
+                cmd.Parameters.Add("RecordCount", SqlDbType.Int, 8);
+                cmd.Parameters["RecordCount"].Direction = ParameterDirection.Output;
+                using (SqlDataReader sqlDataReader = cmd.ExecuteReader())
+                {
+                    while (sqlDataReader.Read())
+                    {
+                        list.Add(ToPermitFormScreenDesignTemplateDetailBE(sqlDataReader));
+                    }
+                }
+                if (cmd.Parameters["RecordCount"].Value != DBNull.Value)
+                {
+                    totalRecords = Convert.ToInt32(cmd.Parameters["RecordCount"].Value);
+                }
+            }
+            return list;
+        }
+
         public static PermitFormScreenDesignTemplateDetailBE FetchPermitFormScreenDesignTemplateDetail(int formId, int field)
         {
             PermitFormScreenDesignTemplateDetailBE o = null;
@@ -242,7 +272,7 @@ namespace HabitatManagement.BusinessLogic
         }
 
 
-        public DigitalSignatureBE FetchDigitalSignature(int surrogate)
+        public static DigitalSignatureBE FetchDigitalSignature(int surrogate)
         {
             DigitalSignatureBE o = null;
 
@@ -263,7 +293,7 @@ namespace HabitatManagement.BusinessLogic
             return o;
         }
 
-        public void AddDigitalSignature(DigitalSignatureBE o, out int createdSurrogate)
+        public static void AddDigitalSignature(DigitalSignatureBE o, out int createdSurrogate)
         {
             createdSurrogate = 0;
             using (SqlConnection conn = new SqlConnection(_connectionstring))
@@ -283,7 +313,7 @@ namespace HabitatManagement.BusinessLogic
             }
         }
 
-        public void UpdateDigitalSignature(DigitalSignatureBE o)
+        public static void UpdateDigitalSignature(DigitalSignatureBE o)
         {
             using (SqlConnection conn = new SqlConnection(_connectionstring))
             {
@@ -316,6 +346,28 @@ namespace HabitatManagement.BusinessLogic
                 }
             }
             return list;
+        }
+
+        public static bool SaveTemplateFormFieldData(TemplateFormFieldDataBE o)
+        {
+            bool success = false;
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_TemplateFormFieldData_Update", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                BusinessEntityHelper.ReplaceNullProperties<TemplateFormFieldDataBE>(o);
+                FromTemplateFormFieldDataBE(ref cmd, o);
+                cmd.Parameters.Add("ErrorOccured", SqlDbType.Bit);
+                cmd.Parameters["ErrorOccured"].Direction = ParameterDirection.Output;
+                cmd.ExecuteNonQuery();
+                if (cmd.Parameters["ErrorOccured"].Value != DBNull.Value)
+                {
+                    success = Convert.ToBoolean(cmd.Parameters["ErrorOccured"].Value);
+                }
+            }
+            return success;
         }
 
         #region Template Form Section
@@ -416,6 +468,13 @@ namespace HabitatManagement.BusinessLogic
         #endregion
 
         #region Private Methods
+
+        private static void FromTemplateFormFieldDataBE(ref SqlCommand cmd, TemplateFormFieldDataBE o)
+        {
+            cmd.Parameters.AddWithValue("FormID", o.FormID);
+            cmd.Parameters.AddWithValue("Field", o.Field);
+            cmd.Parameters.AddWithValue("FieldValue", o.FieldValue);
+        }
 
         private static TemplateFormSectionBE ToTemplateFormSectionBE(SqlDataReader rdr)
         {
