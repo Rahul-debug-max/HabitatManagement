@@ -405,12 +405,14 @@ GO
   
 CREATE PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplateDetail_Fetch]    
 (    
- @FormID INT,   
- @Field INT   
+	@FormID INT,   
+	@Field INT   
 )   
 AS     
-BEGIN  
-   SELECT * FROM PermitFormScreenDesignTemplateDetail WHERE FormID = @FormID AND [Field] = @Field    
+BEGIN 
+	SELECT t.*, t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence 
+	FROM PermitFormScreenDesignTemplateDetail t JOIN TemplateFormSection t1 
+	ON t.Section = t1.Section WHERE t.[FormID] = @FormID AND [Field] = @Field ORDER BY t1.[Sequence], t.[Sequence]  
 END  
 GO
 /****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplateDetail_FetchAll]    Script Date: 08-04-2021 15:51:54 ******/
@@ -450,7 +452,7 @@ CREATE PROCEDURE  [dbo].[usp_PermitFormScreenDesignTemplateDetail_Update]
 )  
 AS  
 BEGIN  
- DECLARE @PrevSection char(1),@PrevSequence int;  
+ DECLARE @PrevSection nvarchar(20),@PrevSequence int;  
   
  IF NOT EXISTS(SELECT 1 FROM PermitFormScreenDesignTemplateDetail WHERE FormID = @FormID AND Field = @Field   
     AND Section = @Section AND [Sequence] = @Sequence)  
@@ -644,26 +646,31 @@ IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_T
 DROP PROCEDURE [dbo].[usp_TemplateFormSection_Add]
 GO
 CREATE PROCEDURE [dbo].[usp_TemplateFormSection_Add]    
- @FormID [int] NULL,
- @Section [nvarchar](20) NULL,
- @Description [nvarchar](max) NULL,
- @Sequence int NULL  
+	@FormID [int] NULL,
+	@Section [nvarchar](20) NULL,
+	@Description [nvarchar](max) NULL,
+	@Sequence int NULL  
 AS    
 BEGIN
 
-INSERT INTO [dbo].TemplateFormSection    
-(
-    [FormID],    
-    [Section],    
-    [Description],    
-    [Sequence]
-)      
-VALUES (    
-    @FormID,    
-    @Section,    
-    @Description,    
-    @Sequence
-)  
+	IF(@Sequence = 0)
+	BEGIN
+		SELECT @Sequence = ISNULL(MAX([Sequence]),0) + 1 FROM TemplateFormSection WHERE FormID = @FormID;
+	END
+
+	INSERT INTO [dbo].TemplateFormSection    
+	(
+		[FormID],    
+		[Section],    
+		[Description],    
+		[Sequence]
+	)      
+	VALUES (    
+		@FormID,    
+		@Section,    
+		@Description,    
+		@Sequence
+	)  
 END
 GO
 

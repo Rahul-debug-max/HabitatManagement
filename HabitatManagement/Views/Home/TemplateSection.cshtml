@@ -16,7 +16,7 @@
         <div class="form-group row">
             <label class="col-sm-2 text-right col-form-label" asp-for="Description">Description</label>
             <div class="col-sm-10">
-                @Html.TextAreaFor(m=> m.Description,new { @class = "form-control" })
+                @Html.TextAreaFor(m => m.Description, new { @class = "form-control textAreaVerticalResizing", @rows = 6 })
             </div>
         </div>
         @Html.HiddenFor(m => m.FormID)                
