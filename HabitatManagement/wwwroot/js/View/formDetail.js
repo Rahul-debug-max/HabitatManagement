@@ -57,8 +57,7 @@
             }
         }
 
-        if (isValid) {
-            debugger;
+        if (isValid) {          
             var surrogateDate = selectedRow;
             var surrogateSectionDate = selectedSectionRow;
             switch (clickFor) {
@@ -201,14 +200,12 @@
         return ajx;
     }
 
-    var renderSectionList = function () {
-        debugger;
+    var renderSectionList = function () {        
         $.ajax({
             url: defaults.getSectionListURL,
             cache: false,            
             data: { formID: defaults.formID },
-            success: function (result) {
-                debugger;
+            success: function (result) {               
                 $("#dvSectionDetail").html(result);               
             },
             error: function () {

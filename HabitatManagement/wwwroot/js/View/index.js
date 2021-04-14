@@ -120,12 +120,12 @@
             url: defaults.addEditURL,
             dataType: 'JSON',
             data: $('#PermitDesignTemplateForm').serialize(),
-            success: function (result) {
+            success: function (result) {               
                 if (result.success) {
                     if (result.id != undefined && result.id > 0) {
                         selectedRow = [];
-                        selectedRow.push(result.ID);
-                        $("#FormID").val(result.ID);
+                        selectedRow.push(result.id);
+                        $("#FormID").val(result.id);
                     }
                     reloadGridForPositioner();
                     if (openDetailDialog != undefined && openDetailDialog) {

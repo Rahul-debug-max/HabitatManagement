@@ -268,8 +268,7 @@
             for (var i = 0; i < buttons.length; i++) {
                 buttonHtml += "<button type='button' class='btn " + (buttons[i].class || "") + "' aria-modalID = '" + modalID + "' name='btn" + modalID + "' id = '" + buttons[i].id + dialogID + "' title = '" + buttons[i].title + "'>" + (buttons[i].text || "<span class='" + buttons[i].icons + "'></span>") + "</button>";
             }
-        }
-        debugger;
+        }        
         dialog.Div.find('.modal-footer').html(buttonHtml);
         dialog.Div.find('.modal-dialog').addClass(dialog.dialogDefaults.modalDialogClass);
         dialog.Div.find('.modal-title').text(dialog.dialogDefaults.title);
@@ -524,7 +523,7 @@
             "class": "btn btn-primary",
             type: "button"
         }];
-        debugger;
+      
         var modalID = 'model-id-' + dialogID;
         var divDetail = "<div class='modal fade' role='dialog' data-backdrop = 'static' id='" + modalID + "'><div class='modal-dialog'><div class='modal-content'>" +
             "<div class='modal-header'><h4 class='modal-title'>" + _requiredDialogTitle + "</h4><button type='button' class='close'>&times;</button></div>" +
