@@ -19,9 +19,9 @@
         font-weight: bold;
     }
 
-/*    .bgLightGray {
+    .bgLightGray {
         background-color: lightgray;
-    }*/
+    }
 
     .conditionDigitalSignature canvas {
         height: 97px !important;
@@ -53,9 +53,9 @@
         padding: 10px;
     }
 
-        .sectionStyle:hover * {
-            cursor: move;
-        }
+    .sectionStyle:hover * {
+        cursor: move;
+    }
 
     .mrgright {
         margin-right: 2px;
@@ -71,9 +71,9 @@
         opacity: 1;
     }
 </style>
-@if (Model.RenderForDragnDrop) {
+<script src="~/lib/jquery/dist/jquery-ui-1.11.0.custom.js"></script>
+
 <script src="~/js/View/FormTemplateFields.js"></script>
-}
 <script src="~/js/JSignature/jSignature.js"></script>
 <script src="~/js/JSignature/jSignature.CompressorBase30.js"></script>
 <script src="~/js/JSignature/jSignature.CompressorSVG.js"></script>
@@ -82,48 +82,47 @@
 <script type="text/javascript">
     var hasStopTimer = false;
     $(document).ready(function () {
-       if ('@Model.RenderForDragnDrop' == 'True') {
-            FormTemplateFields.onInit({
+
+        FormTemplateFields.onInit({
             formId: JSON.parse('@Model.FormID'),
-                saveDataURL: '@Url.Action("PermitFormScreenDesignTemplateDetailFields", "Home")'
-            });
-        }
+            saveDataURL: '@Url.Action("PermitFormScreenDesignTemplateDetailFields", "Home")'
+        });
 
         $('.dvSignatureDataType').each(function (i, ele) {
-        var singnatureDv = $(ele).find('div[id^="digitalSignature_"]');
-        if ($(singnatureDv).find('canvas').length == 0) {
-            var $digSigdiv = singnatureDv.jSignature({ 'UndoButton': false, 'cssclass': 'digitalcanvas' });
-            var image64BitString = $(ele).find('#SignatureResponse');
-            if ($.trim($(image64BitString).val()) != "") {
+            var singnatureDv = $(ele).find('div[id^="digitalSignature_"]');
+            if ($(singnatureDv).find('canvas').length == 0) {
+                var $digSigdiv = singnatureDv.jSignature({ 'UndoButton': false, 'cssclass': 'digitalcanvas' });
+                var image64BitString = $(ele).find('#SignatureResponse');
+                if ($.trim($(image64BitString).val()) != "") {
                     $(singnatureDv).jSignature("importData", $(image64BitString).val());
-            }
+                }
                 $digSigdiv.jSignature("disable");
-        }
-    });
+            }
+        });
 
         $(window).trigger('resize');
         $(window).resize(function () {
-        hasStopTimer = false;
+            hasStopTimer = false;
+            setTimeout(function () {
+                if (!hasStopTimer) {
+                    getDigitalSignature();
+                }
+            }, 1000);
+        });
+
         setTimeout(function () {
             if (!hasStopTimer) {
                 getDigitalSignature();
             }
         }, 1000);
-    });
 
-    setTimeout(function () {
-        if (!hasStopTimer) {
-            getDigitalSignature();
-        }
-    }, 1000);
-
-    setDateTimePicker();
+        setDateTimePicker();
 
         $('.dvCheckList').find('input[type="checkbox"]').on('change', function () {
-        var isChecked = $(this).is(":checked");
+            var isChecked = $(this).is(":checked");
             $(this).closest("tr").find('input:checkbox').prop('checked', false);
             $(this).prop("checked", isChecked);
-    });
+        });
 
         @*if ('@Model.RenderForDragnDrop' == 'True') {
             $('.conditionDigitalSignature canvas').css({ 'background-color': '#eeeeee !important;' });
@@ -189,7 +188,7 @@
 </script>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftght-none">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none xspaddrght">
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none xspaddrght">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none xspaddrght sectionStyle" data-section="">
             @Html.Raw(Model.FormSectionFields())
         </div>
     </div>

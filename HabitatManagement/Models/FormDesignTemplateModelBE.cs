@@ -123,8 +123,8 @@ namespace HabitatManagement.Models
                     case FormFieldType.Textbox:
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
                         sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\">", field.Field);
-                        sb.AppendFormat("<label class=\"col-lg-3 text-right col-form-label paddlftrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
-                        sb.Append("<div class=\"col-lg-7\">");
+                        sb.AppendFormat("<label class=\"col-lg-4 text-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
+                        sb.Append("<div class=\"col-lg-8 pr-5\">");
                         if (RenderForDragnDrop)
                         {
                             sb.AppendFormat("<input type=\"text\" class=\"form-control\" readonly=\"readonly\" \\>");
@@ -139,8 +139,8 @@ namespace HabitatManagement.Models
                     case FormFieldType.TextArea:
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
                         sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\">", field.Field);
-                        sb.AppendFormat("<label class=\"col-lg-3 text-right col-form-label paddlftrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
-                        sb.Append("<div class=\"col-lg-7\">");
+                        sb.AppendFormat("<label class=\"col-lg-4 text-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
+                        sb.Append("<div class=\"col-lg-8 pr-5\">");
                         if (RenderForDragnDrop)
                         {
                             sb.AppendFormat("<textarea class=\"form-control textAreaVerticalResizing\" readonly=\"readonly\" rows=\"3\" ></textarea>");
@@ -157,8 +157,8 @@ namespace HabitatManagement.Models
                         DateTime dateTime;
                         bool isSuccess = DateTime.TryParse(_templateFormFieldData?.FieldValue, out dateTime);
                         sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\">", field.Field);
-                        sb.AppendFormat("<label class=\"col-lg-3 text-right col-form-label paddlftrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
-                        sb.Append("<div class=\"col-lg-7\">");
+                        sb.AppendFormat("<label class=\"col-lg-4 text-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
+                        sb.Append("<div class=\"col-lg-8 pr-5\">");
                         sb.AppendFormat("<div class=\"input-group date col-lg-6 paddlft-none\" id=\"datepicker\">");
 
                         if (RenderForDragnDrop)
@@ -182,7 +182,7 @@ namespace HabitatManagement.Models
                         DateTime dateAndTime;
                         bool success = DateTime.TryParse(_templateFormFieldData?.FieldValue, out dateAndTime);
                         sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\">", field.Field);
-                        sb.AppendFormat("<label class=\"col-lg-3 text-right col-form-label paddlftrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
+                        sb.AppendFormat("<label class=\"col-lg-4 text-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
                         sb.Append("<div class=\"col-lg-4 pr-5\">");
                         sb.AppendFormat("<div class=\"input-group date paddlft-none\" id=\"datetimepicker\">");
                         if (RenderForDragnDrop)
@@ -219,10 +219,10 @@ namespace HabitatManagement.Models
                     case FormFieldType.Signature:
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
                         sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\">", field.Field);
-                        sb.AppendFormat("<label class=\"col-lg-3 text-right col-form-label paddlftrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
-                        sb.Append("<div class=\"col-lg-7\">");
+                        sb.AppendFormat("<label class=\"col-lg-4 text-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
+                        sb.Append("<div class=\"col-lg-8 pr-5\">");
                         sb.Append("<div class=\"col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none dvSignatureDataType\" >");
-                        sb.Append("<div class=\"panel panel-default\" style=\"margin-bottom:0px;\" >");
+                        sb.Append("<div class=\"panel panel-default\" style=\"margin-bottom:0px;border: 1px solid;\" >");
                         sb.Append("<div class=\"panel-heading\" style=\"text-align:right;background-color: #f5f5f5; padding: 10px 15px;\" >");
 
                         if (RenderForDragnDrop)

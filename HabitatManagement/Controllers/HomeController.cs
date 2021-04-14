@@ -266,13 +266,17 @@ namespace HabitatManagement.Controllers
             return Json(new { Success = success });
         }
 
-        public ActionResult PermitFormTemplateFields(int formID)
+        public ActionResult PermitFormTemplateFields(int formID, bool? isRenderForDragnDrop = null)
         {
             List<PermitFormScreenDesignTemplateDetailBE> templateDetails = FormLogic.FetchAllPermitFormScreenDesignTemplateDetail(formID);
             List<TemplateFormFieldDataBE> templateFormFieldData = FormLogic.FetchAllTemplateFormFieldData(formID);
             FormDesignTemplateModelBE model = new FormDesignTemplateModelBE(templateDetails, templateFormFieldData);
             model.FormID = formID;
             model.RenderForDragnDrop = true;
+            if (isRenderForDragnDrop != null)
+            {
+                model.RenderForDragnDrop = isRenderForDragnDrop.Value;
+            }
             return View(model);
         }
 
