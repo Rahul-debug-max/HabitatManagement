@@ -116,7 +116,7 @@ namespace HabitatManagement.Models
                 {
                     case FormFieldType.Label:
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
-                        sb.AppendFormat("<div class=\"form-group row\" style=\"padding-left: 25px;padding-right: 5px;\" data-field = \"{0}\">", field.Field);
+                        sb.AppendFormat("<div class=\"form-group row\" style=\"padding-left: 25px;padding-right: 20px;text-align: justify;\" data-field = \"{0}\">", field.Field);
                         sb.AppendFormat("<label class=\"col-form-label\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
                         sb.Append("</div>");
                         break;

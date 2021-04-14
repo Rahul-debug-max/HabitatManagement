@@ -441,87 +441,101 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
   
-CREATE PROCEDURE  [dbo].[usp_PermitFormScreenDesignTemplateDetail_Update]  
-(  
-    @FormID INT,  
-    @Field INT,    
-    @FieldName nvarchar(max),    
-    @FieldType INT,     
-    @Section nvarchar(20),      
-    @Sequence INT  
-)  
-AS  
-BEGIN  
- DECLARE @PrevSection nvarchar(20),@PrevSequence int;  
-  
- IF NOT EXISTS(SELECT 1 FROM PermitFormScreenDesignTemplateDetail WHERE FormID = @FormID AND Field = @Field   
-    AND Section = @Section AND [Sequence] = @Sequence)  
- BEGIN  
-  SELECT @PrevSection = Section, @PrevSequence = [Sequence] FROM PermitFormScreenDesignTemplateDetail   
-  WHERE FormID = @FormID AND Field = @Field;  
-  
-  IF(@PrevSection != @Section)  
-  BEGIN  
-   UPDATE PermitFormScreenDesignTemplateDetail SET   
-    [Sequence] = [Sequence] + 1  
-    WHERE PermitFormScreenDesignTemplateDetail.FormID = @FormID AND Section = @Section  
-    AND [Sequence] >= @Sequence  
-  
-   UPDATE PermitFormScreenDesignTemplateDetail    
-   SET FieldName = @FieldName,    
+CREATE PROCEDURE  [dbo].[usp_PermitFormScreenDesignTemplateDetail_Update]    
+(    
+    @FormID INT,    
+    @Field INT,      
+    @FieldName nvarchar(max),      
+    @FieldType INT,       
+    @Section nvarchar(20),        
+    @Sequence INT    
+)    
+AS    
+BEGIN    
+ DECLARE @PrevSection nvarchar(20),@PrevSequence int;    
+ DECLARE @CheckListPrevSection nvarchar(20);
+ 
+ SELECT @CheckListPrevSection = Section FROM PermitFormScreenDesignTemplateDetail
+  WHERE FormID = @FormID AND FieldType = 9 AND Field = @Field
+
+ IF NOT EXISTS(SELECT 1 FROM PermitFormScreenDesignTemplateDetail WHERE FormID = @FormID AND Field = @Field     
+    AND Section = @Section AND [Sequence] = @Sequence)    
+ BEGIN    
+  SELECT @PrevSection = Section, @PrevSequence = [Sequence] FROM PermitFormScreenDesignTemplateDetail     
+  WHERE FormID = @FormID AND Field = @Field;    
+    
+  IF(@PrevSection != @Section)    
+  BEGIN    
+   UPDATE PermitFormScreenDesignTemplateDetail SET     
+    [Sequence] = [Sequence] + 1    
+    WHERE PermitFormScreenDesignTemplateDetail.FormID = @FormID AND Section = @Section    
+    AND [Sequence] >= @Sequence    
+    
+   UPDATE PermitFormScreenDesignTemplateDetail      
+   SET FieldName = @FieldName,      
+   FieldType = @FieldType,          
+   [Section] = @Section,      
+   [Sequence] = @Sequence    
+   WHERE FormID = @FormID AND [Field] = @Field    
+    
+   ;WITH templateField    
+   AS    
+   (    
+    SELECT ROW_NUMBER() OVER(ORDER BY [Sequence]) AS RowNumber, FormID,[Section],[Field] FROM PermitFormScreenDesignTemplateDetail    
+    WHERE FormID = @FormID AND Section = @PrevSection    
+   )    
+    
+   UPDATE PermitFormScreenDesignTemplateDetail SET PermitFormScreenDesignTemplateDetail.[Sequence] = templateField.RowNumber    
+   FROM PermitFormScreenDesignTemplateDetail INNER JOIN templateField ON     
+   PermitFormScreenDesignTemplateDetail.FormID = templateField.FormID     
+   AND PermitFormScreenDesignTemplateDetail.Section = templateField.Section    
+   AND PermitFormScreenDesignTemplateDetail.[Field] = templateField.[Field];    
+  END    
+  ELSE    
+  BEGIN    
+   IF (@PrevSequence > @Sequence) --Increment seq no      
+   BEGIN    
+    UPDATE PermitFormScreenDesignTemplateDetail SET     
+    PermitFormScreenDesignTemplateDetail.[Sequence] = PermitFormScreenDesignTemplateDetail.[Sequence] + 1    
+    WHERE PermitFormScreenDesignTemplateDetail.FormID = @FormID AND Section = @Section    
+    AND [Sequence] >= @Sequence AND [Sequence] < @PrevSequence    
+   END    
+   ELSE IF (@PrevSequence < @Sequence) --decrement seq no     
+   BEGIN    
+    UPDATE PermitFormScreenDesignTemplateDetail SET     
+    PermitFormScreenDesignTemplateDetail.[Sequence] = PermitFormScreenDesignTemplateDetail.[Sequence] - 1    
+    WHERE PermitFormScreenDesignTemplateDetail.FormID = @FormID AND Section = @Section    
+    AND [Sequence] > @PrevSequence AND [Sequence] <= @Sequence    
+   END    
+    
+   UPDATE PermitFormScreenDesignTemplateDetail      
+   SET FieldName = @FieldName,      
    FieldType = @FieldType,        
-   [Section] = @Section,    
-   [Sequence] = @Sequence  
-   WHERE FormID = @FormID AND [Field] = @Field  
-  
-   ;WITH templateField  
-   AS  
-   (  
-    SELECT ROW_NUMBER() OVER(ORDER BY [Sequence]) AS RowNumber, FormID,[Section],[Field] FROM PermitFormScreenDesignTemplateDetail  
-    WHERE FormID = @FormID AND Section = @PrevSection  
-   )  
-  
-   UPDATE PermitFormScreenDesignTemplateDetail SET PermitFormScreenDesignTemplateDetail.[Sequence] = templateField.RowNumber  
-   FROM PermitFormScreenDesignTemplateDetail INNER JOIN templateField ON   
-   PermitFormScreenDesignTemplateDetail.FormID = templateField.FormID   
-   AND PermitFormScreenDesignTemplateDetail.Section = templateField.Section  
-   AND PermitFormScreenDesignTemplateDetail.[Field] = templateField.[Field];  
-  END  
-  ELSE  
-  BEGIN  
-   IF (@PrevSequence > @Sequence) --Increment seq no    
-   BEGIN  
-    UPDATE PermitFormScreenDesignTemplateDetail SET   
-    PermitFormScreenDesignTemplateDetail.[Sequence] = PermitFormScreenDesignTemplateDetail.[Sequence] + 1  
-    WHERE PermitFormScreenDesignTemplateDetail.FormID = @FormID AND Section = @Section  
-    AND [Sequence] >= @Sequence AND [Sequence] < @PrevSequence  
-   END  
-   ELSE IF (@PrevSequence < @Sequence) --decrement seq no   
-   BEGIN  
-    UPDATE PermitFormScreenDesignTemplateDetail SET   
-    PermitFormScreenDesignTemplateDetail.[Sequence] = PermitFormScreenDesignTemplateDetail.[Sequence] - 1  
-    WHERE PermitFormScreenDesignTemplateDetail.FormID = @FormID AND Section = @Section  
-    AND [Sequence] > @PrevSequence AND [Sequence] <= @Sequence  
-   END  
-  
-   UPDATE PermitFormScreenDesignTemplateDetail    
-   SET FieldName = @FieldName,    
-   FieldType = @FieldType,      
-   [Section] = @Section,    
-   [Sequence] = @Sequence  
-   WHERE FormID = @FormID AND [Field] = @Field  
-  END  
- END  
- ELSE  
- BEGIN  
-  UPDATE PermitFormScreenDesignTemplateDetail    
-  SET FieldName = @FieldName,    
-   FieldType = @FieldType,      
-  [Section] = @Section,    
-  [Sequence] = @Sequence   
-  WHERE FormID = @FormID AND [Field] = @Field  
- END  
-END  
+   [Section] = @Section,      
+   [Sequence] = @Sequence    
+   WHERE FormID = @FormID AND [Field] = @Field    
+  END    
+ END    
+ ELSE    
+ BEGIN    
+  UPDATE PermitFormScreenDesignTemplateDetail      
+  SET FieldName = @FieldName,      
+   FieldType = @FieldType,        
+  [Section] = @Section,      
+  [Sequence] = @Sequence     
+  WHERE FormID = @FormID AND [Field] = @Field    
+ END    
+
+  -- Check List Type
+  IF EXISTS (SELECT 1 FROM PermitFormScreenDesignTemplateDetail WHERE FormID = @FormID AND FieldType = 9 AND Field = @Field)
+  BEGIN
+
+    UPDATE PermitFormScreenDesignTemplateDetail
+	  SET Section = @Section, [Sequence] = @Sequence
+	WHERE FormID = @FormID AND FieldType = 9 AND Section = @CheckListPrevSection
+
+  END
+END    
 GO
 
 
