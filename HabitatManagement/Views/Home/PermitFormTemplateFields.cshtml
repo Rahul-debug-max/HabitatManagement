@@ -125,6 +125,12 @@
             $(this).closest("tr").find('input:checkbox').prop('checked', false);
             $(this).prop("checked", isChecked);
         });
+
+        $('.formFieldTypeCheckbox').find('input[type="checkbox"]').on('change', function () {
+            var isChecked = $(this).is(":checked");
+            $(this).closest("div").find('input:checkbox').prop('checked', false);
+            $(this).prop("checked", isChecked);
+        });
     });
 
     function getDigitalSignature() {

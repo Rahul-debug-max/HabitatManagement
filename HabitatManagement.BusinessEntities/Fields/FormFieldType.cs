@@ -9,7 +9,7 @@ namespace HabitatManagement.BusinessEntities
     {
         //None = 0,
         Textbox = 1,
-       // Checkbox = 2,
+        Checkbox = 2,
        // Radio = 3,
        // Dropdown = 4,
         Date = 5,

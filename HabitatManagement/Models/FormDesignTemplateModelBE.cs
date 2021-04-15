@@ -77,13 +77,31 @@ namespace HabitatManagement.Models
             sb.AppendFormat("<div class=\"container-fluid formOuterStyle bgLightGray sortable_list connectedSortable\" data-section = \"{0}\" >", groupingFields.Key);
             var sortableGroupingFields = groupingFields.OrderBy(s => s.Sequence).ToList() ?? new List<PermitFormScreenDesignTemplateDetailBE>();
             sb.AppendFormat("<label class=\"col-lg-12 col-form-label fontBold\">{0}</label>", sortableGroupingFields[0].SectionDescription);
-            List<PermitFormScreenDesignTemplateDetailBE> permitFormScreenDesignTemplateDetailsCheckList = sortableGroupingFields.Where(s => s.FieldType == FormFieldType.CheckList).Select(s => s).ToList();
+            List<PermitFormScreenDesignTemplateDetailBE> permitFormScreenDesignTemplateDetailsCheckList = sortableGroupingFields.Where(s => s.FieldType == FormFieldType.CheckList).OrderBy(s=>s.Field).ThenBy(s=>s.Sequence).Select(s => s).ToList();
             bool isCheckList = false;
 
             foreach (var field in sortableGroupingFields)
             {
                 switch (field.FieldType)
                 {
+                    case FormFieldType.Checkbox:
+                        _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
+                        sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
+                        sb.AppendFormat("<label class=\"col-lg-4 text-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
+                        sb.Append("<div class=\"col-lg-8 pr-5 formFieldTypeCheckbox\" style=\"padding-top:7px;\">");
+                        if (RenderForDragnDrop)
+                        {
+                            sb.AppendFormat("<label class=\"align-items-center d-inline-flex\"> Yes <input type=\"checkbox\" class=\"ml-2\" forType=\"yes\" name=\"{0}\" disabled>  </label>", field.Field);
+                            sb.AppendFormat("<label class=\"align-items-center d-inline-flex\" style=\"margin-left:22px;\"> No <input type=\"checkbox\" class=\"ml-2\" forType=\"no\" name=\"{0}\" disabled> </label>", field.Field);
+                        }
+                        else
+                        {
+                            sb.AppendFormat("<label class=\"align-items-center d-inline-flex\"> Yes <input type=\"checkbox\" class=\"ml-2\" forType=\"yes\" name=\"{0}\" {1}>  </label>", field.Field, !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "");
+                            sb.AppendFormat("<label class=\"align-items-center d-inline-flex\" style=\"margin-left:22px;\"> No <input type=\"checkbox\" class=\"ml-2\" forType=\"no\" name=\"{0}\" {1}> </label>", field.Field, !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && !Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "");
+                        }
+                        sb.Append("</div>");
+                        sb.Append("</div>");
+                        break;
                     case FormFieldType.Label:
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
                         sb.AppendFormat("<div class=\"form-group row\" style=\"padding-left: 25px;padding-right: 20px;text-align: justify;\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
