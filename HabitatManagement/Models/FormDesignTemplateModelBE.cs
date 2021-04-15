@@ -75,40 +75,10 @@ namespace HabitatManagement.Models
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat("<div class=\"container-fluid formOuterStyle bgLightGray sortable_list connectedSortable\" data-section = \"{0}\" >", groupingFields.Key);
-
             var sortableGroupingFields = groupingFields.OrderBy(s => s.Sequence).ToList() ?? new List<PermitFormScreenDesignTemplateDetailBE>();
-
             sb.AppendFormat("<label class=\"col-lg-12 col-form-label fontBold\">{0}</label>", sortableGroupingFields[0].SectionDescription);
-
             List<PermitFormScreenDesignTemplateDetailBE> permitFormScreenDesignTemplateDetailsCheckList = sortableGroupingFields.Where(s => s.FieldType == FormFieldType.CheckList).Select(s => s).ToList();
-
-            if (permitFormScreenDesignTemplateDetailsCheckList != null && permitFormScreenDesignTemplateDetailsCheckList.Count > 0)
-            {
-                sb.AppendFormat("<div class=\"dvCheckList form-group\" style=\"margin-bottom: 10px;padding-top: 5px;\" data-field = \"{0}\" field-Type = \"{1}\">", permitFormScreenDesignTemplateDetailsCheckList[0].Field, (int)FormFieldType.CheckList);
-                sb.Append("<table class=\"tableCheckList\"><tr><th></th><th style=\"width: 50px;text-align:center;\"> Yes </th><th style=\"width: 50px;text-align:center;\"> No </th></tr>");
-
-                foreach (var permitFormScreenDesignTemplateDetail in permitFormScreenDesignTemplateDetailsCheckList)
-                {
-                    if (RenderForDragnDrop)
-                    {
-                        sb.AppendFormat("<tr> <td> {0} </td>", permitFormScreenDesignTemplateDetail.FieldName);
-                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" name=\"checkListEntityType\" disabled></td>");
-                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" name=\"checkListEntityType\" disabled></td>");
-                        sb.Append("</tr>");
-                    }
-                    else
-                    {
-                        _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == permitFormScreenDesignTemplateDetail.Field).FirstOrDefault();
-                        sb.AppendFormat("<tr class=\"checkListTR\"> <td data-field = \"{1}\"> {0} </td>", permitFormScreenDesignTemplateDetail.FieldName, permitFormScreenDesignTemplateDetail.Field);
-                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" forType=\"yes\" name=\"{1}\" {0}></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "", permitFormScreenDesignTemplateDetail.Field);
-                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" forType=\"no\" name=\"{1}\" {0}></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && !Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "", permitFormScreenDesignTemplateDetail.Field);
-                        sb.Append("</tr>");
-                    }
-                }
-
-                sb.Append("</table>");
-                sb.Append("</div>");
-            }
+            bool isCheckList = false;
 
             foreach (var field in sortableGroupingFields)
             {
@@ -253,6 +223,41 @@ namespace HabitatManagement.Models
                         sb.Append("</div>");
 
                         break;
+                    case FormFieldType.CheckList:
+
+                        if (!isCheckList)
+                        {
+                            if (permitFormScreenDesignTemplateDetailsCheckList != null && permitFormScreenDesignTemplateDetailsCheckList.Count > 0)
+                            {
+                                isCheckList = true;
+                                sb.AppendFormat("<div class=\"dvCheckList form-group\" style=\"margin-bottom: 10px;padding-top: 5px;\" data-field = \"{0}\" field-Type = \"{1}\">", permitFormScreenDesignTemplateDetailsCheckList[0].Field, (int)FormFieldType.CheckList);
+                                sb.Append("<table class=\"tableCheckList\"><tr><th></th><th style=\"width: 50px;text-align:center;\"> Yes </th><th style=\"width: 50px;text-align:center;\"> No </th></tr>");
+
+                                foreach (var permitFormScreenDesignTemplateDetail in permitFormScreenDesignTemplateDetailsCheckList)
+                                {
+                                    if (RenderForDragnDrop)
+                                    {
+                                        sb.AppendFormat("<tr> <td> {0} </td>", permitFormScreenDesignTemplateDetail.FieldName);
+                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" name=\"checkListEntityType\" disabled></td>");
+                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" name=\"checkListEntityType\" disabled></td>");
+                                        sb.Append("</tr>");
+                                    }
+                                    else
+                                    {
+                                        _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == permitFormScreenDesignTemplateDetail.Field).FirstOrDefault();
+                                        sb.AppendFormat("<tr class=\"checkListTR\"> <td data-field = \"{1}\"> {0} </td>", permitFormScreenDesignTemplateDetail.FieldName, permitFormScreenDesignTemplateDetail.Field);
+                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" forType=\"yes\" name=\"{1}\" {0}></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "", permitFormScreenDesignTemplateDetail.Field);
+                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" forType=\"no\" name=\"{1}\" {0}></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && !Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "", permitFormScreenDesignTemplateDetail.Field);
+                                        sb.Append("</tr>");
+                                    }
+                                }
+
+                                sb.Append("</table>");
+                                sb.Append("</div>");
+                            }
+                        }
+                        break;
+
                 }
             }
 
