@@ -55,7 +55,7 @@ namespace HabitatManagement.Models
         public string FormSectionFields()
         {
             StringBuilder sb = new StringBuilder();
-            var sectionGroupFields = _fields.GroupBy(o => o.Section).OrderBy(s => s.Key).Select(x => x).ToList();
+            var sectionGroupFields = _fields.OrderBy(m=> m.SectionSequence).ThenBy(m => m.Sequence).GroupBy(o => o.Section).Select(x => x).ToList();
 
             if (sectionGroupFields != null && sectionGroupFields.Count > 0)
             {

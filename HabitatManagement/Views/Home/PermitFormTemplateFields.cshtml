@@ -19,7 +19,7 @@
         font-weight: bold;
     }
 
-/*    .bgLightGray {
+    /*    .bgLightGray {
         background-color: lightgray;
     }*/
 
@@ -71,8 +71,9 @@
         opacity: 1;
     }
 </style>
-@if (Model.RenderForDragnDrop) {
-<script src="~/js/View/FormTemplateFields.js"></script>
+@if (Model.RenderForDragnDrop)
+{
+    <script src="~/js/View/FormTemplateFields.js"></script>
 }
 <script src="~/js/JSignature/jSignature.js"></script>
 <script src="~/js/JSignature/jSignature.CompressorBase30.js"></script>
@@ -185,6 +186,6 @@
 </script>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftght-none">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none xspaddrght dvFormFeedbackData">
-            @Html.Raw(Model.FormSectionFields())
+        @Html.Raw(Model.FormSectionFields())
     </div>
 </div>

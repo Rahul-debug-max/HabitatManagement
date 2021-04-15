@@ -410,9 +410,10 @@ CREATE PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplateDetail_Fetch]
 )   
 AS     
 BEGIN 
-	SELECT t.*, t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence 
-	FROM PermitFormScreenDesignTemplateDetail t RIGHT JOIN TemplateFormSection t1 
-	ON t.Section = t1.Section WHERE t1.[FormID] = @FormID AND [Field] = @Field ORDER BY t1.[Sequence], t.[Sequence]  
+	SELECT t.[FormID], t.[Field], t.[FieldName], t.[FieldType], t.[Sequence], t1.[Section], 
+	t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence  
+	FROM PermitFormScreenDesignTemplateDetail t JOIN TemplateFormSection t1 
+	ON t.Section = t1.Section WHERE t1.[FormID] = @FormID AND [Field] = @Field AND ISNULL(t1.[Description],'') != '' ORDER BY t1.[Sequence], t.[Sequence]  
 END  
 GO
 /****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplateDetail_FetchAll]    Script Date: 08-04-2021 15:51:54 ******/
@@ -429,9 +430,10 @@ AS
 BEGIN  
 SET NOCOUNT ON;  
    
-	SELECT t.*, t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence 
+	SELECT t.[FormID], t.[Field], t.[FieldName], t.[FieldType], t.[Sequence], t1.[Section], 
+	t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence 
 	FROM PermitFormScreenDesignTemplateDetail t RIGHT JOIN TemplateFormSection t1 
-	ON t.Section = t1.Section WHERE t1.[FormID] = @FormID AND t.FormID IS NOT NULL ORDER BY t1.[Sequence], t.[Sequence]
+	ON t.Section = t1.Section WHERE t1.[FormID] = @FormID AND ISNULL(t1.[Description],'') != '' ORDER BY t1.[Sequence], t.[Sequence]
 
 END  
 GO
@@ -639,7 +641,7 @@ CREATE PROCEDURE [dbo].usp_TemplateFormSection_FetchAll
 AS         
 BEGIN        
 SET NOCOUNT ON;         
-   SELECT t.* FROM TemplateFormSection AS t  WHERE t.FormID = @FormID      
+   SELECT t.* FROM TemplateFormSection AS t  WHERE t.FormID = @FormID ORDER BY [Sequence]     
 END      
 GO
 
@@ -652,7 +654,7 @@ CREATE PROCEDURE [dbo].[usp_TemplateFormSection_Fetch]
 AS    
 BEGIN    
 SET NOCOUNT ON;        
-   SELECT t.* FROM TemplateFormSection AS t  WHERE t.FormID = @FormID AND t.Section = @Section
+   SELECT t.* FROM TemplateFormSection AS t  WHERE t.FormID = @FormID AND t.Section = @Section ORDER BY [Sequence]
 END    
 GO
 
@@ -799,11 +801,12 @@ BEGIN
  END      
   
  SELECT @RecordCount = COUNT(*)  FROM PermitFormScreenDesignTemplateDetail t RIGHT JOIN TemplateFormSection t1   
- ON t.Section = t1.Section WHERE t1.[FormID] = @FormID AND t.FormID IS NOT NULL
+ ON t.Section = t1.Section WHERE t1.[FormID] = @FormID AND ISNULL(t1.[Description],'') != ''
         
- SELECT t.*, t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence   
+ SELECT t.[FormID], t.[Field], t.[FieldName], t.[FieldType], t.[Sequence], t1.[Section], 
+	t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence   
  FROM PermitFormScreenDesignTemplateDetail t RIGHT JOIN TemplateFormSection t1   
- ON t.Section = t1.Section WHERE t1.[FormID] = @FormID AND t.FormID IS NOT NULL
+ ON t.Section = t1.Section WHERE t1.[FormID] = @FormID  AND ISNULL(t1.[Description],'') != ''
  ORDER BY t1.[Sequence], t.[Sequence]           
  OFFSET @PageSize * (@PageIndex - 1) ROWS FETCH NEXT @PageSize ROWS ONLY;    
 

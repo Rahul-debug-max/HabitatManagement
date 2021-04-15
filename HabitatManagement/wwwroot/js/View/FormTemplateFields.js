@@ -11,7 +11,7 @@
     var makeDivSortable = function () {
 
         $(".sortable_list").sortable({
-            items: $("div.form-group"),
+            items: $(".dvFormFeedbackData div.form-group"),
             connectWith: ".connectedSortable",
             containment: 'document',
             placeholder: "ui-state-highlight",   

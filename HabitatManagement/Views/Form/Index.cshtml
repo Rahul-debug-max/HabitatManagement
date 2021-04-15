@@ -88,7 +88,7 @@
                     fieldValue = $(obj).find('#SignatureId').val();
                 }
                 else if (fieldType == '@Convert.ToInt32(FormFieldType.TextArea)') {
-                    fieldValue = $(objParent).find('textarea[name^=' + field + ']').val();
+                    fieldValue = $(obj).find('textarea[name^=' + field + ']').val();
                 }
                 if (fieldType != '@Convert.ToInt32(FormFieldType.CheckList)') {
                     data.push({
