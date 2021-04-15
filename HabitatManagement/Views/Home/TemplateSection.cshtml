@@ -10,7 +10,14 @@
         <div class="form-group row">
             <label class="col-sm-2 text-right col-form-label" asp-for="Section">Section</label>
             <div class="col-sm-10">
-                @Html.TextBox("Section", Model.Section, new { @class = "form-control uppercaseTextBox" })
+                @if (!string.IsNullOrWhiteSpace(Model.Section))
+                {
+                    @Html.TextBox("Section", Model.Section, new { @class = "form-control uppercaseTextBox", @readOnly = "readonly" })
+                }
+                else
+                {
+                    @Html.TextBox("Section", Model.Section, new { @class = "form-control uppercaseTextBox"})
+                }
             </div>
         </div>
         <div class="form-group row">
@@ -19,6 +26,6 @@
                 @Html.TextAreaFor(m => m.Description, new { @class = "form-control textAreaVerticalResizing", @rows = 6 })
             </div>
         </div>
-        @Html.HiddenFor(m => m.FormID)                
+        @Html.HiddenFor(m => m.FormID)
     </div>
 </form>

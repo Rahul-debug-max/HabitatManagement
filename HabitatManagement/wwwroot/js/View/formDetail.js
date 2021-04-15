@@ -48,7 +48,14 @@
     var fireonClick = function (clickFor, selectionRequired) {
         var isValid = true;
         if (selectionRequired) {
-            if (selectedRow.length <= 0) {
+            if ((selectedSectionRow.length <= 0 && (clickFor == "delSection" || clickFor == "editSection"))) {
+                WCMDialog.openOkBtnDialog({
+                    requiredDialogTitle: "Entity not selected",
+                    requiredDialogMessage: "Select entity"
+                });
+                isValid = false;
+            }
+            else if ((selectedRow.length <= 0 && (clickFor == "del" || clickFor == "edit"))) {
                 WCMDialog.openOkBtnDialog({
                     requiredDialogTitle: "Entity not selected",
                     requiredDialogMessage: "Select entity"
@@ -328,12 +335,19 @@
         }
     }
 
+    var getSelectedSection = function (e) {
+        var formID = $(e).attr('data-FormID');
+        var section = $(e).attr('data-Section');
+        selectedSectionRow = [];
+        selectedSectionRow.push({ formID: formID, section: section });
+    }
+
     return {
         onInit: onInit,
         fireonClick: fireonClick,
         reloadGridForPositioner: reloadGridForPositioner,
         getSelectedTemplate: getSelectedTemplate,
-        saveFormField: saveFormField
-
+        saveFormField: saveFormField,
+        getSelectedSection: getSelectedSection
     }
 }());

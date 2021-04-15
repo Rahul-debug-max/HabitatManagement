@@ -17,7 +17,17 @@
                 });
                 saveSectionSequence();
             }
+        });   
+
+        $("#dvSectionList tr").on('click', function () {
+            $("#dvSectionList tr").removeClass('ui-state-highlight');
+            $(this).addClass('ui-state-highlight');
+            PermitFormFieldDetail.getSelectedSection(this);
         });
+
+        $("#dvSectionList tr").dblclick(function () {
+            PermitFormFieldDetail.fireonClick('editSection', true);
+        }); 
 
         var saveSectionSequence = function () {
             var postData = $('#TemplateSectionListForm').serialize();
@@ -54,12 +64,12 @@
             <tbody id="dvSectionList">
                 @for (int index = 0; index < Model.TemplateSectionDetail.Count; index++)
                 {
-                    <tr class='table-row'>
+                    <tr class='table-row' data-FormID="@Model.TemplateSectionDetail[index].FormID" data-Section="@Model.TemplateSectionDetail[index].Section">
                         <td style="vertical-align: middle; width: 110px;">
                             @Model.TemplateSectionDetail[index].Section
-                            <input type="hidden" name="TemplateDetails[@index].FormID" value="@Model.TemplateSectionDetail[index].FormID" />
-                            <input type="hidden" name="TemplateDetails[@index].SectionName" value="@Model.TemplateSectionDetail[index].Section" />
-                            <input type="hidden" name="TemplateDetails[@index].Sequence" value="@Model.TemplateSectionDetail[index].Sequence" />
+                            <input type="hidden" name="TemplateSectionDetail[@index].FormID" value="@Model.TemplateSectionDetail[index].FormID" />
+                            <input type="hidden" name="TemplateSectionDetail[@index].Section" value="@Model.TemplateSectionDetail[index].Section" />
+                            <input type="hidden" name="TemplateSectionDetail[@index].Sequence" value="@Model.TemplateSectionDetail[index].Sequence" />
                         </td>
                         <td class="text-center" style="width: 67px;">
                             @Model.TemplateSectionDetail[index].Description

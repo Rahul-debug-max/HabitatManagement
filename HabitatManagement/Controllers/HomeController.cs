@@ -198,11 +198,11 @@ namespace HabitatManagement.Controllers
             return PartialView("TemplateSectionList", model);
         }
 
-        public ActionResult TemplateSection(int formID, string sectionName)
+        public ActionResult TemplateSection(int formID, string section)
         {
             TemplateFormSectionBE model;
 
-            model = FormLogic.FetchTemplateFormSection(formID, sectionName ?? "");
+            model = FormLogic.FetchTemplateFormSection(formID, section ?? "");
             if (model == null)
             {
                 model = new TemplateFormSectionBE();
@@ -238,11 +238,11 @@ namespace HabitatManagement.Controllers
             return Json(new { success, id });
         }
 
-        public JsonResult DeleteTemplateSection(int formID, string sectionName)
+        public JsonResult DeleteTemplateSection(int formID, string section)
         {
             bool success = false;
 
-            success = FormLogic.DeleteTemplateFormSection(formID, sectionName);
+            success = FormLogic.DeleteTemplateFormSection(formID, section);
 
             return new JsonResult(new { Success = success });
         }
@@ -253,16 +253,21 @@ namespace HabitatManagement.Controllers
         {
             bool success = true;
 
-            if(model.TemplateSectionDetail != null && model.TemplateSectionDetail.Count > 0)
+            if (model.TemplateSectionDetail != null && model.TemplateSectionDetail.Count > 0)
             {
-                foreach(var se in model.TemplateSectionDetail)
+                foreach (var se in model.TemplateSectionDetail)
                 {
-                    if(success)
+                    if (success)
                     {
-                        success = FormLogic.UpdateTemplateFormSection(se);
+                        TemplateFormSectionBE templateFormSection = FormLogic.FetchTemplateFormSection(se.FormID, se.Section);
+                        if (templateFormSection != null)
+                        {
+                            templateFormSection.Sequence = se.Sequence;
+                            success = FormLogic.UpdateTemplateFormSection(templateFormSection);
+                        }
                     }
-                }                
-            }           
+                }
+            }
             return Json(new { Success = success });
         }
 
