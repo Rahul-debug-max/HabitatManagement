@@ -2,6 +2,7 @@
 using HabitatManagement.WebAPI.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,6 +40,60 @@ namespace HabitatManagement.WebAPI.Controllers
             model.FormID = formID;
             model.RenderForDragnDrop = isRenderForDragnDrop;
             return model.FormSectionFields();
+        }
+
+        [HttpPost]
+        [Route("SaveFormData/{data:string}")]
+        public bool SaveFormData(string data)
+        {
+            bool success = true;
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(data))
+                {
+                    List<TemplateFormFieldDataBE> templateFormFieldDatas = JsonConvert.DeserializeObject<List<TemplateFormFieldDataBE>>(data);
+
+                    foreach (var templateFormFieldDataBE in templateFormFieldDatas)
+                    {
+                        string digitalSignatureImage64BitString = templateFormFieldDataBE.DigitalSignatureImage64BitString;
+                        string signatureID = templateFormFieldDataBE.FieldValue;
+                        if (templateFormFieldDataBE.FieldType == FormFieldType.Signature.ToString())
+                        {
+                            int surrogate = 0;
+                            DigitalSignatureBE digitalSignature = FormLogic.FetchDigitalSignature(Functions.ToInt(signatureID));
+                            if (digitalSignature != null)
+                            {
+                                digitalSignature.DigitalSignatureImage64BitString = digitalSignatureImage64BitString ?? string.Empty;
+                                digitalSignature.LastUpdatedDate = DateTime.Now;
+                                FormLogic.UpdateDigitalSignature(digitalSignature);
+                            }
+                            else if (!string.IsNullOrWhiteSpace(digitalSignatureImage64BitString))
+                            {
+                                digitalSignature = new DigitalSignatureBE();
+                                digitalSignature.CreationDateTime = DateTime.Now;
+                                digitalSignature.LastUpdatedDate = DateTime.Now;
+                                digitalSignature.DigitalSignatureImage64BitString = digitalSignatureImage64BitString ?? string.Empty;
+                                FormLogic.AddDigitalSignature(digitalSignature, out surrogate);
+                            }
+                            if (surrogate > 0)
+                            {
+                                templateFormFieldDataBE.FieldValue = surrogate.ToString();
+                            }
+                        }
+
+                        if (templateFormFieldDataBE.FormID > 0 && templateFormFieldDataBE.Field > 0)
+                        {
+                            success = FormLogic.SaveTemplateFormFieldData(templateFormFieldDataBE);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                success = false;
+            }
+
+            return success;
         }
     }
 }
