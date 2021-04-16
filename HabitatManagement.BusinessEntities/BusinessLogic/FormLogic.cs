@@ -1,5 +1,4 @@
-﻿using HabitatManagement.BusinessEntities;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,11 +6,11 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HabitatManagement.BusinessLogic
+namespace HabitatManagement.BusinessEntities
 {
     public class FormLogic
     {
-        static string _connectionstring = Startup.ConnectionString;
+        static string _connectionstring = DBConfiguration.Connection;
 
         public static List<PermitFormScreenDesignTemplateBE> BlockFetchPermitFormScreenDesignTemplate(int pageIndex, int pageSize, out int totalRecords, string searchForm)
         {

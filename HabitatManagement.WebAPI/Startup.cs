@@ -2,30 +2,24 @@ using HabitatManagement.BusinessEntities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HabitatManagement
+namespace HabitatManagement.WebAPI
 {
     public class Startup
     {
-        public IConfigurationRoot ConfigurationRoot { get; set; }
-        public static string ConnectionString { get; private set; }
-
-        public Startup(IConfiguration configuration, IWebHostEnvironment env)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-
-            ConfigurationRoot = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appSettings.json")
-                .Build();
-
         }
 
         public IConfiguration Configuration { get; }
@@ -33,7 +27,24 @@ namespace HabitatManagement
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+
+            services.AddControllers();
+            //services.AddSwaggerGen(c =>
+            //{
+            //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "HabitatManagement.WebAPI", Version = "v1" });
+            //});
+            services.AddSingleton<IConfiguration>(Configuration);       // add Configuration to our services collection
+            services.AddTransient<IDBConfiguration, DBConfiguration>(); // register our IDBConfiguration class (from class library)
+
+            //services.AddMvc(options =>
+            //   options.EnableEndpointRouting = false)
+            //   .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
+            //services.AddApiVersioning(options => {
+            //    options.AssumeDefaultVersionWhenUnspecified = true;
+            //    options.ReportApiVersions = true;
+            //});
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,15 +53,11 @@ namespace HabitatManagement
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                //app.UseSwagger();
+                //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HabitatManagement.WebAPI v1"));
             }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
 
             app.UseRouting();
 
@@ -58,12 +65,9 @@ namespace HabitatManagement
 
             DBConfiguration.SetConfig(Configuration);
 
-            ConnectionString = ConfigurationRoot.GetConnectionString("DefaultConnection");
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllers();
             });
         }
     }

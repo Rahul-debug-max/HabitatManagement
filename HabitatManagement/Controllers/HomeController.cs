@@ -1,5 +1,4 @@
 ﻿using HabitatManagement.BusinessEntities;
-using HabitatManagement.BusinessLogic;
 using HabitatManagement.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -12,7 +11,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
-
+using System.Text;
+using Newtonsoft.Json;
+using System.Net.Http;
 
 namespace HabitatManagement.Controllers
 {
@@ -57,7 +58,7 @@ namespace HabitatManagement.Controllers
             }
         }
 
-        public ActionResult GetFormDesignerData(string searchInput, string sidx, string sord, int page = 1, int rows = 10)
+        public async Task<IActionResult> GetFormDesignerData(string searchInput, string sidx, string sord, int page = 1, int rows = 10)
         {
             var jsonData = new
             {

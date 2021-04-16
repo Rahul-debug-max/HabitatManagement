@@ -1,11 +1,9 @@
-﻿using HabitatManagement.BusinessEntities;
-using HabitatManagement.BusinessLogic;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace HabitatManagement.Models
+namespace HabitatManagement.BusinessEntities
 {
     public class FormDesignTemplateModelBE
     {
@@ -147,7 +145,7 @@ namespace HabitatManagement.Models
                         sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
                         sb.AppendFormat("<label class=\"col-lg-4 text-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
                         sb.Append("<div class=\"col-lg-8 pr-5\">");
-                        sb.AppendFormat("<div class=\"input-group date col-lg-4 paddlft-none\" name=\"datetimepicker\">");
+                        sb.AppendFormat("<div class=\"input-group date col-lg-4 pl-0\" name=\"datetimepicker\">");
 
                         if (RenderForDragnDrop)
                         {
@@ -172,7 +170,7 @@ namespace HabitatManagement.Models
                         sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
                         sb.AppendFormat("<label class=\"col-lg-4 text-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
                         sb.Append("<div class=\"col-lg-3 pr-5\">");
-                        sb.AppendFormat("<div class=\"input-group date paddlft-none\" name=\"datetimepicker\">");
+                        sb.AppendFormat("<div class=\"input-group date pl-0\" name=\"datetimepicker\">");
                         if (RenderForDragnDrop)
                         {
                             sb.AppendFormat("<input class=\"form-control\" type=\"text\" placeholder=\"DD/MM/YYYY\" readonly=\"readonly\" />");
@@ -209,7 +207,7 @@ namespace HabitatManagement.Models
                         sb.AppendFormat("<div class=\"form-group row\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
                         sb.AppendFormat("<label class=\"col-lg-4 text-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
                         sb.Append("<div class=\"col-lg-8 pr-5\">");
-                        sb.Append("<div class=\"col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none dvSignatureDataType\" >");
+                        sb.Append("<div class=\"col-xs-12 col-sm-12 col-md-12 col-lg-12 pl-0 pr-0 dvSignatureDataType\" >");
                         sb.Append("<div class=\"panel panel-default\" style=\"margin-bottom:0px;border: 1px solid;\" >");
                         sb.Append("<div class=\"panel-heading\" style=\"text-align:right;background-color: #f5f5f5; padding: 10px 15px;\" >");
 
@@ -224,7 +222,7 @@ namespace HabitatManagement.Models
                             sb.AppendFormat("<button type=\"button\" class=\"btn btn-primary x1\" onclick=\"resetDigitalSignature(this)\" title=\"{0}\" \"><span class=\"glyphicons glyphicons-refresh\"></span></button>", "Reset");
                         }
                         sb.Append("</div>");
-                        sb.Append("<div class=\"panel-body paddlftrght-none\" style=\"padding-bottom: 0; padding-top: 0;\" >");
+                        sb.Append("<div class=\"panel-body pl-0 pr-0\" style=\"padding-bottom: 0; padding-top: 0;\" >");
                         sb.AppendFormat("<div id=\"digitalcanvasouter_{0}\">", field.Field);
                         sb.AppendFormat("<div class=\"conditionDigitalSignature\" id=\"digitalSignature_{0}\"></div>", field.Field);
                         sb.Append("</div>");
