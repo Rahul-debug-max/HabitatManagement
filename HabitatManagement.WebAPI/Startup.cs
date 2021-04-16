@@ -20,6 +20,7 @@ namespace HabitatManagement.WebAPI
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            DBConfiguration.SetConfig(Configuration);
         }
 
         public IConfiguration Configuration { get; }
@@ -35,16 +36,6 @@ namespace HabitatManagement.WebAPI
             //});
             services.AddSingleton<IConfiguration>(Configuration);       // add Configuration to our services collection
             services.AddTransient<IDBConfiguration, DBConfiguration>(); // register our IDBConfiguration class (from class library)
-
-            //services.AddMvc(options =>
-            //   options.EnableEndpointRouting = false)
-            //   .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-
-            //services.AddApiVersioning(options => {
-            //    options.AssumeDefaultVersionWhenUnspecified = true;
-            //    options.ReportApiVersions = true;
-            //});
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -62,8 +53,6 @@ namespace HabitatManagement.WebAPI
             app.UseRouting();
 
             app.UseAuthorization();
-
-            DBConfiguration.SetConfig(Configuration);
 
             app.UseEndpoints(endpoints =>
             {
