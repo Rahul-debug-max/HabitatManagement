@@ -44,15 +44,13 @@ namespace HabitatManagement.WebAPI.Controllers
 
         [HttpPost]
         [Route("SaveFormData")]
-        public bool SaveFormData(string data)
+        public bool SaveFormData([FromBody] List<TemplateFormFieldDataBE> templateFormFieldDatas)
         {
             bool success = true;
             try
             {
-                if (!string.IsNullOrWhiteSpace(data))
+                if (templateFormFieldDatas != null)
                 {
-                    List<TemplateFormFieldDataBE> templateFormFieldDatas = JsonConvert.DeserializeObject<List<TemplateFormFieldDataBE>>(data);
-
                     foreach (var templateFormFieldDataBE in templateFormFieldDatas)
                     {
                         string digitalSignatureImage64BitString = templateFormFieldDataBE.DigitalSignatureImage64BitString;

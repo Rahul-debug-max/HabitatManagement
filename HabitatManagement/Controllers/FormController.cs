@@ -50,54 +50,21 @@ namespace HabitatManagement.Controllers
                         string url = DBConfiguration.WebAPIHostingURL;
                         if (!string.IsNullOrWhiteSpace(url))
                         {
-                            string webAPIURL = string.Format("{0}form/SaveFormData/", url);
-                            var contentData = new StringContent(data);
-                           // var contentData = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
-                           // HttpResponseMessage response = httpClient.PostAsync(webAPIURL, contentData).Result;
-                           // ViewBag.Message = response.Content.ReadAsStringAsync().Result;
-
-                            using (var response = await httpClient.PostAsync(webAPIURL, contentData))
+                            string webAPIURL = string.Format("{0}form/SaveFormData", url);
+                            List<TemplateFormFieldDataBE> templateFormFieldDatas = JsonConvert.DeserializeObject<List<TemplateFormFieldDataBE>>(data);
+                            if (templateFormFieldDatas != null)
                             {
-                                string apiResponse = await response.Content.ReadAsStringAsync();
+                                var jsonStringData = JsonConvert.SerializeObject(templateFormFieldDatas);
+                                var contentData = new StringContent(jsonStringData, System.Text.Encoding.UTF8, "application/json");
+
+                                using (var response = await httpClient.PostAsync(webAPIURL, contentData))
+                                {
+                                    var apiResponse = response.Content.ReadAsStringAsync().Result;
+                                    success = Functions.ToBool(apiResponse);
+                                }
                             }
                         }
                     }
-
-                    //List<TemplateFormFieldDataBE> templateFormFieldDatas = JsonConvert.DeserializeObject<List<TemplateFormFieldDataBE>>(data);
-
-                    //foreach (var templateFormFieldDataBE in templateFormFieldDatas)
-                    //{
-                    //    string digitalSignatureImage64BitString = templateFormFieldDataBE.DigitalSignatureImage64BitString;
-                    //    string signatureID = templateFormFieldDataBE.FieldValue;
-                    //    if (templateFormFieldDataBE.FieldType == FormFieldType.Signature.ToString())
-                    //    {
-                    //        int surrogate = 0;
-                    //        DigitalSignatureBE digitalSignature = FormLogic.FetchDigitalSignature(Functions.ToInt(signatureID));
-                    //        if (digitalSignature != null)
-                    //        {
-                    //            digitalSignature.DigitalSignatureImage64BitString = digitalSignatureImage64BitString ?? string.Empty;
-                    //            digitalSignature.LastUpdatedDate = DateTime.Now;
-                    //            FormLogic.UpdateDigitalSignature(digitalSignature);
-                    //        }
-                    //        else if (!string.IsNullOrWhiteSpace(digitalSignatureImage64BitString))
-                    //        {
-                    //            digitalSignature = new DigitalSignatureBE();
-                    //            digitalSignature.CreationDateTime = DateTime.Now;
-                    //            digitalSignature.LastUpdatedDate = DateTime.Now;
-                    //            digitalSignature.DigitalSignatureImage64BitString = digitalSignatureImage64BitString ?? string.Empty;
-                    //            FormLogic.AddDigitalSignature(digitalSignature, out surrogate);
-                    //        }
-                    //        if (surrogate > 0)
-                    //        {
-                    //            templateFormFieldDataBE.FieldValue = surrogate.ToString();
-                    //        }
-                    //    }
-
-                    //    if (templateFormFieldDataBE.FormID > 0 && templateFormFieldDataBE.Field > 0)
-                    //    {
-                    //        success = FormLogic.SaveTemplateFormFieldData(templateFormFieldDataBE);
-                    //    }
-                    //}
                 }
             }
             catch(Exception ex)
