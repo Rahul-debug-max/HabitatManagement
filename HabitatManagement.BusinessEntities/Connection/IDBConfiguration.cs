@@ -10,5 +10,6 @@ namespace HabitatManagement.BusinessEntities
     public interface IDBConfiguration
     {
         static string Connection { get; }
+        static string WebAPIHostingURL { get; }
     }
 }

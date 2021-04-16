@@ -181,7 +181,7 @@
             {
                 title: "Permit Form Layout",
                 url: defaults.screenLayoutURL,
-                data: { formID: $("#FormID").val() },
+                data: { formID: $("#FormID").val(), isRenderForDragnDrop: true },
                 modalDialogClass: "modal-xl",
                 buttons: [
                     {

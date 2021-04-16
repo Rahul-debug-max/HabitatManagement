@@ -272,17 +272,24 @@ namespace HabitatManagement.Controllers
             return Json(new { Success = success });
         }
 
-        public ActionResult PermitFormTemplateFields(int formID, bool? isRenderForDragnDrop = null)
+        public async Task<IActionResult> PermitFormTemplateFields(int formID, bool? isRenderForDragnDrop = null)
         {
-            List<PermitFormScreenDesignTemplateDetailBE> templateDetails = FormLogic.FetchAllPermitFormScreenDesignTemplateDetail(formID);
-            List<TemplateFormFieldDataBE> templateFormFieldData = FormLogic.FetchAllTemplateFormFieldData(formID);
-            FormDesignTemplateModelBE model = new FormDesignTemplateModelBE(templateDetails, templateFormFieldData);
-            model.FormID = formID;
-            model.RenderForDragnDrop = true;
-            if (isRenderForDragnDrop != null)
+            FormDesignTemplateModelBE model = new FormDesignTemplateModelBE();
+            string htmlForm = string.Empty;
+            using (var httpClient = new HttpClient())
             {
-                model.RenderForDragnDrop = isRenderForDragnDrop.Value;
+                string url = DBConfiguration.WebAPIHostingURL;
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    string webAPIURL = string.Format("{0}form/GetFormHtml/{1}/{2}", url, formID, isRenderForDragnDrop != null ? isRenderForDragnDrop.Value : false);
+                    using (var response = await httpClient.GetAsync(webAPIURL))
+                    {
+                        htmlForm = await response.Content.ReadAsStringAsync();
+                    }
+                }
             }
+            model.HtmlForm = htmlForm;
+            model.FormID = formID;
             return View(model);
         }
 

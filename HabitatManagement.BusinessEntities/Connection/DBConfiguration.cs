@@ -22,5 +22,12 @@ namespace HabitatManagement.BusinessEntities
                return _configuration.GetConnectionString("DefaultConnection");
             }
         }
+        public static string WebAPIHostingURL
+        {
+            get
+            {
+                return _configuration["WebAPIHostingURL"];
+            }
+        }
     }
 }

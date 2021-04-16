@@ -7,7 +7,13 @@ namespace HabitatManagement.BusinessEntities
 {
     public class FormDesignTemplateModelBE
     {
+        public string Form { get; set; }
+        public string HtmlForm { get; set; }
         private List<PermitFormScreenDesignTemplateDetailBE> _fields;
+
+        public FormDesignTemplateModelBE()
+        {
+        }
 
         public FormDesignTemplateModelBE(List<PermitFormScreenDesignTemplateDetailBE> fields)
         {

@@ -43,7 +43,7 @@ namespace HabitatManagement.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("SaveFormData/{data}")]
+        [Route("SaveFormData")]
         public bool SaveFormData(string data)
         {
             bool success = true;

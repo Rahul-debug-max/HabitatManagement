@@ -12,68 +12,92 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using System.Net.Http;
 
 namespace HabitatManagement.Controllers
 {
     public class FormController : Controller
     {
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            IEnumerable<PermitFormScreenDesignTemplateBE> listPermitFormScreenDesignTemplate = FormLogic.BlockFetchPermitFormScreenDesignTemplate(1, Int32.MaxValue, out int totalRecords, "");
-            List<SelectListItem> forms = new List<SelectListItem>();
-            forms = listPermitFormScreenDesignTemplate.Select(m => new SelectListItem()
+            FormDesignTemplateModelBE model = new FormDesignTemplateModelBE();
+            using (var httpClient = new HttpClient())
             {
-                Text = m.Design,
-                Value = m.FormID.ToString()
-            }).ToList();
-
-            forms.Insert(0, new SelectListItem { Text = "--Select Form--", Value = "-1" });
-            ViewData["FormList"] = forms;
-            return View();
+                string url = DBConfiguration.WebAPIHostingURL;
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    string webAPIURL = string.Format("{0}form/GetForms", url);
+                    using (var response = await httpClient.GetAsync(webAPIURL))
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        List<SelectListItem> forms = JsonConvert.DeserializeObject<List<SelectListItem>>(apiResponse);
+                        ViewData["FormList"] = forms;
+                    }
+                }
+            }
+            return View(model);
         }
 
-        public ActionResult SaveFormFeedback(string data)
+        public async Task<IActionResult> SaveFormFeedback(string data)
         {
             bool success = true;
             try
             {
                 if (!string.IsNullOrWhiteSpace(data))
                 {
-                    List<TemplateFormFieldDataBE> templateFormFieldDatas = JsonConvert.DeserializeObject<List<TemplateFormFieldDataBE>>(data);
-
-                    foreach (var templateFormFieldDataBE in templateFormFieldDatas)
+                    using (var httpClient = new HttpClient())
                     {
-                        string digitalSignatureImage64BitString = templateFormFieldDataBE.DigitalSignatureImage64BitString;
-                        string signatureID = templateFormFieldDataBE.FieldValue;
-                        if (templateFormFieldDataBE.FieldType == FormFieldType.Signature.ToString())
+                        string url = DBConfiguration.WebAPIHostingURL;
+                        if (!string.IsNullOrWhiteSpace(url))
                         {
-                            int surrogate = 0;
-                            DigitalSignatureBE digitalSignature = FormLogic.FetchDigitalSignature(Functions.ToInt(signatureID));
-                            if (digitalSignature != null)
-                            {
-                                digitalSignature.DigitalSignatureImage64BitString = digitalSignatureImage64BitString ?? string.Empty;
-                                digitalSignature.LastUpdatedDate = DateTime.Now;
-                                FormLogic.UpdateDigitalSignature(digitalSignature);
-                            }
-                            else if (!string.IsNullOrWhiteSpace(digitalSignatureImage64BitString))
-                            {
-                                digitalSignature = new DigitalSignatureBE();
-                                digitalSignature.CreationDateTime = DateTime.Now;
-                                digitalSignature.LastUpdatedDate = DateTime.Now;
-                                digitalSignature.DigitalSignatureImage64BitString = digitalSignatureImage64BitString ?? string.Empty;
-                                FormLogic.AddDigitalSignature(digitalSignature, out surrogate);
-                            }
-                            if (surrogate > 0)
-                            {
-                                templateFormFieldDataBE.FieldValue = surrogate.ToString();
-                            }
-                        }
+                            string webAPIURL = string.Format("{0}form/SaveFormData/", url);
+                            var contentData = new StringContent(data);
+                           // var contentData = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
+                           // HttpResponseMessage response = httpClient.PostAsync(webAPIURL, contentData).Result;
+                           // ViewBag.Message = response.Content.ReadAsStringAsync().Result;
 
-                        if (templateFormFieldDataBE.FormID > 0 && templateFormFieldDataBE.Field > 0)
-                        {
-                            success = FormLogic.SaveTemplateFormFieldData(templateFormFieldDataBE);
+                            using (var response = await httpClient.PostAsync(webAPIURL, contentData))
+                            {
+                                string apiResponse = await response.Content.ReadAsStringAsync();
+                            }
                         }
                     }
+
+                    //List<TemplateFormFieldDataBE> templateFormFieldDatas = JsonConvert.DeserializeObject<List<TemplateFormFieldDataBE>>(data);
+
+                    //foreach (var templateFormFieldDataBE in templateFormFieldDatas)
+                    //{
+                    //    string digitalSignatureImage64BitString = templateFormFieldDataBE.DigitalSignatureImage64BitString;
+                    //    string signatureID = templateFormFieldDataBE.FieldValue;
+                    //    if (templateFormFieldDataBE.FieldType == FormFieldType.Signature.ToString())
+                    //    {
+                    //        int surrogate = 0;
+                    //        DigitalSignatureBE digitalSignature = FormLogic.FetchDigitalSignature(Functions.ToInt(signatureID));
+                    //        if (digitalSignature != null)
+                    //        {
+                    //            digitalSignature.DigitalSignatureImage64BitString = digitalSignatureImage64BitString ?? string.Empty;
+                    //            digitalSignature.LastUpdatedDate = DateTime.Now;
+                    //            FormLogic.UpdateDigitalSignature(digitalSignature);
+                    //        }
+                    //        else if (!string.IsNullOrWhiteSpace(digitalSignatureImage64BitString))
+                    //        {
+                    //            digitalSignature = new DigitalSignatureBE();
+                    //            digitalSignature.CreationDateTime = DateTime.Now;
+                    //            digitalSignature.LastUpdatedDate = DateTime.Now;
+                    //            digitalSignature.DigitalSignatureImage64BitString = digitalSignatureImage64BitString ?? string.Empty;
+                    //            FormLogic.AddDigitalSignature(digitalSignature, out surrogate);
+                    //        }
+                    //        if (surrogate > 0)
+                    //        {
+                    //            templateFormFieldDataBE.FieldValue = surrogate.ToString();
+                    //        }
+                    //    }
+
+                    //    if (templateFormFieldDataBE.FormID > 0 && templateFormFieldDataBE.Field > 0)
+                    //    {
+                    //        success = FormLogic.SaveTemplateFormFieldData(templateFormFieldDataBE);
+                    //    }
+                    //}
                 }
             }
             catch(Exception ex)
