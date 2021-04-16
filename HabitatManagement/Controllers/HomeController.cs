@@ -288,6 +288,7 @@ namespace HabitatManagement.Controllers
                     }
                 }
             }
+            model.RenderForDragnDrop = isRenderForDragnDrop != null ? isRenderForDragnDrop.Value : false;
             model.HtmlForm = htmlForm;
             model.FormID = formID;
             return View(model);
