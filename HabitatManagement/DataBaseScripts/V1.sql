@@ -102,6 +102,31 @@ CREATE TABLE [dbo].TemplateFormSection(
 END
 GO
 
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[TableFieldTypeMaster]') AND TYPE in (N'U'))
+BEGIN
+
+    CREATE TABLE [dbo].[TableFieldTypeMaster](
+	    [Id] [int] IDENTITY(1,1) NOT NULL,
+	    [Field] [int] NOT NULL,
+	    [ColumnName] [nvarchar](max) NULL,
+	    [RowCount] [int] NULL,
+	    [ColumnType] [int] NULL
+		)
+END
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[TableFieldTypeMasterData]') AND TYPE in (N'U'))
+BEGIN
+
+    CREATE TABLE [dbo].[TableFieldTypeMasterData](
+	    [Id] [int] IDENTITY(1,1) NOT NULL,
+	    [TableFieldTypeMasterId] [int] NOT NULL,
+	    [RowColumnValue] [nvarchar](max) NULL
+		)
+END
+GO
+
+
 -------------------------------------------------------------------------------------------------------------------------------
 /* 2DVF */
 -------------------------------------------------------------------------------------------------------------------------------
@@ -815,6 +840,122 @@ BEGIN
  OFFSET @PageSize * (@PageIndex - 1) ROWS FETCH NEXT @PageSize ROWS ONLY;    
 
 END      
+GO
+
+
+
+/****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplateDetail_Fetch]    Script Date: 08-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TableFieldTypeMaster_Fetch]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_TableFieldTypeMaster_Fetch]
+GO
+CREATE PROCEDURE [dbo].[usp_TableFieldTypeMaster_Fetch]    
+(    
+ @Id INT,   
+ @Field INT   
+)   
+AS     
+BEGIN 
+	SELECT * FROM [TableFieldTypeMaster] t WHERE t.[id] = @Id AND [Field] = @Field
+END  
+GO
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TableFieldTypeMaster_Add]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_TableFieldTypeMaster_Add]
+GO
+CREATE PROCEDURE [dbo].[usp_TableFieldTypeMaster_Add]  
+@Field [int],
+@ColumnName [nvarchar](max) = NULL,
+@RowCount [int] = NULL,
+@ColumnType [int] = NULL 
+  
+AS   
+  
+INSERT INTO [dbo].TableFieldTypeMaster  
+(Field,  
+ColumnName,  
+[RowCount],  
+[ColumnType]
+)  
+VALUES (  
+@Field,  
+@ColumnName,  
+@RowCount,  
+@ColumnType)  
+GO
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TableFieldTypeMaster_FetchAll]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].usp_TableFieldTypeMaster_FetchAll
+GO
+CREATE PROCEDURE [dbo].usp_TableFieldTypeMaster_FetchAll      
+(      
+ @Field INT      
+)     
+AS       
+BEGIN      
+SET NOCOUNT ON;       
+   SELECT t.* FROM TableFieldTypeMaster AS t  WHERE t.Field = @Field    
+END    
+GO
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TableFieldTypeMaster_Delete]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_TableFieldTypeMaster_Delete]
+GO
+CREATE PROCEDURE [dbo].[usp_TableFieldTypeMaster_Delete]  
+  @Field [int] = NULL 
+AS  
+BEGIN
+    DELETE FROM TableFieldTypeMaster WHERE Field = @Field
+END  
+GO
+
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TableFieldTypeMasterData_Add]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_TableFieldTypeMasterData_Add]
+GO
+CREATE PROCEDURE [dbo].[usp_TableFieldTypeMasterData_Add]  
+@Id [int] = NULL,
+@TableFieldTypeMasterId [int] = NULL,
+@RowColumnValue [nvarchar](max) = NULL
+  
+AS   
+  
+INSERT INTO [dbo].TableFieldTypeMasterData  
+(
+Id,  
+TableFieldTypeMasterId,  
+RowColumnValue
+)  
+VALUES (  
+@Id,  
+@TableFieldTypeMasterId,  
+@RowColumnValue
+)  
+  
+GO
+
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TableFieldTypeMasterData_Delete]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_TableFieldTypeMasterData_Delete]
+GO
+CREATE PROCEDURE [dbo].[usp_TableFieldTypeMasterData_Delete]  
+   @TableFieldTypeMasterId [int] = NULL 
+AS  
+BEGIN
+    DELETE FROM TableFieldTypeMasterData WHERE TableFieldTypeMasterId = @TableFieldTypeMasterId
+END  
+GO
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TableFieldTypeMasterData_FetchAll]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].usp_TableFieldTypeMasterData_FetchAll
+GO
+CREATE PROCEDURE [dbo].usp_TableFieldTypeMasterData_FetchAll      
+(      
+ @Field INT      
+)     
+AS       
+BEGIN      
+SET NOCOUNT ON;       
+   SELECT t.* FROM TableFieldTypeMasterData AS t  WHERE t.TableFieldTypeMasterId IN (select Id from TableFieldTypeMaster where @Field = @Field)   
+END    
 GO
 
 -------------------------------------------------------------------------------------------------------------------------------

@@ -466,7 +466,175 @@ namespace HabitatManagement.BusinessEntities
 
         #endregion
 
+
+        #region Table Field Type Master
+
+        public static TableFieldTypeMasterBE FetchTableFieldTypeMaster(int id, int field)
+        {
+            TableFieldTypeMasterBE o = null;
+
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_TableFieldTypeMaster_Fetch", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("Id", id);
+                cmd.Parameters.AddWithValue("Field", field);
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                        o = ToTableFieldTypeMasterBE(reader);
+                }
+            }
+            return o;
+        }
+
+        public static List<TableFieldTypeMasterBE> FetchAllTableFieldTypeMaster(int field)
+        {
+            List<TableFieldTypeMasterBE> list = new List<TableFieldTypeMasterBE>();
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("usp_TableFieldTypeMaster_FetchAll", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("Field", field);
+                using (SqlDataReader sqlDataReader = cmd.ExecuteReader())
+                {
+                    while (sqlDataReader.Read())
+                    {
+                        list.Add(ToTableFieldTypeMasterBE(sqlDataReader));
+                    }
+                }
+            }
+            return list;
+        }
+
+        public static void AddTableFieldTypeMaster(TableFieldTypeMasterBE o)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_TableFieldTypeMaster_Add", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                BusinessEntityHelper.ReplaceNullProperties<TableFieldTypeMasterBE>(o);
+                FromTableFieldTypeMasterBE(ref cmd, o);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public static bool DeleteTableFieldTypeMaster(int field)
+        {
+            bool success = false;
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_TableFieldTypeMaster_Delete", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("Field", field);
+                cmd.ExecuteNonQuery();
+                success = true;
+            }
+            return success;
+        }
+
+        #endregion
+
+        #region Table Field Type Master Data
+
+
+        public static void AddTableFieldTypeMasterData(TableFieldTypeMasterDataBE o)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_TableFieldTypeMasterData_Add", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                BusinessEntityHelper.ReplaceNullProperties<TableFieldTypeMasterDataBE>(o);
+                FromTableFieldTypeMasterDataBE(ref cmd, o);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public static bool DeleteTableFieldTypeMasterData(int tableFieldTypeMasterId)
+        {
+            bool success = false;
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_TableFieldTypeMasterData_Delete", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("TableFieldTypeMasterId", tableFieldTypeMasterId);
+                cmd.ExecuteNonQuery();
+                success = true;
+            }
+            return success;
+        }
+
+        public static List<TableFieldTypeMasterDataBE> FetchAllTableFieldTypeMasterData(int field)
+        {
+            List<TableFieldTypeMasterDataBE> list = new List<TableFieldTypeMasterDataBE>();
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("usp_TableFieldTypeMasterData_FetchAll", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("Field", field);
+                using (SqlDataReader sqlDataReader = cmd.ExecuteReader())
+                {
+                    while (sqlDataReader.Read())
+                    {
+                        list.Add(ToTableFieldTypeMasterDataBE(sqlDataReader));
+                    }
+                }
+            }
+            return list;
+        }
+
+        #endregion
+
         #region Private Methods
+
+        private static void FromTableFieldTypeMasterDataBE(ref SqlCommand cmd, TableFieldTypeMasterDataBE o)
+        {
+            cmd.Parameters.AddWithValue("Id", o.Id);
+            cmd.Parameters.AddWithValue("TableFieldTypeMasterId", o.TableFieldTypeMasterId);
+            cmd.Parameters.AddWithValue("RowColumnValue", o.RowColumnValue);
+        }
+
+        private static TableFieldTypeMasterDataBE ToTableFieldTypeMasterDataBE(SqlDataReader rdr)
+        {
+            TableFieldTypeMasterDataBE o = new TableFieldTypeMasterDataBE();
+            o.Id = Functions.ToInt(rdr["Id"]);
+            o.TableFieldTypeMasterId = Functions.ToInt(rdr["TableFieldTypeMasterId"]);
+            o.RowColumnValue = Functions.TrimRight(rdr["RowColumnValue"]);
+            return o;
+        }
+
+
+        private static void FromTableFieldTypeMasterBE(ref SqlCommand cmd, TableFieldTypeMasterBE o)
+        {
+            cmd.Parameters.AddWithValue("Field", o.Field);
+            cmd.Parameters.AddWithValue("ColumnName", o.ColumnName);
+            cmd.Parameters.AddWithValue("RowCount", o.RowCount);
+            cmd.Parameters.AddWithValue("ColumnType", o.ColumnType);
+        }
+
+        private static TableFieldTypeMasterBE ToTableFieldTypeMasterBE(SqlDataReader rdr)
+        {
+            TableFieldTypeMasterBE o = new TableFieldTypeMasterBE();
+            o.Id = Functions.ToInt(rdr["Id"]);
+            o.Field = Functions.ToInt(rdr["Field"]);
+            o.ColumnName = Functions.TrimRight(rdr["ColumnName"]);
+            o.RowCount = Functions.ToInt(rdr["RowCount"]);
+            o.ColumnType = Functions.ToInt(rdr["ColumnType"]);
+            return o;
+        }
 
         private static void FromTemplateFormFieldDataBE(ref SqlCommand cmd, TemplateFormFieldDataBE o)
         {
