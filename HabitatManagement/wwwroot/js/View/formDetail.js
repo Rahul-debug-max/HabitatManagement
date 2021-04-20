@@ -90,7 +90,7 @@
                 case 'addSection':
                     WCMDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
-                        modalDialogClass: "modal-lg",
+                        modalDialogClass: "modal-xl",
                         url: defaults.addEditSectionURL,
                         data: { formID: defaults.formID, sectionName: "" },
                         buttons: [
@@ -109,7 +109,7 @@
                 case 'editSection':
                     WCMDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
-                        modalDialogClass: "modal-lg",
+                        modalDialogClass: "modal-xl",
                         url: defaults.addEditSectionURL,
                         data: surrogateSectionDate[0],
                         buttons: [
@@ -144,7 +144,7 @@
                 case 'add':
                     WCMDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
-                        modalDialogClass: "modal-lg",
+                        modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,
                         data: { formID: defaults.formID, fieldID: 0 },
                         buttons: [
@@ -163,7 +163,7 @@
                 case 'edit':
                     WCMDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
-                        modalDialogClass: "modal-lg",
+                        modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,
                         data: { formID: defaults.formID, fieldID: surrogateDate[0] },
                         buttons: [

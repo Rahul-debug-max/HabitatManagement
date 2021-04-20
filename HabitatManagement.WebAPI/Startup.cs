@@ -29,11 +29,7 @@ namespace HabitatManagement.WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
-            //services.AddSwaggerGen(c =>
-            //{
-            //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "HabitatManagement.WebAPI", Version = "v1" });
-            //});
+            services.AddControllers();           
             services.AddSingleton<IConfiguration>(Configuration);       // add Configuration to our services collection
             services.AddTransient<IDBConfiguration, DBConfiguration>(); // register our IDBConfiguration class (from class library)
         }
@@ -43,9 +39,7 @@ namespace HabitatManagement.WebAPI
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
-                //app.UseSwagger();
-                //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HabitatManagement.WebAPI v1"));
+                app.UseDeveloperExceptionPage();               
             }
 
             app.UseHttpsRedirection();

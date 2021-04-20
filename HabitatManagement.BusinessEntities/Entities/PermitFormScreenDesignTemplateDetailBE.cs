@@ -27,5 +27,9 @@ namespace HabitatManagement.BusinessEntities
         public string SectionDescription { get; set; }
 
         public int SectionSequence { get; set; }
+
+        public int TableRowCount { get; set; }
+
+
     }
 }
