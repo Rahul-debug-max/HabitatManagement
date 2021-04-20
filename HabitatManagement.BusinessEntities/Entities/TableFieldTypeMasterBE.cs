@@ -12,6 +12,6 @@ namespace HabitatManagement.BusinessEntities
         public int Field { get; set; }
         public string ColumnName { get; set; }
         public int RowCount { get; set; }
-        public int ColumnType { get; set; }
+        public FormFieldType ColumnType { get; set; }
     }
 }
