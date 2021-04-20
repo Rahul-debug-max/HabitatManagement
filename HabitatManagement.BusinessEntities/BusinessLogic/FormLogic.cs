@@ -632,7 +632,7 @@ namespace HabitatManagement.BusinessEntities
             o.Field = Functions.ToInt(rdr["Field"]);
             o.ColumnName = Functions.TrimRight(rdr["ColumnName"]);
             o.RowCount = Functions.ToInt(rdr["RowCount"]);
-            o.ColumnType = Functions.ToInt(rdr["ColumnType"]);
+            o.ColumnType = (FormFieldType)Functions.ToInt(rdr["ColumnType"]);
             return o;
         }
 
