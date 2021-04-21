@@ -183,19 +183,26 @@ namespace HabitatManagement.BusinessEntities
             return o;
         }
 
-        public static bool AddPermitFormScreenDesignTemplateDetail(PermitFormScreenDesignTemplateDetailBE o)
+        public static bool AddPermitFormScreenDesignTemplateDetail(PermitFormScreenDesignTemplateDetailBE o, out int field)
         {
             bool success = false;
+            field = 0;
             using (SqlConnection conn = new SqlConnection(_connectionstring))
             {
                 conn.Open();
 
                 SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplateDetail_Add", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("Field", SqlDbType.Int, 8).Direction = ParameterDirection.Output;
                 BusinessEntityHelper.ReplaceNullProperties<PermitFormScreenDesignTemplateDetailBE>(o);
                 FromPermitFormScreenDesignTemplateDetailBE(ref cmd, o);
                 cmd.ExecuteNonQuery();
                 success = true;
+                if (cmd.Parameters["Field"].Value != DBNull.Value)
+                {
+                    field = Convert.ToInt32(cmd.Parameters["Field"].Value);
+                }
+
             }
             return success;
         }

@@ -181,6 +181,7 @@
     }
 
     var saveSectionDetail = function (dialogID) {
+
         var ajx = $.ajax({
             type: 'POST',
             cache: false,
@@ -227,12 +228,26 @@
 
 
     var saveFormField = function (dialogID) {
+
+        var tableFieldTypeMaster = new Array();
+        $(".tableType TH").each(function () {        
+            var row = $(this);
+            var tableColumn = row.html();
+            var columnfieldType = row.attr("columnfieldtype");
+
+            var tableFieldType = {};
+            tableFieldType.ColumnName = tableColumn;
+            tableFieldType.RowCount = $("#TableRowCount").val();
+            tableFieldType.ColumnType = columnfieldType;
+            tableFieldTypeMaster.push(tableFieldType);
+        });
+
         var ajx = $.ajax({
             type: 'POST',
             cache: false,
             url: defaults.addEditURL,
             dataType: 'JSON',
-            data: $('#PermitFormField').serialize(),
+            data: $('#PermitFormField').serialize() + '&' + $.param({ tableFieldTypeMaster: tableFieldTypeMaster }),
             success: function (result) {
                 if (result.success) {
                     $("#" + dialogID).modal("hide");

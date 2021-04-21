@@ -391,12 +391,13 @@ CREATE PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplateDetail_Add]
     @FieldName nvarchar(max),    
     @FieldType INT,     
     @Section nvarchar(20),    
-    @Sequence INT
-)    
+    @Sequence INT,
+    @Field INT OUT   
+)
 AS    
 BEGIN    
 
- DECLARE @Field BIGINT;  
+ --DECLARE @Field BIGINT;  
  SELECT @Field = ISNULL(MAX(Field),0) + 1 FROM PermitFormScreenDesignTemplateDetail WHERE FormID = @FormID
 
  IF(@Sequence = 0)

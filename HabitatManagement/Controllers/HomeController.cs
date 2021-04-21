@@ -385,7 +385,7 @@ namespace HabitatManagement.Controllers
         }
 
         [HttpPost]
-        public ActionResult EditPermitFormField(PermitFormScreenDesignTemplateDetailBE model)
+        public ActionResult EditPermitFormField(PermitFormScreenDesignTemplateDetailBE model, List<TableFieldTypeMasterBE> tableFieldTypeMaster)
         {
 
             bool success = false;
@@ -405,7 +405,7 @@ namespace HabitatManagement.Controllers
 
             if (model.Field <= 0)
             {
-                success = FormLogic.AddPermitFormScreenDesignTemplateDetail(permitFormScreenDesignTemplateDetail);
+                success = FormLogic.AddPermitFormScreenDesignTemplateDetail(permitFormScreenDesignTemplateDetail, out int field);
             }
             else
             {

@@ -8,12 +8,22 @@
 
 <script type="text/javascript">
     $(function () {
-        debugger;
         EditFormField.onInit({
             tableFieldType: @Html.Raw((int)FormFieldType.Table)
         });
     });
 </script>
+<style>
+    .tableType td, .tableType th {
+        border: 1px solid black;
+        padding: 3px 10px 3px 15px;
+    }
+
+    .tableType {
+        width: 100%;
+        border-collapse: collapse;
+    }
+</style>
 
 <form id="PermitFormField" asp-controller="Home" asp-action="PermitFormField">
     <div class="container-fluid">
@@ -56,6 +66,8 @@
                     </div>
                 </div>
             </div>
+
+            <div id="dvTable"></div>
         </div>
 
         @Html.HiddenFor(m => m.FormID)
