@@ -32,6 +32,10 @@ namespace HabitatManagement.WebAPI
             services.AddControllers();           
             services.AddSingleton<IConfiguration>(Configuration);       // add Configuration to our services collection
             services.AddTransient<IDBConfiguration, DBConfiguration>(); // register our IDBConfiguration class (from class library)
+            services.AddCors(c =>
+            {
+                c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,11 +45,10 @@ namespace HabitatManagement.WebAPI
             {
                 app.UseDeveloperExceptionPage();               
             }
-
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            app.UseCors(options => options.AllowAnyOrigin());
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

@@ -1,5 +1,6 @@
 ﻿using HabitatManagement.BusinessEntities;
 using HabitatManagement.WebAPI.Model;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -11,10 +12,12 @@ using System.Threading.Tasks;
 namespace HabitatManagement.WebAPI.Controllers
 {
     [Route("api/[controller]")]
+    [EnableCors("AllowOrigin")]
     [ApiController]
     public class FormController : ControllerBase
     {
         [HttpGet]
+        [EnableCors("AllowOrigin")]
         [Route("GetForms")]
         public IEnumerable<SelectListItem> GetForms()
         {
@@ -30,7 +33,19 @@ namespace HabitatManagement.WebAPI.Controllers
             return forms;
         }
 
+
         [HttpGet]
+        [EnableCors("AllowOrigin")]
+        [Route("GetDigitalSignature/{signatureId:int}")]
+        public string GetDigitalSignature(int signatureId)
+        {
+            string signature = FormLogic.GetDigitalSignature(signatureId);
+            return signature;
+        }
+
+
+        [HttpGet]
+        [EnableCors("AllowOrigin")]
         [Route("GetFormHtml/{formID:int}/{isRenderForDragnDrop:bool}")]
         public string GetFormHtml(int formID, bool isRenderForDragnDrop)
         {
@@ -43,6 +58,7 @@ namespace HabitatManagement.WebAPI.Controllers
         }
 
         [HttpPost]
+        [EnableCors("AllowOrigin")]
         [Route("SaveFormData")]
         public bool SaveFormData([FromBody] List<TemplateFormFieldDataBE> templateFormFieldDatas)
         {
