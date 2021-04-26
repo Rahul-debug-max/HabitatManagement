@@ -215,7 +215,6 @@ namespace HabitatManagement.Controllers
         [HttpPost]
         public ActionResult TemplateSection(TemplateFormSectionBE model)
         {
-
             bool success = false;
             int id = 0;
             bool sectionExist = true;
@@ -272,7 +271,7 @@ namespace HabitatManagement.Controllers
             return Json(new { Success = success });
         }
 
-        public async Task<IActionResult> PermitFormTemplateFields(int formID, bool? isRenderForDragnDrop = null)
+        public async Task<IActionResult> PermitFormTemplateFields(int formID, int? surrogate, bool? isRenderForDragnDrop = null)
         {
             FormDesignTemplateModelBE model = new FormDesignTemplateModelBE();
             string htmlForm = string.Empty;
@@ -281,7 +280,7 @@ namespace HabitatManagement.Controllers
                 string url = DBConfiguration.WebAPIHostingURL;
                 if (!string.IsNullOrWhiteSpace(url))
                 {
-                    string webAPIURL = string.Format("{0}form/GetFormHtml/{1}/{2}", url, formID, isRenderForDragnDrop != null ? isRenderForDragnDrop.Value : false);
+                    string webAPIURL = string.Format("{0}form/GetFormHtml/{1}/{2}/{3}", url, formID, surrogate ?? 0, isRenderForDragnDrop != null ? isRenderForDragnDrop.Value : false);
                     using (var response = await httpClient.GetAsync(webAPIURL))
                     {
                         htmlForm = await response.Content.ReadAsStringAsync();
@@ -292,6 +291,25 @@ namespace HabitatManagement.Controllers
             model.HtmlForm = htmlForm;
             model.FormID = formID;
             return View(model);
+        }
+
+        public async Task<string> EditCreatedForm(int formID, int surrogate)
+        {
+            FormDesignTemplateModelBE model = new FormDesignTemplateModelBE();
+            string htmlForm = string.Empty;
+            using (var httpClient = new HttpClient())
+            {
+                string url = DBConfiguration.WebAPIHostingURL;
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    string webAPIURL = string.Format("{0}form/GetFormHtml/{1}/{2}/{3}", url, formID, surrogate, false);
+                    using (var response = await httpClient.GetAsync(webAPIURL))
+                    {
+                        htmlForm = await response.Content.ReadAsStringAsync();
+                    }
+                }
+            }
+            return htmlForm;
         }
 
         public JsonResult GetFieldDesignerColumnNames()
@@ -445,4 +463,6 @@ namespace HabitatManagement.Controllers
             return Json(new { Success = success });
         }
     }
+
+
 }

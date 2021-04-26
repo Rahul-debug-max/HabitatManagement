@@ -46,13 +46,18 @@ namespace HabitatManagement.WebAPI.Controllers
 
         [HttpGet]
         [EnableCors("AllowOrigin")]
-        [Route("GetFormHtml/{formID:int}/{isRenderForDragnDrop:bool}")]
-        public string GetFormHtml(int formID, bool isRenderForDragnDrop)
+        [Route("GetFormHtml/{formID:int}/{surrogate:int}/{isRenderForDragnDrop:bool}")]
+        public string GetFormHtml(int formID, int surrogate, bool isRenderForDragnDrop)
         {
             List<PermitFormScreenDesignTemplateDetailBE> templateDetails = FormLogic.FetchAllPermitFormScreenDesignTemplateDetail(formID);
-            List<TemplateFormFieldDataBE> templateFormFieldData = FormLogic.FetchAllTemplateFormFieldData(formID);
+            List<TemplateFormFieldDataBE> templateFormFieldData = new List<TemplateFormFieldDataBE>();
+            if (surrogate > 0)
+            {
+                templateFormFieldData = FormLogic.FetchAllTemplateFormFieldData(formID, surrogate);
+            }
             FormDesignTemplateModelBE model = new FormDesignTemplateModelBE(templateDetails, templateFormFieldData);
             model.FormID = formID;
+            model.Surrogate = surrogate;
             model.RenderForDragnDrop = isRenderForDragnDrop;
             return model.FormSectionFields();
         }
@@ -69,13 +74,30 @@ namespace HabitatManagement.WebAPI.Controllers
                 List<TemplateFormFieldDataBE> templateFormFieldDatas = JsonConvert.DeserializeObject<List<TemplateFormFieldDataBE>>(data);
                 if (templateFormFieldDatas != null)
                 {
+                    int formDataSurrogate = Functions.ToInt(Request.Form["surrogate"]);                    
+                    int formID = templateFormFieldDatas.Select(m => m.FormID).Distinct().FirstOrDefault();
+                    if (formDataSurrogate <= 0)
+                    {
+                        formDataSurrogate = FormLogic.GetMaxProjectFormSurroagate() + 1;
+                        templateFormFieldDatas.ForEach(m => m.Surrogate = formDataSurrogate);
+                        templateFormFieldDatas.ForEach(m => m.CreationDate = DateTime.Now);
+                    }
+                    else
+                    {
+                        templateFormFieldDatas.ForEach(m => m.Surrogate = formDataSurrogate);
+                        List<TemplateFormFieldDataBE> templateFormFieldDataValue = FormLogic.FetchAllTemplateFormFieldData(formID, formDataSurrogate);   
+                        if(templateFormFieldDataValue != null && templateFormFieldDataValue.Count > 0)
+                        {
+                            templateFormFieldDatas.ForEach(m => m.CreationDate = templateFormFieldDataValue[0].CreationDate);
+                        }  
+                    }
                     foreach (var templateFormFieldDataBE in templateFormFieldDatas)
                     {
                         string digitalSignatureImage64BitString = templateFormFieldDataBE.DigitalSignatureImage64BitString;
                         string signatureID = templateFormFieldDataBE.FieldValue;
                         if (templateFormFieldDataBE.FieldType == FormFieldType.Signature.ToString())
                         {
-                            int surrogate = 0;
+                            int digitalSignatureSurrogate = 0;
                             DigitalSignatureBE digitalSignature = FormLogic.FetchDigitalSignature(Functions.ToInt(signatureID));
                             if (digitalSignature != null)
                             {
@@ -89,11 +111,11 @@ namespace HabitatManagement.WebAPI.Controllers
                                 digitalSignature.CreationDateTime = DateTime.Now;
                                 digitalSignature.LastUpdatedDate = DateTime.Now;
                                 digitalSignature.DigitalSignatureImage64BitString = digitalSignatureImage64BitString ?? string.Empty;
-                                FormLogic.AddDigitalSignature(digitalSignature, out surrogate);
+                                FormLogic.AddDigitalSignature(digitalSignature, out digitalSignatureSurrogate);
                             }
-                            if (surrogate > 0)
+                            if (digitalSignatureSurrogate > 0)
                             {
-                                templateFormFieldDataBE.FieldValue = surrogate.ToString();
+                                templateFormFieldDataBE.FieldValue = digitalSignatureSurrogate.ToString();
                             }
                         }
 

@@ -334,7 +334,7 @@ namespace HabitatManagement.BusinessEntities
             }
         }
 
-        public static List<TemplateFormFieldDataBE> FetchAllTemplateFormFieldData(int formId)
+        public static List<TemplateFormFieldDataBE> FetchAllTemplateFormFieldData(int formId, int surrogate)
         {
             List<TemplateFormFieldDataBE> list = new List<TemplateFormFieldDataBE>();
             using (SqlConnection conn = new SqlConnection(_connectionstring))
@@ -343,6 +343,7 @@ namespace HabitatManagement.BusinessEntities
                 SqlCommand cmd = new SqlCommand("usp_TemplateFormFieldData_FetchAll", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("FormId", formId);
+                cmd.Parameters.AddWithValue("Surrogate", surrogate);
                 using (SqlDataReader sqlDataReader = cmd.ExecuteReader())
                 {
                     while (sqlDataReader.Read())
@@ -375,6 +376,58 @@ namespace HabitatManagement.BusinessEntities
             }
             return success;
         }
+
+        public static int GetMaxProjectFormSurroagate()
+        {
+            int formSurrogate = 0;
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_connectionstring))
+                {
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand("usp_TemplateFormFieldData_Fetch_MaxSurrogate", conn);
+                    cmd.CommandType = CommandType.StoredProcedure;                                        
+                    formSurrogate = Convert.ToInt32(cmd.ExecuteScalar());
+                }
+            }
+            catch
+            {
+
+            }
+            return formSurrogate;
+        }
+
+        public static List<TemplateFormFieldDataBE> BlockFetchByForm(int pageIndex, int pageSize, out int totalRecords, int formID)
+        {
+            totalRecords = 0;
+            List<TemplateFormFieldDataBE> list = new List<TemplateFormFieldDataBE>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("usp_TemplateFormFieldData_BlockFetch_ByForm", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("FormID", formID);
+                cmd.Parameters.AddWithValue("PageIndex", pageIndex);
+                cmd.Parameters.AddWithValue("PageSize", pageSize);
+                cmd.Parameters.Add("RecordCount", SqlDbType.Int, 8);
+                cmd.Parameters["RecordCount"].Direction = ParameterDirection.Output;
+                using (SqlDataReader sqlDataReader = cmd.ExecuteReader())
+                {
+                    while (sqlDataReader.Read())
+                    {
+                        list.Add(ToTemplateFormFieldDataByFormBE(sqlDataReader));
+                    }
+                }
+                if (cmd.Parameters["RecordCount"].Value != DBNull.Value)
+                {
+                    totalRecords = Convert.ToInt32(cmd.Parameters["RecordCount"].Value);
+                }
+            }
+            return list;
+        }
+
 
         #region Template Form Section
 
@@ -645,9 +698,11 @@ namespace HabitatManagement.BusinessEntities
 
         private static void FromTemplateFormFieldDataBE(ref SqlCommand cmd, TemplateFormFieldDataBE o)
         {
-            cmd.Parameters.AddWithValue("FormID", o.FormID);
+            cmd.Parameters.AddWithValue("Surrogate", o.Surrogate);
+            cmd.Parameters.AddWithValue("FormID", o.FormID);            
             cmd.Parameters.AddWithValue("Field", o.Field);
             cmd.Parameters.AddWithValue("FieldValue", o.FieldValue);
+            cmd.Parameters.AddWithValue("CreationDate", o.CreationDate);
         }
 
         private static TemplateFormSectionBE ToTemplateFormSectionBE(SqlDataReader rdr)
@@ -671,9 +726,22 @@ namespace HabitatManagement.BusinessEntities
         private static TemplateFormFieldDataBE ToTemplateFormFieldDataBE(SqlDataReader rdr)
         {
             TemplateFormFieldDataBE o = new TemplateFormFieldDataBE();
+            o.Surrogate = Convert.ToInt32(rdr["Surrogate"]);
             o.FormID = Convert.ToInt32(rdr["FormID"]);
             o.Field = Convert.ToInt32(rdr["Field"]);
             o.FieldValue = Convert.ToString(rdr["FieldValue"]);
+            o.CreationDate = Functions.ToDateTime(rdr["CreationDate"]);
+            return o;
+        }
+
+        private static TemplateFormFieldDataBE ToTemplateFormFieldDataByFormBE(SqlDataReader rdr)
+        {
+            TemplateFormFieldDataBE o = new TemplateFormFieldDataBE();
+            o.Surrogate = Convert.ToInt32(rdr["Surrogate"]);
+            o.FormID = Convert.ToInt32(rdr["FormID"]);
+            o.Design = Functions.TrimRight(rdr["Design"]);
+            o.Description = Functions.TrimRight(rdr["Description"]);
+            o.CreationDate = Functions.ToDateTime(rdr["CreationDate"]);
             return o;
         }
 

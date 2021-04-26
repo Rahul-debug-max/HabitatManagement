@@ -64,9 +64,11 @@ IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Te
 BEGIN
 
 CREATE TABLE [dbo].TemplateFormFieldData(
+    [Surrogate] [int] NOT NULL,
 	[FormID] [int] NOT NULL,
 	[Field] [int] NOT NULL,
-	[FieldValue] [nvarchar](max) NULL
+	[FieldValue] [nvarchar](max) NULL,
+    [CreationDate] DATETIME DEFAULT(GETDATE())
 )
 END
 GO
@@ -647,15 +649,16 @@ GO
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TemplateFormFieldData_FetchAll]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].usp_TemplateFormFieldData_FetchAll
 GO
-CREATE PROCEDURE [dbo].usp_TemplateFormFieldData_FetchAll      
+CREATE PROCEDURE [dbo].usp_TemplateFormFieldData_FetchAll
 (      
- @FormID INT      
+	@Surrogate int,
+	@FormID INT      
 )     
 AS       
-BEGIN      
+BEGIN
 SET NOCOUNT ON;       
-   SELECT t.* FROM TemplateFormFieldData AS t  WHERE t.FormID = @FormID    
-END    
+	SELECT t.* FROM TemplateFormFieldData AS t  WHERE t.FormID = @FormID AND t.Surrogate = @Surrogate   
+END  
 GO
 
 
@@ -755,62 +758,60 @@ GO
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TemplateFormFieldData_Update]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[usp_TemplateFormFieldData_Update]
 GO
-CREATE PROCEDURE [dbo].[usp_TemplateFormFieldData_Update]      
-(      
+CREATE PROCEDURE [dbo].[usp_TemplateFormFieldData_Update]
+(
+	@Surrogate INT,
     @FormID INT,      
     @Field INT,      
-    @FieldValue NVARCHAR(max),        
+    @FieldValue NVARCHAR(max),
+	@CreationDate datetime,
     @ErrorOccured BIT OUTPUT      
 )      
 AS    
 BEGIN    
- BEGIN TRY    
-  BEGIN TRANSACTION trans      
+	BEGIN TRY    
+	BEGIN TRANSACTION trans      
       
-  IF EXISTS (select 1 from TemplateFormFieldData WHERE FormID = @FormID AND Field = @Field)
-  BEGIN
+	IF EXISTS(SELECT 1 FROM TemplateFormFieldData WHERE FormID = @FormID AND Surrogate = @Surrogate AND Field = @Field)
+	BEGIN
+		UPDATE TemplateFormFieldData      
+		SET FieldValue = @FieldValue
+		WHERE FormID = @FormID AND Field = @Field AND Surrogate = @Surrogate
+	END
+	ELSE 
+	BEGIN
+		INSERT INTO TemplateFormFieldData (Surrogate,FormID, Field, FieldValue,CreationDate)      
+		SELECT @Surrogate, @FormID, @Field, @FieldValue,@CreationDate
+	END
 
-  UPDATE TemplateFormFieldData      
-  SET FieldValue = @FieldValue
-  WHERE FormID = @FormID AND Field = @Field    
-
-  END
-  ELSE BEGIN
-
-   INSERT INTO TemplateFormFieldData (FormID, Field, FieldValue)      
-     SELECT @FormID, @Field, @FieldValue
-
-  END
-
-
-  COMMIT Transaction trans      
+	COMMIT Transaction trans      
       
-  SET @ErrorOccured = 1;     
- END TRY      
- BEGIN CATCH      
-  IF (@@TRANCOUNT > 0)    
-  BEGIN    
-   ROLLBACK      
-  END    
+	SET @ErrorOccured = 1;     
+	END TRY      
+	BEGIN CATCH      
+		IF (@@TRANCOUNT > 0)    
+		BEGIN    
+			ROLLBACK      
+		END    
     
-  SET @ErrorOccured = 0;      
+		SET @ErrorOccured = 0;      
       
-  DECLARE @ErrorMessage nvarchar(4000);      
-  DECLARE @ErrorSeverity int;         
-  DECLARE @ErrorState int;      
+		DECLARE @ErrorMessage nvarchar(4000);      
+		DECLARE @ErrorSeverity int;         
+		DECLARE @ErrorState int;      
       
-  SELECT      
-  @ErrorMessage = ERROR_MESSAGE(),      
-  @ErrorSeverity = ERROR_SEVERITY(),      
-  @ErrorState = ERROR_STATE();      
+		SELECT      
+		@ErrorMessage = ERROR_MESSAGE(),      
+		@ErrorSeverity = ERROR_SEVERITY(),      
+		@ErrorState = ERROR_STATE();      
       
-  RAISERROR (@ErrorMessage, -- Message text.        
-  @ErrorSeverity, -- Severity.        
-  @ErrorState -- State.        
-  );      
+		RAISERROR (@ErrorMessage, -- Message text.        
+		@ErrorSeverity, -- Severity.        
+		@ErrorState -- State.        
+		);      
       
- END CATCH    
-END    
+	END CATCH    
+END
 GO
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_PermitFormScreenDesignTemplateDetail_BlockFetch]') AND type in (N'P', N'PC'))
@@ -957,6 +958,45 @@ BEGIN
 SET NOCOUNT ON;       
    SELECT t.* FROM TableFieldTypeMasterData AS t  WHERE t.TableFieldTypeMasterId IN (select Id from TableFieldTypeMaster where @Field = @Field)   
 END    
+GO
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TemplateFormFieldData_Fetch_MaxSurrogate]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].usp_TemplateFormFieldData_Fetch_MaxSurrogate
+GO
+CREATE PROCEDURE usp_TemplateFormFieldData_Fetch_MaxSurrogate
+AS
+BEGIN
+	SELECT ISNULL(MAX(Surrogate),0) AS MaxSurrogate FROM TemplateFormFieldData
+END
+GO
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TemplateFormFieldData_BlockFetch_ByForm]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].usp_TemplateFormFieldData_BlockFetch_ByForm
+GO
+CREATE PROCEDURE usp_TemplateFormFieldData_BlockFetch_ByForm
+(
+	@FormID INT,
+	@PageIndex INT = 1,      
+	@PageSize INT = 10,
+	@RecordCount INT OUTPUT  
+)
+AS
+BEGIN
+	IF(@PageIndex IS NULL)    
+	BEGIN    
+		SET @PageIndex = 1       
+	END
+
+	SELECT @RecordCount = COUNT(Surrogate) FROM TemplateFormFieldData 
+	WHERE (@FormID = 0 OR FormID = @FormID) GROUP BY Surrogate
+
+
+	SELECT DISTINCT Surrogate,t1.FormID,t1.Design,t1.[Description],t.CreationDate FROM TemplateFormFieldData t JOIN  
+	[dbo].[PermitFormScreenDesignTemplate] t1 ON t.FormID = t1.FormID 
+	WHERE (@FormID = 0 OR t.FormID = @FormID) ORDER BY t.CreationDate            
+	OFFSET @PageSize * (@PageIndex - 1) ROWS            
+	FETCH NEXT @PageSize ROWS ONLY;  
+END
 GO
 
 -------------------------------------------------------------------------------------------------------------------------------

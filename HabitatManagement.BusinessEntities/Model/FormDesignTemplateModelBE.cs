@@ -52,6 +52,8 @@ namespace HabitatManagement.BusinessEntities
 
         public int FormID { get; set; }
 
+        public int Surrogate { get; set; }
+
         #endregion
 
         #region Methods
@@ -239,7 +241,7 @@ namespace HabitatManagement.BusinessEntities
                         sb.Append("</div>");
                         if (!RenderForDragnDrop)
                         {
-                            var digitalSignatureImage64BitString = FormLogic.GetDigitalSignature(Convert.ToInt32(_templateFormFieldData?.FieldValue));
+                            var digitalSignatureImage64BitString = FormLogic.GetDigitalSignature(string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) ? 0 :  Convert.ToInt32(_templateFormFieldData?.FieldValue));
                             sb.AppendFormat("<input type=\"hidden\" id='SignatureResponse' readonly=\"readonly\" class=\"form-control\" value=\"{0}\"  />", digitalSignatureImage64BitString);
                             sb.AppendFormat("<input type=\"hidden\" id='SignatureId' readonly=\"readonly\" class=\"form-control\" value=\"{0}\"  />", _templateFormFieldData?.FieldValue);
                         }

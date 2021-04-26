@@ -73,7 +73,7 @@
 </style>
 @if (Model.RenderForDragnDrop)
 {
-    <script src="~/js/View/FormTemplateFields.js"></script>
+<script src="~/js/View/FormTemplateFields.js"></script>
 }
 <script src="~/js/JSignature/jSignature.js"></script>
 <script src="~/js/JSignature/jSignature.CompressorBase30.js"></script>
@@ -89,7 +89,7 @@
                 saveDataURL: '@Url.Action("PermitFormScreenDesignTemplateDetailFields", "Home")'
             });
         }
-
+        reloadGridForPositioner();
         $('.dvSignatureDataType').each(function (i, ele) {
             var singnatureDv = $(ele).find('div[id^="digitalSignature_"]');
             if ($(singnatureDv).find('canvas').length == 0) {
@@ -189,9 +189,82 @@
         }
     }
 
+    var reloadGridForPositioner = function () {
+        
+    }
+
+    var createdFormGrid = function (createdFormListColumnName) {
+        $("#tblCreatedFormList").jqGrid("GridUnload");
+        $("#tblCreatedFormList").jqGrid({
+            url: '@Url.Action("GetCreatedFormListData", "Form")',
+            datatype: 'json',
+            mtype: 'Post',
+            colNames: createdFormListColumnName,
+            colModel: [
+                { key: false, name: 'formID', index: 'formID', search: false, hidden: true },
+                { key: false, name: 'surrogate', index: 'surrogate', search: false },
+                { key: false, name: 'design', index: 'design', search: false },
+                { key: false, name: 'description', index: 'description', search: false },
+                { key: false, name: 'creationDate', index: 'creationDate', search: false }
+            ],
+            pager: jQuery('#pagerCreatedFormList'),
+            rowNum: 10,
+            rowList: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+            height: '100%',
+            viewrecords: true,
+            caption: '',
+            emptyrecords: 'No records to display',
+            jsonReader: {
+                root: "rows",
+                page: "page",
+                total: "total",
+                records: "records",
+                Id: "0"
+            },
+            autowidth: true,
+            multiselect: false,
+            onSelectRow: function (id) {
+                getSelectedFormDetail();
+            },
+            beforeRequest: function () {
+                $(this).jqGrid('setGridParam', {
+                    postData: {
+                        formID: @Model.FormID
+                    }
+                });
+            },
+            gridComplete: function (e) {
+            },
+        }).navGrid('#pagerCreatedFormList', { edit: false, add: false, del: false, search: false, refresh: false })
+
+        $("#tblCreatedFormList").jqGrid('setLabel', 'Select', '', { 'text-align': 'center' });
+    }
+
+    var getSelectedFormDetail = function () {
+        var gr = $("#tblCreatedFormList").getGridParam('selrow');
+        if (gr != null) {
+            debugger;
+            var surrogate = $("#tblCreatedFormList").getRowData(gr).surrogate;
+            var formId = $("#tblCreatedFormList").getRowData(gr).formID;
+            $.ajax({
+            cache: false,
+            async: false,
+            data: { formID: formId, surrogate: surrogate},
+            url: '@Url.Action("EditCreatedForm", "Home")',
+            success: function (result) {
+                $('.dvFormFeedbackData').html(result);
+            },
+            error: function () {
+            },
+            beforeSend: function () { $("#wait").css("display", "block"); },
+            complete: function () { $("#wait").css("display", "none"); }
+        });
+        }
+    }
+
 </script>
-<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftght-none">
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftght-none">   
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none xspaddrght dvFormFeedbackData">
-           @Html.Raw(Model.HtmlForm)
+        @Html.Raw(Model.HtmlForm)
     </div>
 </div>

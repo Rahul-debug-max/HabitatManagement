@@ -39,7 +39,7 @@
                 alert('Unable to save. Please contact administrator.')
             }
         });
-    }
+    }      
 
     return {
         onInit: onInit,
