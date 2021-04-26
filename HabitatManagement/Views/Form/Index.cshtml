@@ -134,17 +134,19 @@
                 }
             });
 
-            var ajx = $.ajax({
-                type: 'Post',
-                url: '@Url.Action("SaveFormFeedback", "Form")',
-                cache: false,
-                data: { data: JSON.stringify(data) },
-                dataType: 'Json',
-                success: function (result) {
-                    if (result != null && !result.success) {
-                        alert('Unable to save. Please contact administrator.');
-                        return;
-                    }
+             var saveFormDataURL = '@ViewBag.SaveFormDataURL';
+             var ajx = $.ajax({
+                 type: 'Post',
+                 url: saveFormDataURL,
+                 cache: false,
+                 data: { data: JSON.stringify(data) },
+                 dataType: 'Json',
+                 traditional: true,
+                 success: function (result) {
+                     if (!result) {
+                         alert('Unable to save. Please contact administrator.');
+                         return;
+                     }
                     else {
                         loadFormFeedback($('.formFeedbackSelector').val());
                     }

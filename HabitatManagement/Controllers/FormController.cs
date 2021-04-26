@@ -34,45 +34,9 @@ namespace HabitatManagement.Controllers
                         ViewData["FormList"] = forms;
                     }
                 }
+                ViewData["SaveFormDataURL"] = string.Format("{0}form/SaveFormData", url);
             }
             return View(model);
-        }
-
-        public async Task<IActionResult> SaveFormFeedback(string data)
-        {
-            bool success = true;
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(data))
-                {
-                    using (var httpClient = new HttpClient())
-                    {
-                        string url = DBConfiguration.WebAPIHostingURL;
-                        if (!string.IsNullOrWhiteSpace(url))
-                        {
-                            string webAPIURL = string.Format("{0}form/SaveFormData", url);
-                            List<TemplateFormFieldDataBE> templateFormFieldDatas = JsonConvert.DeserializeObject<List<TemplateFormFieldDataBE>>(data);
-                            if (templateFormFieldDatas != null)
-                            {
-                                var jsonStringData = JsonConvert.SerializeObject(templateFormFieldDatas);
-                                var contentData = new StringContent(jsonStringData, System.Text.Encoding.UTF8, "application/json");
-
-                                using (var response = await httpClient.PostAsync(webAPIURL, contentData))
-                                {
-                                    var apiResponse = response.Content.ReadAsStringAsync().Result;
-                                    success = Functions.ToBool(apiResponse);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                success = false;
-            }
-
-            return Json(new { Success = success });
         }
     }
 }

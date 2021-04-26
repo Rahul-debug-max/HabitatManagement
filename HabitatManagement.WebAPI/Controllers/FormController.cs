@@ -58,13 +58,15 @@ namespace HabitatManagement.WebAPI.Controllers
         }
 
         [HttpPost]
+        [DisableRequestSizeLimit]
         [EnableCors("AllowOrigin")]
         [Route("SaveFormData")]
-        public bool SaveFormData([FromBody] List<TemplateFormFieldDataBE> templateFormFieldDatas)
+        public bool SaveFormData([FromForm] string data)
         {
             bool success = true;
             try
             {
+                List<TemplateFormFieldDataBE> templateFormFieldDatas = JsonConvert.DeserializeObject<List<TemplateFormFieldDataBE>>(data);
                 if (templateFormFieldDatas != null)
                 {
                     foreach (var templateFormFieldDataBE in templateFormFieldDatas)
