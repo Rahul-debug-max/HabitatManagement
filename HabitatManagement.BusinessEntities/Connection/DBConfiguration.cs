@@ -29,5 +29,27 @@ namespace HabitatManagement.BusinessEntities
                 return _configuration["WebAPIHostingURL"];
             }
         }
+        public static string JWTKey
+        {
+            get
+            {
+                return _configuration["Jwt:Key"];
+            }
+        }
+        public static string JWTIssuer
+        {
+            get
+            {
+                return _configuration["Jwt:Issuer"];
+            }
+        }
+
+        public static int JWTExpireTokenTimeInMinutes
+        {
+            get
+            {
+                return Functions.ToInt(_configuration["Jwt:ExpireTokenTimeInMinutes"]) == 0 ? 120 : Functions.ToInt(_configuration["Jwt:ExpireTokenTimeInMinutes"]);
+            }
+        }
     }
 }
