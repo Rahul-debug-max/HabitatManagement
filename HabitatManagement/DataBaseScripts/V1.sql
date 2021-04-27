@@ -73,6 +73,21 @@ CREATE TABLE [dbo].TemplateFormFieldData(
 END
 GO
 
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[TemplateFormFieldData]') AND TYPE in (N'U'))
+BEGIN
+	IF (COL_LENGTH('[dbo].[TemplateFormFieldData]','Surrogate') IS NULL)	
+	BEGIN
+		ALTER TABLE [dbo].[TemplateFormFieldData]
+		ADD Surrogate [int] DEFAULT(1) NOT NULL
+	END
+	IF (COL_LENGTH('[dbo].[TemplateFormFieldData]','CreationDate') IS NULL)	
+	BEGIN
+		ALTER TABLE [dbo].[TemplateFormFieldData]
+		ADD [CreationDate] DATETIME DEFAULT(GETDATE()) NOT NULL
+	END
+END
+GO
+
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[DigitalSignature]') AND TYPE in (N'U'))
 BEGIN
 
