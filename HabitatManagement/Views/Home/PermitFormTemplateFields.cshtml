@@ -242,8 +242,7 @@
 
     var getSelectedFormDetail = function () {
         var gr = $("#tblCreatedFormList").getGridParam('selrow');
-        if (gr != null) {
-            debugger;
+        if (gr != null) {          
             var surrogate = $("#tblCreatedFormList").getRowData(gr).surrogate;
             var formId = $("#tblCreatedFormList").getRowData(gr).formID;
             $.ajax({

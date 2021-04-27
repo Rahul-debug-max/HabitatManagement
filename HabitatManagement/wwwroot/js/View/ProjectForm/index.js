@@ -160,8 +160,7 @@
                     FieldType: fieldType == defaults.signatureFieldType ? defaults.signatureField : ''
                 });
             }
-        });
-        debugger;
+        });        
         var ajx = $.ajax({
             type: 'Post',
             url: defaults.saveDataURL,
