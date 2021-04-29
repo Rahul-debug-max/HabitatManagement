@@ -18,10 +18,24 @@ SP database version			9VERSION
 /* 1TABLES */
 -------------------------------------------------------------------------------------------------------------------------------
 
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[PermitFormScreenDesignTemplate]') AND TYPE in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[FormDesignTemplate]') AND type in (N'U'))
+AND EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[PermitFormScreenDesignTemplate]') AND type in (N'U'))
+BEGIN
+    EXEC sp_RENAME 'PermitFormScreenDesignTemplate' , 'FormDesignTemplate'
+END									
+GO
+									
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[FormDesignTemplateDetail]') AND type in (N'U'))
+AND EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[PermitFormScreenDesignTemplateDetail]') AND type in (N'U'))
+BEGIN
+    EXEC sp_RENAME 'PermitFormScreenDesignTemplateDetail' , 'FormDesignTemplateDetail'
+END								
+GO			
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[FormDesignTemplate]') AND TYPE in (N'U'))
 BEGIN
 
-    CREATE TABLE [dbo].[PermitFormScreenDesignTemplate](
+    CREATE TABLE [dbo].[FormDesignTemplate](
 	    [FormID] [int] IDENTITY(1,1) NOT NULL,
 	    [Design] [nvarchar](20) NOT NULL,
 	    [Description] [nvarchar](60) NOT NULL,
@@ -41,17 +55,17 @@ GO
 
 
 
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[PermitFormScreenDesignTemplateDetail]') AND TYPE in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[FormDesignTemplateDetail]') AND TYPE in (N'U'))
 BEGIN
 
-CREATE TABLE [dbo].PermitFormScreenDesignTemplateDetail(
+CREATE TABLE [dbo].FormDesignTemplateDetail(
 	[FormID] [int] NOT NULL,
 	[Field] [int] NOT NULL,
 	[FieldName] [nvarchar](max) NULL,
 	[FieldType] [int] NOT NULL,
 	[Section] [nvarchar](20) NOT NULL,
 	[Sequence] [int] NOT NULL DEFAULT ((0)),
- CONSTRAINT [PK_PermitFormScreenDesignTemplateDetail] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_FormDesignTemplateDetail] PRIMARY KEY CLUSTERED 
 (
 	[FormID] ASC,
 	[Field] ASC
@@ -143,7 +157,8 @@ BEGIN
 END
 GO
 
-
+						
+	
 -------------------------------------------------------------------------------------------------------------------------------
 /* 2DVF */
 -------------------------------------------------------------------------------------------------------------------------------
@@ -163,6 +178,8 @@ GO
 -------------------------------------------------------------------------------------------------------------------------------
 /* 6SP */
 -------------------------------------------------------------------------------------------------------------------------------
+
+---------------------- Start of Drop Extra Sproc from data base ----------------------
 
 /****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplateDetail_Update]    Script Date: 08-04-2021 15:51:54 ******/
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_PermitFormScreenDesignTemplateDetail_Update]') AND type in (N'P', N'PC'))
@@ -199,44 +216,87 @@ GO
 /****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplateDetail_Delete]    Script Date: 12-04-2021 15:51:54 ******/
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_PermitFormScreenDesignTemplateDetail_Delete]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplateDetail_Delete]
+GO														
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_PermitFormScreenDesignTemplateDetail_BlockFetch]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplateDetail_BlockFetch]
+GO		
+
+---------------------- End of Drop Extra Sproc from data base ----------------------
+
+
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplateDetail_Update]    Script Date: 08-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_FormDesignTemplateDetail_Update]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_FormDesignTemplateDetail_Update]
 GO
-/****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplateDetail_Delete]    Script Date: 12-04-2021 15:51:54 ******/
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplateDetail_FetchAll]    Script Date: 08-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_FormDesignTemplateDetail_FetchAll]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_FormDesignTemplateDetail_FetchAll]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplateDetail_Fetch]    Script Date: 08-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_FormDesignTemplateDetail_Fetch]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_FormDesignTemplateDetail_Fetch]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplateDetail_Add]    Script Date: 08-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_FormDesignTemplateDetail_Add]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_FormDesignTemplateDetail_Add]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplate_Update]    Script Date: 08-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_FormDesignTemplate_Update]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_FormDesignTemplate_Update]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplate_BlockFetch]    Script Date: 08-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_FormDesignTemplate_BlockFetch]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_FormDesignTemplate_BlockFetch]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplate_Add]    Script Date: 08-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_FormDesignTemplate_Add]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_FormDesignTemplate_Add]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplate_Fetch]    Script Date: 08-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_FormDesignTemplate_Fetch]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_FormDesignTemplate_Fetch]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplateDetail_Delete]    Script Date: 12-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_FormDesignTemplateDetail_Delete]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_FormDesignTemplateDetail_Delete]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplateDetail_Delete]    Script Date: 12-04-2021 15:51:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE dbo.[usp_PermitFormScreenDesignTemplateDetail_Delete]
+CREATE PROCEDURE dbo.[usp_FormDesignTemplateDetail_Delete]
 (
 	@FormID INT,  
 	@Field INT
 )
 AS
 BEGIN
-	DELETE FROM PermitFormScreenDesignTemplateDetail WHERE FormID = @FormID AND Field = @Field;
+	DELETE FROM FormDesignTemplateDetail WHERE FormID = @FormID AND Field = @Field;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplate_Fetch]    Script Date: 08-04-2021 15:51:54 ******/
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplate_Fetch]    Script Date: 08-04-2021 15:51:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplate_Fetch]    
+CREATE PROCEDURE [dbo].[usp_FormDesignTemplate_Fetch]    
 (    
  @FormID INT    
 )   
 AS     
 BEGIN    
 SET NOCOUNT ON;     
-   SELECT t.* FROM PermitFormScreenDesignTemplate AS t  WHERE t.FormID = @FormID  
+   SELECT t.* FROM FormDesignTemplate AS t  WHERE t.FormID = @FormID  
 END  
 GO
-/****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplate_Add]    Script Date: 08-04-2021 15:51:54 ******/
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplate_Add]    Script Date: 08-04-2021 15:51:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
   
-CREATE PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplate_Add]    
+CREATE PROCEDURE [dbo].[usp_FormDesignTemplate_Add]    
 (     
     @Design NVARCHAR(max),    
     @Description NVARCHAR(max),    
@@ -253,7 +313,7 @@ BEGIN
 BEGIN TRY    
  BEGIN TRANSACTION trans    
     
-  INSERT INTO [PermitFormScreenDesignTemplate]    
+  INSERT INTO FormDesignTemplate    
   (    
    [Design],    
    [Description],    
@@ -307,12 +367,12 @@ BEGIN CATCH
 END CATCH  
 END
 GO
-/****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplate_BlockFetch]    Script Date: 08-04-2021 15:51:54 ******/
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplate_BlockFetch]    Script Date: 08-04-2021 15:51:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
- CREATE PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplate_BlockFetch]      
+ CREATE PROCEDURE [dbo].[usp_FormDesignTemplate_BlockFetch]      
  @SearchForm VARCHAR (256) = NULL,              
  @PageIndex INT = 1,      
  @PageSize INT = 10,
@@ -324,11 +384,11 @@ BEGIN
   SET @PageIndex = 1       
  END    
 
- SELECT @RecordCount = COUNT(*) FROM PermitFormScreenDesignTemplate  
+ SELECT @RecordCount = COUNT(*) FROM FormDesignTemplate  
  Where ([Design] LIKE '%' + @SearchForm + '%' OR [Description] LIKE '%' + @SearchForm + '%')  
       
  SELECT t.*
- FROM PermitFormScreenDesignTemplate AS t    
+ FROM FormDesignTemplate AS t    
  Where (t.[Design] LIKE '%' + @SearchForm + '%' OR t.[Description] LIKE '%' + @SearchForm + '%')   
  ORDER BY [Design]             
  OFFSET @PageSize * (@PageIndex - 1) ROWS            
@@ -336,13 +396,13 @@ BEGIN
 
 END    
 GO
-/****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplate_Update]    Script Date: 08-04-2021 15:51:54 ******/
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplate_Update]    Script Date: 08-04-2021 15:51:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
   
-CREATE PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplate_Update]    
+CREATE PROCEDURE [dbo].[usp_FormDesignTemplate_Update]    
 (    
     @FormID INT,    
     @Design NVARCHAR(max),    
@@ -359,7 +419,7 @@ BEGIN
  BEGIN TRY  
   BEGIN TRANSACTION trans    
     
-  UPDATE [PermitFormScreenDesignTemplate]    
+  UPDATE FormDesignTemplate    
   SET [Design] = @Design,    
   [Description] = @Description,    
   [Active] = @Active,  
@@ -396,13 +456,13 @@ BEGIN
  END CATCH  
 END  
 GO
-/****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplateDetail_Add]    Script Date: 08-04-2021 15:51:54 ******/
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplateDetail_Add]    Script Date: 08-04-2021 15:51:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
   
-CREATE PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplateDetail_Add]    
+CREATE PROCEDURE [dbo].[usp_FormDesignTemplateDetail_Add]    
 (    
     @FormID INT,    
     @FieldName nvarchar(max),    
@@ -415,14 +475,14 @@ AS
 BEGIN    
 
  --DECLARE @Field BIGINT;  
- SELECT @Field = ISNULL(MAX(Field),0) + 1 FROM PermitFormScreenDesignTemplateDetail WHERE FormID = @FormID
+ SELECT @Field = ISNULL(MAX(Field),0) + 1 FROM FormDesignTemplateDetail WHERE FormID = @FormID
 
  IF(@Sequence = 0)
  BEGIN
-     SELECT @Sequence = ISNULL(MAX([Sequence]),0) + 1 FROM PermitFormScreenDesignTemplateDetail WHERE FormID = @FormID AND [Section] = @Section;
+     SELECT @Sequence = ISNULL(MAX([Sequence]),0) + 1 FROM FormDesignTemplateDetail WHERE FormID = @FormID AND [Section] = @Section;
  END
 
-     INSERT INTO PermitFormScreenDesignTemplateDetail    
+     INSERT INTO FormDesignTemplateDetail    
         (FormID,    
         [Field],    
         FieldName,    
@@ -440,13 +500,13 @@ BEGIN
 		  )    
 END    
 GO
-/****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplateDetail_Fetch]    Script Date: 08-04-2021 15:51:54 ******/
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplateDetail_Fetch]    Script Date: 08-04-2021 15:51:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
   
-CREATE PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplateDetail_Fetch]    
+CREATE PROCEDURE [dbo].[usp_FormDesignTemplateDetail_Fetch]    
 (    
 	@FormID INT,   
 	@Field INT   
@@ -455,18 +515,18 @@ AS
 BEGIN 
 	SELECT t.[FormID], t.[Field], t.[FieldName], t.[FieldType], t.[Sequence], t1.[Section], 
 	t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence  
-	FROM PermitFormScreenDesignTemplateDetail t JOIN TemplateFormSection t1 
+	FROM FormDesignTemplateDetail t JOIN TemplateFormSection t1 
 	ON t.Section = t1.Section AND t.[FormID] = t1.[FormID]
     WHERE t1.[FormID] = @FormID AND [Field] = @Field ORDER BY t1.[Sequence], t.[Sequence]  
 END  
 GO
-/****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplateDetail_FetchAll]    Script Date: 08-04-2021 15:51:54 ******/
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplateDetail_FetchAll]    Script Date: 08-04-2021 15:51:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
   
-CREATE PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplateDetail_FetchAll]  
+CREATE PROCEDURE [dbo].[usp_FormDesignTemplateDetail_FetchAll]  
 (  
 	@FormID INT  
 )   
@@ -476,19 +536,19 @@ SET NOCOUNT ON;
    
 	SELECT t.[FormID], t.[Field], t.[FieldName], t.[FieldType], t.[Sequence], t1.[Section], 
 	t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence 
-	FROM PermitFormScreenDesignTemplateDetail t RIGHT JOIN TemplateFormSection t1 
+	FROM FormDesignTemplateDetail t RIGHT JOIN TemplateFormSection t1 
 	ON t.Section = t1.Section AND t.[FormID] = t1.[FormID] 
     WHERE t1.[FormID] = @FormID AND (ISNULL(t1.[Description],'') != '' OR [Field] IS NOT NULL) ORDER BY t1.[Sequence], t.[Sequence]
 
 END  
 GO
-/****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplateDetail_Update]    Script Date: 08-04-2021 15:51:54 ******/
+/****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplateDetail_Update]    Script Date: 08-04-2021 15:51:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
   
-CREATE PROCEDURE  [dbo].[usp_PermitFormScreenDesignTemplateDetail_Update]    
+CREATE PROCEDURE  [dbo].[usp_FormDesignTemplateDetail_Update]    
 (    
     @FormID INT,    
     @Field INT,      
@@ -502,23 +562,23 @@ BEGIN
  DECLARE @PrevSection nvarchar(20),@PrevSequence int;    
  DECLARE @CheckListPrevSection nvarchar(20);
  
- SELECT @CheckListPrevSection = Section FROM PermitFormScreenDesignTemplateDetail
+ SELECT @CheckListPrevSection = Section FROM FormDesignTemplateDetail
   WHERE FormID = @FormID AND FieldType = 9 AND Field = @Field
 
- IF NOT EXISTS(SELECT 1 FROM PermitFormScreenDesignTemplateDetail WHERE FormID = @FormID AND Field = @Field     
+ IF NOT EXISTS(SELECT 1 FROM FormDesignTemplateDetail WHERE FormID = @FormID AND Field = @Field     
     AND Section = @Section AND [Sequence] = @Sequence)    
  BEGIN    
-  SELECT @PrevSection = Section, @PrevSequence = [Sequence] FROM PermitFormScreenDesignTemplateDetail     
+  SELECT @PrevSection = Section, @PrevSequence = [Sequence] FROM FormDesignTemplateDetail     
   WHERE FormID = @FormID AND Field = @Field;    
     
   IF(@PrevSection != @Section)    
   BEGIN    
-   UPDATE PermitFormScreenDesignTemplateDetail SET     
+   UPDATE FormDesignTemplateDetail SET     
     [Sequence] = [Sequence] + 1    
-    WHERE PermitFormScreenDesignTemplateDetail.FormID = @FormID AND Section = @Section    
+    WHERE FormDesignTemplateDetail.FormID = @FormID AND Section = @Section    
     AND [Sequence] >= @Sequence    
     
-   UPDATE PermitFormScreenDesignTemplateDetail      
+   UPDATE FormDesignTemplateDetail      
    SET FieldName = @FieldName,      
    FieldType = @FieldType,          
    [Section] = @Section,      
@@ -528,34 +588,34 @@ BEGIN
    ;WITH templateField    
    AS    
    (    
-    SELECT ROW_NUMBER() OVER(ORDER BY [Sequence]) AS RowNumber, FormID,[Section],[Field] FROM PermitFormScreenDesignTemplateDetail    
+    SELECT ROW_NUMBER() OVER(ORDER BY [Sequence]) AS RowNumber, FormID,[Section],[Field] FROM FormDesignTemplateDetail    
     WHERE FormID = @FormID AND Section = @PrevSection    
    )    
     
-   UPDATE PermitFormScreenDesignTemplateDetail SET PermitFormScreenDesignTemplateDetail.[Sequence] = templateField.RowNumber    
-   FROM PermitFormScreenDesignTemplateDetail INNER JOIN templateField ON     
-   PermitFormScreenDesignTemplateDetail.FormID = templateField.FormID     
-   AND PermitFormScreenDesignTemplateDetail.Section = templateField.Section    
-   AND PermitFormScreenDesignTemplateDetail.[Field] = templateField.[Field];    
+   UPDATE FormDesignTemplateDetail SET FormDesignTemplateDetail.[Sequence] = templateField.RowNumber    
+   FROM FormDesignTemplateDetail INNER JOIN templateField ON     
+   FormDesignTemplateDetail.FormID = templateField.FormID     
+   AND FormDesignTemplateDetail.Section = templateField.Section    
+   AND FormDesignTemplateDetail.[Field] = templateField.[Field];    
   END    
   ELSE    
   BEGIN    
    IF (@PrevSequence > @Sequence) --Increment seq no      
    BEGIN    
-    UPDATE PermitFormScreenDesignTemplateDetail SET     
-    PermitFormScreenDesignTemplateDetail.[Sequence] = PermitFormScreenDesignTemplateDetail.[Sequence] + 1    
-    WHERE PermitFormScreenDesignTemplateDetail.FormID = @FormID AND Section = @Section    
+    UPDATE FormDesignTemplateDetail SET     
+    FormDesignTemplateDetail.[Sequence] = FormDesignTemplateDetail.[Sequence] + 1    
+    WHERE FormDesignTemplateDetail.FormID = @FormID AND Section = @Section    
     AND [Sequence] >= @Sequence AND [Sequence] < @PrevSequence    
    END    
    ELSE IF (@PrevSequence < @Sequence) --decrement seq no     
    BEGIN    
-    UPDATE PermitFormScreenDesignTemplateDetail SET     
-    PermitFormScreenDesignTemplateDetail.[Sequence] = PermitFormScreenDesignTemplateDetail.[Sequence] - 1    
-    WHERE PermitFormScreenDesignTemplateDetail.FormID = @FormID AND Section = @Section    
+    UPDATE FormDesignTemplateDetail SET     
+    FormDesignTemplateDetail.[Sequence] = FormDesignTemplateDetail.[Sequence] - 1    
+    WHERE FormDesignTemplateDetail.FormID = @FormID AND Section = @Section    
     AND [Sequence] > @PrevSequence AND [Sequence] <= @Sequence    
    END    
     
-   UPDATE PermitFormScreenDesignTemplateDetail      
+   UPDATE FormDesignTemplateDetail      
    SET FieldName = @FieldName,      
    FieldType = @FieldType,        
    [Section] = @Section,      
@@ -565,7 +625,7 @@ BEGIN
  END    
  ELSE    
  BEGIN    
-  UPDATE PermitFormScreenDesignTemplateDetail      
+  UPDATE FormDesignTemplateDetail      
   SET FieldName = @FieldName,      
    FieldType = @FieldType,        
   [Section] = @Section,      
@@ -574,10 +634,10 @@ BEGIN
  END    
 
   -- Check List Type
-  IF EXISTS (SELECT 1 FROM PermitFormScreenDesignTemplateDetail WHERE FormID = @FormID AND FieldType = 9 AND Field = @Field)
+  IF EXISTS (SELECT 1 FROM FormDesignTemplateDetail WHERE FormID = @FormID AND FieldType = 9 AND Field = @Field)
   BEGIN
 
-    UPDATE PermitFormScreenDesignTemplateDetail
+    UPDATE FormDesignTemplateDetail
 	  SET Section = @Section, [Sequence] = @Sequence
 	WHERE FormID = @FormID AND FieldType = 9 AND Section = @CheckListPrevSection
 
@@ -829,10 +889,10 @@ BEGIN
 END
 GO
 
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_PermitFormScreenDesignTemplateDetail_BlockFetch]') AND type in (N'P', N'PC'))
-DROP PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplateDetail_BlockFetch]
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_FormDesignTemplateDetail_BlockFetch]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_FormDesignTemplateDetail_BlockFetch]
 GO
-CREATE PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplateDetail_BlockFetch]        
+CREATE PROCEDURE [dbo].[usp_FormDesignTemplateDetail_BlockFetch]        
  @FormID INT,                    
  @PageIndex INT = 1,        
  @PageSize INT = 10,  
@@ -844,13 +904,13 @@ BEGIN
   SET @PageIndex = 1         
  END      
   
- SELECT @RecordCount = COUNT(*)  FROM PermitFormScreenDesignTemplateDetail t JOIN TemplateFormSection t1   
+ SELECT @RecordCount = COUNT(*)  FROM FormDesignTemplateDetail t JOIN TemplateFormSection t1   
  ON t.Section = t1.Section AND t.[FormID] = t1.[FormID]
  WHERE t1.[FormID] = @FormID AND (ISNULL(t1.[Description],'') != '' OR [Field] IS NOT NULL)
         
  SELECT t.[FormID], t.[Field], t.[FieldName], t.[FieldType], t.[Sequence], t1.[Section], 
 	t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence   
- FROM PermitFormScreenDesignTemplateDetail t JOIN TemplateFormSection t1   
+ FROM FormDesignTemplateDetail t JOIN TemplateFormSection t1   
  ON t.Section = t1.Section AND t.[FormID] = t1.[FormID]
  WHERE t1.[FormID] = @FormID AND (ISNULL(t1.[Description],'') != '' OR [Field] IS NOT NULL)
  ORDER BY t1.[Sequence], t.[Sequence]           
@@ -861,7 +921,7 @@ GO
 
 
 
-/****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplateDetail_Fetch]    Script Date: 08-04-2021 15:51:54 ******/
+/****** Object:  StoredProcedure [dbo].[usp_TableFieldTypeMaster_Fetch]    Script Date: 08-04-2021 15:51:54 ******/
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TableFieldTypeMaster_Fetch]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[usp_TableFieldTypeMaster_Fetch]
 GO
@@ -1007,7 +1067,7 @@ BEGIN
 
 
 	SELECT DISTINCT Surrogate,t1.FormID,t1.Design,t1.[Description],t.CreationDate FROM TemplateFormFieldData t JOIN  
-	[dbo].[PermitFormScreenDesignTemplate] t1 ON t.FormID = t1.FormID 
+	[dbo].FormDesignTemplate t1 ON t.FormID = t1.FormID 
 	WHERE (@FormID = 0 OR t.FormID = @FormID) ORDER BY t.CreationDate            
 	OFFSET @PageSize * (@PageIndex - 1) ROWS            
 	FETCH NEXT @PageSize ROWS ONLY;  

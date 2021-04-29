@@ -21,9 +21,9 @@ namespace HabitatManagement.WebAPI.Controllers
         [Route("GetForms")]
         public IEnumerable<SelectListItem> GetForms()
         {
-            IEnumerable<PermitFormScreenDesignTemplateBE> listPermitFormScreenDesignTemplate = FormLogic.BlockFetchPermitFormScreenDesignTemplate(1, Int32.MaxValue, out int totalRecords, "");
+            IEnumerable<FormDesignTemplateBE> listFormDesignTemplate = FormLogic.BlockFetchFormDesignTemplate(1, Int32.MaxValue, out int totalRecords, "");
             List<SelectListItem> forms = new List<SelectListItem>();
-            forms = listPermitFormScreenDesignTemplate.Select(m => new SelectListItem()
+            forms = listFormDesignTemplate.Select(m => new SelectListItem()
             {
                 Text = m.Design,
                 Value = m.FormID.ToString()
@@ -49,7 +49,7 @@ namespace HabitatManagement.WebAPI.Controllers
         [Route("GetFormHtml/{formID:int}/{surrogate:int}/{isRenderForDragnDrop:bool}")]
         public string GetFormHtml(int formID, int surrogate, bool isRenderForDragnDrop)
         {
-            List<PermitFormScreenDesignTemplateDetailBE> templateDetails = FormLogic.FetchAllPermitFormScreenDesignTemplateDetail(formID);
+            List<FormDesignTemplateDetailBE> templateDetails = FormLogic.FetchAllFormDesignTemplateDetail(formID);
             List<TemplateFormFieldDataBE> templateFormFieldData = new List<TemplateFormFieldDataBE>();
             if (surrogate > 0)
             {

@@ -65,30 +65,30 @@ namespace HabitatManagement.Controllers
                 total = 0,
                 page,
                 records = 0,
-                rows = new List<PermitFormScreenDesignTemplateModel>()
+                rows = new List<FormDesignTemplateModel>()
             };
 
             try
             {
-                IEnumerable<PermitFormScreenDesignTemplateBE> listPermitFormScreenDesignTemplate = FormLogic.BlockFetchPermitFormScreenDesignTemplate(page, rows, out int totalRecords, searchInput);
+                IEnumerable<FormDesignTemplateBE> listFormDesignTemplate = FormLogic.BlockFetchFormDesignTemplate(page, rows, out int totalRecords, searchInput);
 
-                if (listPermitFormScreenDesignTemplate == null)
+                if (listFormDesignTemplate == null)
                 {
                     return Json(jsonData);
                 }
                 else
                 {
-                    var resultFormTemplate = (from permitFormScreenDesignTemplateObj in listPermitFormScreenDesignTemplate
-                                              select new PermitFormScreenDesignTemplateModel
+                    var resultFormTemplate = (from o in listFormDesignTemplate
+                                              select new FormDesignTemplateModel
                                               {
-                                                  FormID = permitFormScreenDesignTemplateObj.FormID.ToString(),
-                                                  Design = permitFormScreenDesignTemplateObj.Design,
-                                                  Description = permitFormScreenDesignTemplateObj.Description,
-                                                  Active = permitFormScreenDesignTemplateObj.Active.ToString(),
-                                                  CreatedDateTime = permitFormScreenDesignTemplateObj.CreatedDateTime.ToString(),
-                                                  LastUpdatedDateTime = permitFormScreenDesignTemplateObj.LastUpdatedDateTime.ToString(),
-                                                  CreatedBy = permitFormScreenDesignTemplateObj.CreatedBy,
-                                                  UpdatedBy = permitFormScreenDesignTemplateObj.UpdatedBy
+                                                  FormID = o.FormID.ToString(),
+                                                  Design = o.Design,
+                                                  Description = o.Description,
+                                                  Active = o.Active.ToString(),
+                                                  CreatedDateTime = o.CreatedDateTime.ToString(),
+                                                  LastUpdatedDateTime = o.LastUpdatedDateTime.ToString(),
+                                                  CreatedBy = o.CreatedBy,
+                                                  UpdatedBy = o.UpdatedBy
                                               }).ToList();
 
                     var totalPages = (int)Math.Ceiling((float)totalRecords / (float)rows);
@@ -111,9 +111,9 @@ namespace HabitatManagement.Controllers
             }
         }
 
-        public ActionResult PermitFormScreenDesignTemplate(int formID)
+        public ActionResult FormDesignTemplate(int formID)
         {
-            PermitFormScreenDesignTemplateBE model = new PermitFormScreenDesignTemplateBE();
+            FormDesignTemplateBE model = new FormDesignTemplateBE();
 
             if (formID <= 0)
             {
@@ -121,7 +121,7 @@ namespace HabitatManagement.Controllers
             }
             else
             {
-                PermitFormScreenDesignTemplateBE conditionFeedbackTemplate = FormLogic.FetchPermitFormScreenDesignTemplate(formID);
+                FormDesignTemplateBE conditionFeedbackTemplate = FormLogic.FetchFormDesignTemplate(formID);
                 if (conditionFeedbackTemplate != null)
                 {
                     model.FormID = conditionFeedbackTemplate.FormID;
@@ -134,50 +134,50 @@ namespace HabitatManagement.Controllers
         }
 
         [HttpPost]
-        public ActionResult PermitFormScreenDesignTemplate(PermitFormScreenDesignTemplateBE model)
+        public ActionResult FormDesignTemplate(FormDesignTemplateBE model)
         {
 
             bool success = false;
             int id = 0;
 
-            PermitFormScreenDesignTemplateBE permitFormScreenDesignTemplate = FormLogic.FetchPermitFormScreenDesignTemplate(model.FormID);
-            if (permitFormScreenDesignTemplate == null)
+            FormDesignTemplateBE formDesignTemplate = FormLogic.FetchFormDesignTemplate(model.FormID);
+            if (formDesignTemplate == null)
             {
-                permitFormScreenDesignTemplate = new PermitFormScreenDesignTemplateBE();
+                formDesignTemplate = new FormDesignTemplateBE();
             }
-            permitFormScreenDesignTemplate.Design = model.Design.ToUpper();
-            permitFormScreenDesignTemplate.Description = model.Description;
-            permitFormScreenDesignTemplate.Active = model.Active;
+            formDesignTemplate.Design = model.Design.ToUpper();
+            formDesignTemplate.Description = model.Description;
+            formDesignTemplate.Active = model.Active;
 
             if (model.FormID <= 0)
             {
-                permitFormScreenDesignTemplate.CreatedBy = "Habitat";
-                permitFormScreenDesignTemplate.CreatedDateTime = DateTime.Now;
-                permitFormScreenDesignTemplate.LastUpdatedDateTime = DateTime.Now;
-                success = FormLogic.AddPermitFormScreenDesignTemplate(permitFormScreenDesignTemplate, out id);
+                formDesignTemplate.CreatedBy = "Habitat";
+                formDesignTemplate.CreatedDateTime = DateTime.Now;
+                formDesignTemplate.LastUpdatedDateTime = DateTime.Now;
+                success = FormLogic.AddFormDesignTemplate(formDesignTemplate, out id);
             }
             else
             {
-                permitFormScreenDesignTemplate.UpdatedBy = "Habitat";
-                permitFormScreenDesignTemplate.LastUpdatedDateTime = DateTime.Now;
-                success = FormLogic.UpdatePermitFormScreenDesignTemplate(permitFormScreenDesignTemplate);
+                formDesignTemplate.UpdatedBy = "Habitat";
+                formDesignTemplate.LastUpdatedDateTime = DateTime.Now;
+                success = FormLogic.UpdateFormDesignTemplate(formDesignTemplate);
             }
             return Json(new { success, id });
         }
 
-        public ActionResult PermitFormScreenDesignTemplateDetail(int formID)
+        public ActionResult FormDesignTemplateDetail(int formID)
         {
-            PermitFormScreenDesignTemplateDetailModelBE model = new PermitFormScreenDesignTemplateDetailModelBE();
+            FormDesignTemplateDetailModel model = new FormDesignTemplateDetailModel();
 
-            model.TemplateDetails = new List<PermitFormScreenDesignTemplateDetailBE>();
+            model.TemplateDetails = new List<FormDesignTemplateDetailBE>();
 
-            PermitFormScreenDesignTemplateBE permitFormScreenDesignTemplate = FormLogic.FetchPermitFormScreenDesignTemplate(formID);
-            if (permitFormScreenDesignTemplate != null)
+            FormDesignTemplateBE formDesignTemplate = FormLogic.FetchFormDesignTemplate(formID);
+            if (formDesignTemplate != null)
             {
-                model.FormID = permitFormScreenDesignTemplate.FormID;
-                model.Design = permitFormScreenDesignTemplate.Design;
-                model.Description = permitFormScreenDesignTemplate.Description;
-                model.Active = permitFormScreenDesignTemplate.Active;
+                model.FormID = formDesignTemplate.FormID;
+                model.Design = formDesignTemplate.Design;
+                model.Description = formDesignTemplate.Description;
+                model.Active = formDesignTemplate.Active;
             }
             model.TemplateSectionDetail = FormLogic.FetchAllTemplateFormSection(model.FormID);
             return View(model);
@@ -185,7 +185,7 @@ namespace HabitatManagement.Controllers
 
 
         [HttpPost]
-        public ActionResult PermitFormScreenDesignTemplateDetail(PermitFormScreenDesignTemplateDetailModelBE model)
+        public ActionResult FormDesignTemplateDetail(FormDesignTemplateDetailModel model)
         {
             bool success = false;
             //success = FormLogic.Save(model.TemplateDetails);
@@ -194,7 +194,7 @@ namespace HabitatManagement.Controllers
 
         public ActionResult TemplateSectionList(int formID)
         {
-            PermitFormScreenDesignTemplateDetailModelBE model = new PermitFormScreenDesignTemplateDetailModelBE();
+            FormDesignTemplateDetailModel model = new FormDesignTemplateDetailModel();
             model.TemplateSectionDetail = FormLogic.FetchAllTemplateFormSection(formID);
             return PartialView("TemplateSectionList", model);
         }
@@ -249,7 +249,7 @@ namespace HabitatManagement.Controllers
 
 
         [HttpPost]
-        public ActionResult TemplateSectionList(PermitFormScreenDesignTemplateDetailModelBE model)
+        public ActionResult TemplateSectionList(FormDesignTemplateDetailModel model)
         {
             bool success = true;
 
@@ -339,12 +339,12 @@ namespace HabitatManagement.Controllers
                 total = 0,
                 page,
                 records = 0,
-                rows = new List<PermitFormScreenDesignTemplateDetailBE>()
+                rows = new List<FormDesignTemplateDetailBE>()
             };
 
             try
             {
-                IEnumerable<PermitFormScreenDesignTemplateDetailBE> list = FormLogic.BlockFetchPermitFormScreenDesignTemplateDetail(formID, page, rows, out int totalRecords);
+                IEnumerable<FormDesignTemplateDetailBE> list = FormLogic.BlockFetchFormDesignTemplateDetail(formID, page, rows, out int totalRecords);
 
                 if (list == null)
                 {
@@ -353,7 +353,7 @@ namespace HabitatManagement.Controllers
                 else
                 {
                     var resultFormTemplate = (from obj in list
-                                              select new PermitFormScreenDesignTemplateDetailBE
+                                              select new FormDesignTemplateDetailBE
                                               {
                                                   Field = obj.Field,
                                                   FieldName = obj.FieldName,
@@ -385,12 +385,12 @@ namespace HabitatManagement.Controllers
 
         public ActionResult EditPermitFormField(int formID, int fieldID)
         {
-            PermitFormScreenDesignTemplateDetailBE model;
+            FormDesignTemplateDetailBE model;
 
-            model = FormLogic.FetchPermitFormScreenDesignTemplateDetail(formID, fieldID);
+            model = FormLogic.FetchFormDesignTemplateDetail(formID, fieldID);
             if (model == null)
             {
-                model = new PermitFormScreenDesignTemplateDetailBE();
+                model = new FormDesignTemplateDetailBE();
             }
 
             ViewData["SectionList"] = FormLogic.FetchAllTemplateFormSection(formID).Select(m => new SelectListItem()
@@ -403,31 +403,51 @@ namespace HabitatManagement.Controllers
         }
 
         [HttpPost]
-        public ActionResult EditPermitFormField(PermitFormScreenDesignTemplateDetailBE model, List<TableFieldTypeMasterBE> tableFieldTypeMaster)
+        public ActionResult EditPermitFormField(FormDesignTemplateDetailBE model, List<TableFieldTypeMasterBE> tableFieldTypeMaster)
         {
 
             bool success = false;
             int id = 0;
 
-            PermitFormScreenDesignTemplateDetailBE permitFormScreenDesignTemplateDetail = FormLogic.FetchPermitFormScreenDesignTemplateDetail(model.FormID, model.Field);
-            if (permitFormScreenDesignTemplateDetail == null)
+            FormDesignTemplateDetailBE formDesignTemplateDetail = FormLogic.FetchFormDesignTemplateDetail(model.FormID, model.Field);
+            if (formDesignTemplateDetail == null)
             {
-                permitFormScreenDesignTemplateDetail = new PermitFormScreenDesignTemplateDetailBE();
+                formDesignTemplateDetail = new FormDesignTemplateDetailBE();
             }
-            permitFormScreenDesignTemplateDetail.FormID = model.FormID;
-            permitFormScreenDesignTemplateDetail.Field = model.Field;
-            permitFormScreenDesignTemplateDetail.FieldName = model.FieldName;
-            permitFormScreenDesignTemplateDetail.FieldType = model.FieldType;
-            permitFormScreenDesignTemplateDetail.Section = model.Section;
-            permitFormScreenDesignTemplateDetail.Sequence = model.Sequence;
+            formDesignTemplateDetail.FormID = model.FormID;
+            formDesignTemplateDetail.Field = model.Field;
+            formDesignTemplateDetail.FieldName = model.FieldName;
+            formDesignTemplateDetail.FieldType = model.FieldType;
+            formDesignTemplateDetail.Section = model.Section;
+            formDesignTemplateDetail.Sequence = model.Sequence;
 
             if (model.Field <= 0)
             {
-                success = FormLogic.AddPermitFormScreenDesignTemplateDetail(permitFormScreenDesignTemplateDetail, out int field);
+                success = FormLogic.AddFormDesignTemplateDetail(formDesignTemplateDetail, out int field);
+
+                //if (tableFieldTypeMaster != null)
+                //{
+                //    foreach (var o in tableFieldTypeMaster)
+                //    {
+                //        FormLogic.AddTableFieldTypeMaster(o);
+                //    }
+                //}
             }
             else
             {
-                success = FormLogic.UpdatePermitFormScreenDesignTemplateDetail(permitFormScreenDesignTemplateDetail);
+                success = FormLogic.UpdateFormDesignTemplateDetail(formDesignTemplateDetail);
+
+                //if (tableFieldTypeMaster != null)
+                //{
+                //    foreach (var o in tableFieldTypeMaster)
+                //    {
+                //        if (o.Field > 0)
+                //        {
+                //            FormLogic.DeleteTableFieldTypeMaster(o.Field);
+                //        }
+                //        FormLogic.AddTableFieldTypeMaster(o);
+                //    }
+                //}
             }
             return Json(new { success, id });
         }
@@ -436,7 +456,7 @@ namespace HabitatManagement.Controllers
         {
             bool success = false;
 
-            success = FormLogic.DeletePermitFormScreenDesignTemplateDetail(formID, fieldID);
+            success = FormLogic.DeleteFormDesignTemplateDetail(formID, fieldID);
 
             return new JsonResult(new { Success = success });
         }
@@ -447,17 +467,17 @@ namespace HabitatManagement.Controllers
             return new JsonResult(new { Signature = signature });
         }
 
-        public ActionResult PermitFormScreenDesignTemplateDetailFields(PermitFormScreenDesignTemplateDetailBE formDetail)
+        public ActionResult FormDesignTemplateDetailFields(FormDesignTemplateDetailBE formDetail)
         {
             bool success = true;
             if (formDetail != null)
             {
-                PermitFormScreenDesignTemplateDetailBE permitFormScreenDesignTemplateDetailBE = FormLogic.FetchPermitFormScreenDesignTemplateDetail(formDetail.FormID, formDetail.Field);
-                if (permitFormScreenDesignTemplateDetailBE != null)
+                FormDesignTemplateDetailBE formDesignTemplateDetailBE = FormLogic.FetchFormDesignTemplateDetail(formDetail.FormID, formDetail.Field);
+                if (formDesignTemplateDetailBE != null)
                 {
-                    permitFormScreenDesignTemplateDetailBE.Section = formDetail.Section;
-                    permitFormScreenDesignTemplateDetailBE.Sequence = formDetail.Sequence;
-                    success = FormLogic.UpdatePermitFormScreenDesignTemplateDetail(permitFormScreenDesignTemplateDetailBE);
+                    formDesignTemplateDetailBE.Section = formDetail.Section;
+                    formDesignTemplateDetailBE.Sequence = formDetail.Sequence;
+                    success = FormLogic.UpdateFormDesignTemplateDetail(formDesignTemplateDetailBE);
                 }
             }
             return Json(new { Success = success });

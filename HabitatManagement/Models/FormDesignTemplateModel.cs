@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace HabitatManagement.Models
 {
-    public class PermitFormScreenDesignTemplateModel
+    public class FormDesignTemplateModel
     {
         public string FormID { get; set; }
         public string Design { get; set; }

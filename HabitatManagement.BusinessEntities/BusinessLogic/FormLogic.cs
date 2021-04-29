@@ -12,15 +12,15 @@ namespace HabitatManagement.BusinessEntities
     {
         static string _connectionstring = DBConfiguration.Connection;
 
-        public static List<PermitFormScreenDesignTemplateBE> BlockFetchPermitFormScreenDesignTemplate(int pageIndex, int pageSize, out int totalRecords, string searchForm)
+        public static List<FormDesignTemplateBE> BlockFetchFormDesignTemplate(int pageIndex, int pageSize, out int totalRecords, string searchForm)
         {
             totalRecords = 0;
-            List<PermitFormScreenDesignTemplateBE> list = new List<PermitFormScreenDesignTemplateBE>();
+            List<FormDesignTemplateBE> list = new List<FormDesignTemplateBE>();
 
             using (SqlConnection conn = new SqlConnection(_connectionstring))
             {
                 conn.Open();
-                SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplate_BlockFetch", conn);
+                SqlCommand cmd = new SqlCommand("usp_FormDesignTemplate_BlockFetch", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("SearchForm", searchForm ?? string.Empty);
                 cmd.Parameters.AddWithValue("PageIndex", pageIndex);
@@ -31,7 +31,7 @@ namespace HabitatManagement.BusinessEntities
                 {
                     while (sqlDataReader.Read())
                     {
-                        list.Add(ToPermitFormScreenDesignTemplateBE(sqlDataReader));
+                        list.Add(ToFormDesignTemplateBE(sqlDataReader));
                     }
                 }
                 if (cmd.Parameters["RecordCount"].Value != DBNull.Value)
@@ -42,27 +42,27 @@ namespace HabitatManagement.BusinessEntities
             return list;
         }
 
-        public static PermitFormScreenDesignTemplateBE FetchPermitFormScreenDesignTemplate(int formId)
+        public static FormDesignTemplateBE FetchFormDesignTemplate(int formId)
         {
-            PermitFormScreenDesignTemplateBE o = null;
+            FormDesignTemplateBE o = null;
 
             using (SqlConnection conn = new SqlConnection(_connectionstring))
             {
                 conn.Open();
 
-                SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplate_Fetch", conn);
+                SqlCommand cmd = new SqlCommand("usp_FormDesignTemplate_Fetch", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("FormID", formId);
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
                     if (reader.Read())
-                        o = ToPermitFormScreenDesignTemplateBE(reader);
+                        o = ToFormDesignTemplateBE(reader);
                 }
             }
             return o;
         }
 
-        public static bool AddPermitFormScreenDesignTemplate(PermitFormScreenDesignTemplateBE o, out int id)
+        public static bool AddFormDesignTemplate(FormDesignTemplateBE o, out int id)
         {
             bool success = false;
             id = 0;
@@ -70,10 +70,10 @@ namespace HabitatManagement.BusinessEntities
             {
                 conn.Open();
 
-                SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplate_Add", conn);
+                SqlCommand cmd = new SqlCommand("usp_FormDesignTemplate_Add", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                BusinessEntityHelper.ReplaceNullProperties<PermitFormScreenDesignTemplateBE>(o);
-                FromPermitFormScreenDesignTemplateBE(ref cmd, o);
+                BusinessEntityHelper.ReplaceNullProperties<FormDesignTemplateBE>(o);
+                FromFormDesignTemplateBE(ref cmd, o);
                 cmd.Parameters.Add("ErrorOccured", SqlDbType.Bit);
                 cmd.Parameters["ErrorOccured"].Direction = ParameterDirection.Output;
                 cmd.Parameters["FormID"].Direction = ParameterDirection.Output;
@@ -90,17 +90,17 @@ namespace HabitatManagement.BusinessEntities
             return success;
         }
 
-        public static bool UpdatePermitFormScreenDesignTemplate(PermitFormScreenDesignTemplateBE o)
+        public static bool UpdateFormDesignTemplate(FormDesignTemplateBE o)
         {
             bool success = false;
             using (SqlConnection conn = new SqlConnection(_connectionstring))
             {
                 conn.Open();
 
-                SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplate_Update", conn);
+                SqlCommand cmd = new SqlCommand("usp_FormDesignTemplate_Update", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                BusinessEntityHelper.ReplaceNullProperties<PermitFormScreenDesignTemplateBE>(o);
-                FromPermitFormScreenDesignTemplateBE(ref cmd, o);
+                BusinessEntityHelper.ReplaceNullProperties<FormDesignTemplateBE>(o);
+                FromFormDesignTemplateBE(ref cmd, o);
                 cmd.Parameters.Add("ErrorOccured", SqlDbType.Bit);
                 cmd.Parameters["ErrorOccured"].Direction = ParameterDirection.Output;
                 cmd.ExecuteNonQuery();
@@ -112,35 +112,35 @@ namespace HabitatManagement.BusinessEntities
             return success;
         }
 
-        public static List<PermitFormScreenDesignTemplateDetailBE> FetchAllPermitFormScreenDesignTemplateDetail(int formId)
+        public static List<FormDesignTemplateDetailBE> FetchAllFormDesignTemplateDetail(int formId)
         {
-            List<PermitFormScreenDesignTemplateDetailBE> list = new List<PermitFormScreenDesignTemplateDetailBE>();
+            List<FormDesignTemplateDetailBE> list = new List<FormDesignTemplateDetailBE>();
             using (SqlConnection conn = new SqlConnection(_connectionstring))
             {
                 conn.Open();
-                SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplateDetail_FetchAll", conn);
+                SqlCommand cmd = new SqlCommand("usp_FormDesignTemplateDetail_FetchAll", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("FormId", formId);
                 using (SqlDataReader sqlDataReader = cmd.ExecuteReader())
                 {
                     while (sqlDataReader.Read())
                     {
-                        list.Add(ToPermitFormScreenDesignTemplateDetailBE(sqlDataReader));
+                        list.Add(ToFormDesignTemplateDetailBE(sqlDataReader));
                     }
                 }
             }
             return list;
         }
 
-        public static List<PermitFormScreenDesignTemplateDetailBE> BlockFetchPermitFormScreenDesignTemplateDetail(int formId, int pageIndex, int pageSize, out int totalRecords)
+        public static List<FormDesignTemplateDetailBE> BlockFetchFormDesignTemplateDetail(int formId, int pageIndex, int pageSize, out int totalRecords)
         {
             totalRecords = 0;
-            List<PermitFormScreenDesignTemplateDetailBE> list = new List<PermitFormScreenDesignTemplateDetailBE>();
+            List<FormDesignTemplateDetailBE> list = new List<FormDesignTemplateDetailBE>();
 
             using (SqlConnection conn = new SqlConnection(_connectionstring))
             {
                 conn.Open();
-                SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplateDetail_BlockFetch", conn);
+                SqlCommand cmd = new SqlCommand("usp_FormDesignTemplateDetail_BlockFetch", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("FormId", formId);
                 cmd.Parameters.AddWithValue("PageIndex", pageIndex);
@@ -151,7 +151,7 @@ namespace HabitatManagement.BusinessEntities
                 {
                     while (sqlDataReader.Read())
                     {
-                        list.Add(ToPermitFormScreenDesignTemplateDetailBE(sqlDataReader));
+                        list.Add(ToFormDesignTemplateDetailBE(sqlDataReader));
                     }
                 }
                 if (cmd.Parameters["RecordCount"].Value != DBNull.Value)
@@ -162,13 +162,13 @@ namespace HabitatManagement.BusinessEntities
             return list;
         }
 
-        public static PermitFormScreenDesignTemplateDetailBE FetchPermitFormScreenDesignTemplateDetail(int formId, int field)
+        public static FormDesignTemplateDetailBE FetchFormDesignTemplateDetail(int formId, int field)
         {
-            PermitFormScreenDesignTemplateDetailBE o = null;
+            FormDesignTemplateDetailBE o = null;
             using (SqlConnection conn = new SqlConnection(_connectionstring))
             {
                 conn.Open();
-                SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplateDetail_Fetch", conn);
+                SqlCommand cmd = new SqlCommand("usp_FormDesignTemplateDetail_Fetch", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("FormID", formId);
                 cmd.Parameters.AddWithValue("Field", field);
@@ -176,14 +176,14 @@ namespace HabitatManagement.BusinessEntities
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
                     if (reader.Read())
-                        o = ToPermitFormScreenDesignTemplateDetailBE(reader);
+                        o = ToFormDesignTemplateDetailBE(reader);
                 }
             }
 
             return o;
         }
 
-        public static bool AddPermitFormScreenDesignTemplateDetail(PermitFormScreenDesignTemplateDetailBE o, out int field)
+        public static bool AddFormDesignTemplateDetail(FormDesignTemplateDetailBE o, out int field)
         {
             bool success = false;
             field = 0;
@@ -191,11 +191,11 @@ namespace HabitatManagement.BusinessEntities
             {
                 conn.Open();
 
-                SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplateDetail_Add", conn);
+                SqlCommand cmd = new SqlCommand("usp_FormDesignTemplateDetail_Add", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add("Field", SqlDbType.Int, 8).Direction = ParameterDirection.Output;
-                BusinessEntityHelper.ReplaceNullProperties<PermitFormScreenDesignTemplateDetailBE>(o);
-                FromPermitFormScreenDesignTemplateDetailBE(ref cmd, o);
+                BusinessEntityHelper.ReplaceNullProperties<FormDesignTemplateDetailBE>(o);
+                FromFormDesignTemplateDetailBE(ref cmd, o);
                 cmd.ExecuteNonQuery();
                 success = true;
                 if (cmd.Parameters["Field"].Value != DBNull.Value)
@@ -207,17 +207,17 @@ namespace HabitatManagement.BusinessEntities
             return success;
         }
 
-        public static bool UpdatePermitFormScreenDesignTemplateDetail(PermitFormScreenDesignTemplateDetailBE o)
+        public static bool UpdateFormDesignTemplateDetail(FormDesignTemplateDetailBE o)
         {
             bool success = false;
             using (SqlConnection conn = new SqlConnection(_connectionstring))
             {
                 conn.Open();
 
-                SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplateDetail_Update", conn);
+                SqlCommand cmd = new SqlCommand("usp_FormDesignTemplateDetail_Update", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                BusinessEntityHelper.ReplaceNullProperties<PermitFormScreenDesignTemplateDetailBE>(o);
-                FromPermitFormScreenDesignTemplateDetailBE(ref cmd, o);
+                BusinessEntityHelper.ReplaceNullProperties<FormDesignTemplateDetailBE>(o);
+                FromFormDesignTemplateDetailBE(ref cmd, o);
                 cmd.Parameters.AddWithValue("Field", o.Field);
                 cmd.ExecuteNonQuery();
                 success = true;
@@ -225,14 +225,14 @@ namespace HabitatManagement.BusinessEntities
             return success;
         }
 
-        public static bool DeletePermitFormScreenDesignTemplateDetail(int formID, int FieldID)
+        public static bool DeleteFormDesignTemplateDetail(int formID, int FieldID)
         {
             bool success = false;
             using (SqlConnection conn = new SqlConnection(_connectionstring))
             {
                 conn.Open();
 
-                SqlCommand cmd = new SqlCommand("usp_PermitFormScreenDesignTemplateDetail_Delete", conn);
+                SqlCommand cmd = new SqlCommand("usp_FormDesignTemplateDetail_Delete", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("FormID", formID);
                 cmd.Parameters.AddWithValue("Field", FieldID);
@@ -775,9 +775,9 @@ namespace HabitatManagement.BusinessEntities
             }
         }
 
-        private static PermitFormScreenDesignTemplateDetailBE ToPermitFormScreenDesignTemplateDetailBE(SqlDataReader rdr)
+        private static FormDesignTemplateDetailBE ToFormDesignTemplateDetailBE(SqlDataReader rdr)
         {
-            PermitFormScreenDesignTemplateDetailBE o = new PermitFormScreenDesignTemplateDetailBE();
+            FormDesignTemplateDetailBE o = new FormDesignTemplateDetailBE();
             o.FormID = Functions.ToInt(rdr["FormID"]);
             o.Field = Functions.ToInt(rdr["Field"]);
             o.FieldName = Functions.TrimRight(rdr["FieldName"]);
@@ -789,7 +789,7 @@ namespace HabitatManagement.BusinessEntities
             return o;
         }
 
-        private static void FromPermitFormScreenDesignTemplateDetailBE(ref SqlCommand cmd, PermitFormScreenDesignTemplateDetailBE o)
+        private static void FromFormDesignTemplateDetailBE(ref SqlCommand cmd, FormDesignTemplateDetailBE o)
         {
             cmd.Parameters.AddWithValue("FormID", o.FormID);
             cmd.Parameters.AddWithValue("FieldName", o.FieldName);
@@ -798,9 +798,9 @@ namespace HabitatManagement.BusinessEntities
             cmd.Parameters.AddWithValue("Sequence", o.Sequence);
         }
 
-        private static PermitFormScreenDesignTemplateBE ToPermitFormScreenDesignTemplateBE(SqlDataReader sqlDataReader)
+        private static FormDesignTemplateBE ToFormDesignTemplateBE(SqlDataReader sqlDataReader)
         {
-            PermitFormScreenDesignTemplateBE designTemplate = new PermitFormScreenDesignTemplateBE();
+            FormDesignTemplateBE designTemplate = new FormDesignTemplateBE();
             designTemplate.FormID = Convert.ToInt32(sqlDataReader["FormID"]);
             designTemplate.Design = Convert.ToString(sqlDataReader["Design"]);
             designTemplate.Description = Convert.ToString(sqlDataReader["Description"]);
@@ -812,7 +812,7 @@ namespace HabitatManagement.BusinessEntities
             return designTemplate;
         }
 
-        private static void FromPermitFormScreenDesignTemplateBE(ref SqlCommand cmd, PermitFormScreenDesignTemplateBE o)
+        private static void FromFormDesignTemplateBE(ref SqlCommand cmd, FormDesignTemplateBE o)
         {
             cmd.Parameters.AddWithValue("FormID", o.FormID);
             cmd.Parameters.AddWithValue("Design", o.Design);

@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 
 namespace HabitatManagement.WebAPI
 {
@@ -52,6 +53,48 @@ namespace HabitatManagement.WebAPI
                     ValidIssuer = Configuration["Jwt:Issuer"],
                     ValidAudience = Configuration["Jwt:Issuer"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    //OnAuthenticationFailed = (context) =>
+                    //{
+                    //    Console.WriteLine(context.Exception);
+                    //    return Task.CompletedTask;
+                    //},
+                    OnAuthenticationFailed = context =>
+                    {
+                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                        {
+                            context.Response.Headers.Add("Token-Expired", "true");
+                        }
+                        else if (context.Exception.GetType() == typeof(SecurityTokenValidationException))
+                        {
+                            context.Response.Headers.Add("Token-Validation", "false");
+                        }
+                        else if (context.Exception.GetType() == typeof(ArgumentException))
+                        {
+                            context.Response.Headers.Add("Token-Key-Invalid", "true");
+                        }
+                        return Task.CompletedTask;
+                    },
+                    OnMessageReceived = (context) =>
+                    {
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = (context) =>
+                    {
+                        return Task.CompletedTask;
+                    },
+                    //OnChallenge = async context =>
+                    //{
+                    //    // Call this to skip the default logic and avoid using the default response
+                    //    context.HandleResponse();          
+                    //    // Write to the response in any way you wish
+                    //    context.Response.StatusCode = 401;
+                    //    context.Response.Headers.Append("Token-Invalid", "true");
+                    //    await context.Response.WriteAsync("You are not authorized.");
+                    //}
                 };
             });
         }

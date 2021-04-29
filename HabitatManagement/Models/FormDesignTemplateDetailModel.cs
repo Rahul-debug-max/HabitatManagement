@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace HabitatManagement.Models
 {
-    public class PermitFormScreenDesignTemplateDetailModelBE : PermitFormScreenDesignTemplateBE
+    public class FormDesignTemplateDetailModel : FormDesignTemplateBE
     {
-        public List<PermitFormScreenDesignTemplateDetailBE> TemplateDetails { get; set; }
+        public List<FormDesignTemplateDetailBE> TemplateDetails { get; set; }
 
         public List<TemplateFormSectionBE> TemplateSectionDetail { get; set; }
     }

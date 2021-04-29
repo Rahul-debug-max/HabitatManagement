@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace HabitatManagement.BusinessEntities
 {
-    public class PermitFormScreenDesignTemplateBE : BusinessEntity
+    public class FormDesignTemplateBE : BusinessEntity
     {
         public int FormID { get; set; }
         public string Design { get; set; }

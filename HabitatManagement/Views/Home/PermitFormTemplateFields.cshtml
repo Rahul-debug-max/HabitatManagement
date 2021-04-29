@@ -86,7 +86,7 @@
         if ('@Model.RenderForDragnDrop' == 'True') {
             FormTemplateFields.onInit({
                 formId: JSON.parse('@Model.FormID'),
-                saveDataURL: '@Url.Action("PermitFormScreenDesignTemplateDetailFields", "Home")'
+                saveDataURL: '@Url.Action("FormDesignTemplateDetailFields", "Home")'
             });
         }
         reloadGridForPositioner();

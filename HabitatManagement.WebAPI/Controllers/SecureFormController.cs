@@ -42,14 +42,14 @@ namespace HabitatManagement.WebAPI.Controllers
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            DateTime expireTokenTime = DateTime.Now.AddMinutes(DBConfiguration.JWTExpireTokenTimeInMinutes);
-            var token = new JwtSecurityToken(
-                issuer: DBConfiguration.JWTIssuer,
-                audience: DBConfiguration.JWTIssuer,
-                claims: claims,
-                expires: expireTokenTime,
-                signingCredentials: credentials);
-            response = Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token), expiration = expireTokenTime.ToString("dd/MM/yyyy hh:mm") });
+                DateTime expireTokenTime = DateTime.Now.AddMinutes(DBConfiguration.JWTExpireTokenTimeInMinutes);
+                var token = new JwtSecurityToken(
+                    issuer: DBConfiguration.JWTIssuer,
+                    audience: DBConfiguration.JWTIssuer,
+                    claims: claims,
+                    expires: expireTokenTime,
+                    signingCredentials: credentials);
+                response = Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
             }
 
             return response;
@@ -59,10 +59,10 @@ namespace HabitatManagement.WebAPI.Controllers
         [Authorize]
         [EnableCors("AllowOrigin")]
         [Route("GetFormList")]
-        public IEnumerable<PermitFormScreenDesignTemplateBE> GetFormList()
+        public IEnumerable<FormDesignTemplateBE> GetFormList()
         {
-            IEnumerable<PermitFormScreenDesignTemplateBE> listPermitFormScreenDesignTemplate = FormLogic.BlockFetchPermitFormScreenDesignTemplate(1, Int32.MaxValue, out int totalRecords, "");       
-            return listPermitFormScreenDesignTemplate;
+            IEnumerable<FormDesignTemplateBE> listFormDesignTemplate = FormLogic.BlockFetchFormDesignTemplate(1, Int32.MaxValue, out int totalRecords, string.Empty);
+            return listFormDesignTemplate;
         }
 
         [HttpGet]
@@ -72,16 +72,16 @@ namespace HabitatManagement.WebAPI.Controllers
         public List<SelectListItem> GetFormHtmlList()
         {
             List<SelectListItem> formHtmlList = new List<SelectListItem>();
-            IEnumerable<PermitFormScreenDesignTemplateBE> listPermitFormScreenDesignTemplate = FormLogic.BlockFetchPermitFormScreenDesignTemplate(1, Int32.MaxValue, out int totalRecords, "");
+            IEnumerable<FormDesignTemplateBE> listFormDesignTemplate = FormLogic.BlockFetchFormDesignTemplate(1, Int32.MaxValue, out int totalRecords, string.Empty);
 
-            if (listPermitFormScreenDesignTemplate != null && listPermitFormScreenDesignTemplate.Count() > 0)
+            if (listFormDesignTemplate != null && listFormDesignTemplate.Count() > 0)
             {
-                foreach (var permitFormScreenDesignTemplate in listPermitFormScreenDesignTemplate)
+                foreach (var formDesignTemplate in listFormDesignTemplate)
                 {
-                    List<PermitFormScreenDesignTemplateDetailBE> templateDetails = FormLogic.FetchAllPermitFormScreenDesignTemplateDetail(permitFormScreenDesignTemplate.FormID);
-                    List<TemplateFormFieldDataBE> templateFormFieldData = new List<TemplateFormFieldDataBE>();  //FormLogic.FetchAllTemplateFormFieldData(permitFormScreenDesignTemplate.FormID, templateDetails);
+                    List<FormDesignTemplateDetailBE> templateDetails = FormLogic.FetchAllFormDesignTemplateDetail(formDesignTemplate.FormID);
+                    List<TemplateFormFieldDataBE> templateFormFieldData = new List<TemplateFormFieldDataBE>();  //FormLogic.FetchAllTemplateFormFieldData(formDesignTemplate.FormID, templateDetails);
                     FormDesignTemplateModelBE model = new FormDesignTemplateModelBE(templateDetails, templateFormFieldData);
-                    model.FormID = permitFormScreenDesignTemplate.FormID;
+                    model.FormID = formDesignTemplate.FormID;
                     model.RenderForDragnDrop = false;
 
                     formHtmlList.Add(new SelectListItem
