@@ -699,7 +699,7 @@ namespace HabitatManagement.Business
                 SqlCommand cmd = new SqlCommand("usp_Project_Update", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 BusinessEntityHelper.ReplaceNullProperties<ProjectBE>(o);
-                FromFormDesignTemplateBE(ref cmd, o);
+                FromProjectBE(ref cmd, o);
                 cmd.Parameters.AddWithValue("ProjectId", o.ID);
                 cmd.Parameters.Add("ErrorOccured", SqlDbType.Bit);
                 cmd.Parameters["ErrorOccured"].Direction = ParameterDirection.Output;
