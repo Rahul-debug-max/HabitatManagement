@@ -195,6 +195,26 @@ BEGIN
 END
 GO
 
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SubmittedForm]') AND TYPE in (N'U'))
+BEGIN
+
+    CREATE TABLE [dbo].[SubmittedForm](
+	    [ReferenceNumber] [int] IDENTITY(1,1) NOT NULL,
+	    [ProjectId] [int] NOT NULL,
+	    [FormId] [int] NOT NULL,
+		[Status] [int] NOT NULL,
+	    [CreatedDateTime] [datetime] NOT NULL DEFAULT (getdate()),
+	    [LastUpdatedDateTime] [datetime] NOT NULL DEFAULT (getdate()) ,
+	    [CreatedBy] [char](10) NOT NULL,
+	    [UpdatedBy] [char](10) NOT NULL,
+    PRIMARY KEY CLUSTERED 
+    (
+	    [ReferenceNumber] ASC
+    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+    ) ON [PRIMARY]
+
+END
+GO
 
 -------------------------------------------------------------------------------------------------------------------------------
 /* 2DVF */
@@ -1406,6 +1426,191 @@ BEGIN CATCH
     
 END CATCH  
 END    
+GO
+
+
+
+/****** Object:  StoredProcedure [dbo].[usp_SubmittedForm_Add]    Script Date: 08-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_SubmittedForm_Add]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_SubmittedForm_Add]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_SubmittedForm_Add]    Script Date: 08-04-2021 15:51:54 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[usp_SubmittedForm_Add]    
+(    
+     @ProjectId int,
+	 @FormId int,
+	 @Status int,
+	 @CreatedDateTime datetime,
+	 @LastUpdatedDateTime datetime,
+	 @CreatedBy char(10),
+	 @UpdatedBy char(10),
+	 @ErrorOccured BIT OUTPUT,
+	 @ReferenceNumber INT OUTPUT  
+)
+AS    
+BEGIN    
+
+BEGIN TRY    
+ BEGIN TRANSACTION trans    
+
+     INSERT INTO SubmittedForm    
+        (ProjectId,    
+         FormId,    
+         [Status],    
+         CreatedDateTime,     
+         LastUpdatedDateTime,    
+         CreatedBy,
+		 UpdatedBy
+	  )     
+      VALUES (  
+		@ProjectId,    
+		@FormId,    
+		@Status,    
+		@CreatedDateTime,      
+		@LastUpdatedDateTime,    
+		@CreatedBy,
+		@UpdatedBy
+		  )   
+		  
+ DECLARE @identity INT    
+ SELECT @identity = Scope_Identity(); 
+
+COMMIT Transaction trans    
+    
+ SET @ErrorOccured = 1;     
+ SET @ReferenceNumber = @identity 
+ 
+END TRY    
+BEGIN CATCH    
+ IF (@@TRANCOUNT > 0)  
+ BEGIN  
+  ROLLBACK    
+ END  
+  
+ SET @ErrorOccured = 0;    
+ DECLARE @ErrorMessage nvarchar(4000);        
+ DECLARE @ErrorSeverity int;    
+ DECLARE @ErrorState int;    
+    
+ SELECT    
+ @ErrorMessage = ERROR_MESSAGE(),    
+ @ErrorSeverity = ERROR_SEVERITY(),    
+ @ErrorState = ERROR_STATE();    
+    
+ RAISERROR (@ErrorMessage, -- Message text.      
+ @ErrorSeverity, -- Severity.      
+ @ErrorState -- State.      
+ );    
+    
+END CATCH  
+END    
+GO
+
+/****** Object:  StoredProcedure [dbo].[usp_SubmittedForm_Update]    Script Date: 08-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_SubmittedForm_Update]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_SubmittedForm_Update]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_SubmittedForm_Update]    Script Date: 08-04-2021 15:51:54 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[usp_SubmittedForm_Update]    
+(    
+     @ReferenceNumber int,
+	 @ProjectId int,
+	 @FormId int,
+	 @Status int,
+	 @LastUpdatedDateTime datetime,
+	 @UpdatedBy char(10),
+	 @ErrorOccured BIT OUTPUT
+)
+AS    
+BEGIN    
+
+BEGIN TRY    
+ BEGIN TRANSACTION trans    
+
+     Update SubmittedForm    
+       set ProjectId = @ProjectId,
+	       FormId = @FormId,    
+           [Status] = @Status,    
+           LastUpdatedDateTime = @LastUpdatedDateTime,    
+		   UpdatedBy = @UpdatedBy
+       Where ReferenceNumber = @ReferenceNumber
+
+COMMIT Transaction trans    
+    
+ SET @ErrorOccured = 1;     
+
+END TRY    
+BEGIN CATCH    
+ IF (@@TRANCOUNT > 0)  
+ BEGIN  
+  ROLLBACK    
+ END  
+  
+ SET @ErrorOccured = 0;    
+ DECLARE @ErrorMessage nvarchar(4000);        
+ DECLARE @ErrorSeverity int;    
+ DECLARE @ErrorState int;    
+    
+ SELECT    
+ @ErrorMessage = ERROR_MESSAGE(),    
+ @ErrorSeverity = ERROR_SEVERITY(),    
+ @ErrorState = ERROR_STATE();    
+    
+ RAISERROR (@ErrorMessage, -- Message text.      
+ @ErrorSeverity, -- Severity.      
+ @ErrorState -- State.      
+ );    
+    
+END CATCH  
+END    
+GO
+
+
+/****** Object:  StoredProcedure [dbo].[usp_SubmittedForm_Fetch]    Script Date: 08-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_SubmittedForm_Fetch]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_SubmittedForm_Fetch]
+GO
+CREATE PROCEDURE [dbo].[usp_SubmittedForm_Fetch]    
+(    
+	@ReferenceNumber int
+)   
+AS     
+BEGIN 
+	SELECT * FROM SubmittedForm WHERE ReferenceNumber = @ReferenceNumber
+END  
+GO
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_SubmittedForm_BlockFetch]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_SubmittedForm_BlockFetch]
+GO
+CREATE PROCEDURE [dbo].[usp_SubmittedForm_BlockFetch]        
+ @ProjectId int,                
+ @FormId int,                
+ @PageIndex INT = 1,        
+ @PageSize INT = 10,  
+ @RecordCount INT OUTPUT    
+AS         
+BEGIN       
+ IF(@PageIndex IS NULL)      
+ BEGIN      
+  SET @PageIndex = 1         
+ END      
+  
+ SELECT @RecordCount = COUNT(*) FROM SubmittedForm WHERE ProjectId = @ProjectId and FormId = @FormId
+        
+ SELECT * FROM SubmittedForm WHERE ProjectId = @ProjectId and FormId = @FormId
+ ORDER BY ProjectId, FormId          
+ OFFSET @PageSize * (@PageIndex - 1) ROWS FETCH NEXT @PageSize ROWS ONLY;    
+
+END      
 GO
 
 -------------------------------------------------------------------------------------------------------------------------------

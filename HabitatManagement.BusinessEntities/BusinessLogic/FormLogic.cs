@@ -838,6 +838,116 @@ namespace HabitatManagement.Business
 
         #endregion
 
+        #region Submitted Form
+
+
+        public static bool AddSubmittedForm(SubmittedFormBE o, out int id)
+        {
+            bool success = false;
+            id = 0;
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_SubmittedForm_Add", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                BusinessEntityHelper.ReplaceNullProperties<SubmittedFormBE>(o);
+                FromSubmittedFormBE(ref cmd, o);
+                cmd.Parameters.AddWithValue("CreatedDateTime", o.CreatedDateTime);
+                cmd.Parameters.AddWithValue("CreatedBy", o.CreatedBy);
+                cmd.Parameters.Add("ErrorOccured", SqlDbType.Bit);
+                cmd.Parameters["ErrorOccured"].Direction = ParameterDirection.Output;
+                cmd.Parameters["ReferenceNumber"].Direction = ParameterDirection.Output;
+                cmd.ExecuteNonQuery();
+                if (cmd.Parameters["ErrorOccured"].Value != DBNull.Value)
+                {
+                    success = Convert.ToBoolean(cmd.Parameters["ErrorOccured"].Value);
+                }
+                if (cmd.Parameters["ReferenceNumber"].Value != DBNull.Value)
+                {
+                    id = Convert.ToInt32(cmd.Parameters["ReferenceNumber"].Value);
+                }
+            }
+            return success;
+        }
+
+        public static bool UpdateSubmittedForm(SubmittedFormBE o)
+        {
+            bool success = false;
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_Project_Update", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                BusinessEntityHelper.ReplaceNullProperties<SubmittedFormBE>(o);
+                FromSubmittedFormBE(ref cmd, o);
+                cmd.Parameters.AddWithValue("ReferenceNumber", o.ReferenceNumber);
+                cmd.Parameters.Add("ErrorOccured", SqlDbType.Bit);
+                cmd.Parameters["ErrorOccured"].Direction = ParameterDirection.Output;
+                cmd.ExecuteNonQuery();
+                if (cmd.Parameters["ErrorOccured"].Value != DBNull.Value)
+                {
+                    success = Convert.ToBoolean(cmd.Parameters["ErrorOccured"].Value);
+                }
+            }
+            return success;
+        }
+
+        public static SubmittedFormBE FetchSubmittedForm(int referenceNumber)
+        {
+            SubmittedFormBE o = null;
+
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_SubmittedForm_Fetch", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("ReferenceNumber", referenceNumber);
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                        o = ToSubmittedFormBE(reader);
+                }
+            }
+            return o;
+        }
+
+        public static List<SubmittedFormBE> BlockFetchSubmittedForm(int projectId, int formId, int pageIndex, int pageSize, out int totalRecords)
+        {
+            totalRecords = 0;
+            List<SubmittedFormBE> list = new List<SubmittedFormBE>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("usp_SubmittedForm_BlockFetch", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("ProjectId", projectId);
+                cmd.Parameters.AddWithValue("FormId", formId);
+                cmd.Parameters.AddWithValue("PageIndex", pageIndex);
+                cmd.Parameters.AddWithValue("PageSize", pageSize);
+                cmd.Parameters.Add("RecordCount", SqlDbType.Int, 8);
+                cmd.Parameters["RecordCount"].Direction = ParameterDirection.Output;
+                using (SqlDataReader sqlDataReader = cmd.ExecuteReader())
+                {
+                    while (sqlDataReader.Read())
+                    {
+                        list.Add(ToSubmittedFormBE(sqlDataReader));
+                    }
+                }
+                if (cmd.Parameters["RecordCount"].Value != DBNull.Value)
+                {
+                    totalRecords = Convert.ToInt32(cmd.Parameters["RecordCount"].Value);
+                }
+            }
+            return list;
+        }
+
+
+        #endregion
+
         #region Private Methods
 
         private static void FromTableFieldTypeMasterDataBE(ref SqlCommand cmd, TableFieldTypeMasterDataBE o)
@@ -1034,6 +1144,30 @@ namespace HabitatManagement.Business
             projectFormBE.ProjectId = Functions.ToInt(sqlDataReader["ProjectId"]);
             projectFormBE.FormId = Functions.ToInt(sqlDataReader["FormId"]);
             return projectFormBE;
+        }
+
+
+        private static void FromSubmittedFormBE(ref SqlCommand cmd, SubmittedFormBE o)
+        {
+            cmd.Parameters.AddWithValue("ProjectId", o.ProjectId);
+            cmd.Parameters.AddWithValue("FormId", o.FormId);
+            cmd.Parameters.AddWithValue("Status", (int)o.Status);
+            cmd.Parameters.AddWithValue("LastUpdatedDateTime", o.LastUpdatedDateTime);
+            cmd.Parameters.AddWithValue("UpdatedBy", o.UpdatedBy);
+        }
+
+        private static SubmittedFormBE ToSubmittedFormBE(SqlDataReader sqlDataReader)
+        {
+            SubmittedFormBE submittedFormBE = new SubmittedFormBE();
+            submittedFormBE.ReferenceNumber = Functions.ToInt(sqlDataReader["ReferenceNumber"]);
+            submittedFormBE.ProjectId = Functions.ToInt(sqlDataReader["ProjectId"]);
+            submittedFormBE.FormId = Functions.ToInt(sqlDataReader["FormId"]);
+            submittedFormBE.Status = (SubmittedFormStatusField)Functions.ToInt(sqlDataReader["Status"]);
+            submittedFormBE.CreatedDateTime = Convert.ToDateTime(sqlDataReader["CreatedDateTime"]);
+            submittedFormBE.LastUpdatedDateTime = Convert.ToDateTime(sqlDataReader["LastUpdatedDateTime"]);
+            submittedFormBE.UpdatedBy = Functions.TrimRight(sqlDataReader["UpdatedBy"]);
+            submittedFormBE.CreatedBy = Functions.TrimRight(sqlDataReader["CreatedBy"]);
+            return submittedFormBE;
         }
 
         #endregion
