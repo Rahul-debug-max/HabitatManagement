@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HabitatManagement.BusinessEntities
+namespace HabitatManagement.Business
 {
     public class TemplateFormFieldDataBE : BusinessEntity
     {

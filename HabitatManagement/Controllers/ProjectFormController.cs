@@ -1,4 +1,4 @@
-﻿using HabitatManagement.BusinessEntities;
+﻿using HabitatManagement.Business;
 using HabitatManagement.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;

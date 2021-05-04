@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace HabitatManagement.BusinessEntities
+namespace HabitatManagement.Business
 {
     [Flags]
     public enum FilterOperatorField : byte

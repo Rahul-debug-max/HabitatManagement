@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 
-namespace HabitatManagement.BusinessEntities
+namespace HabitatManagement.Business
 {
     public interface IDBConfiguration
     {

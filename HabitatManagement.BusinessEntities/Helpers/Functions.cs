@@ -15,7 +15,7 @@ using System.Web;
 using System.Data;
 using System.Linq;
 
-namespace HabitatManagement.BusinessEntities
+namespace HabitatManagement.Business
 {
     public class Functions
     {

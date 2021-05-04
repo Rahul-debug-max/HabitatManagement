@@ -7,7 +7,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace HabitatManagement.BusinessEntities
+namespace HabitatManagement.Business
 {
     public class BusinessEntity : ICloneable
     {

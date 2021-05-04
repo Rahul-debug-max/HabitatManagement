@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace HabitatManagement.BusinessEntities
+namespace HabitatManagement.Business
 {
     public class XmlParserHelper
     {

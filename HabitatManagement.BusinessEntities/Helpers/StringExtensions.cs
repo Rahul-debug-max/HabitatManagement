@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace HabitatManagement.BusinessEntities
+namespace HabitatManagement.Business
 {
     public static class StringExtensions
     {

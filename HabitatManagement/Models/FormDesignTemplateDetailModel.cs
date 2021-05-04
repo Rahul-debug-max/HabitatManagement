@@ -1,5 +1,5 @@
 ﻿
-using HabitatManagement.BusinessEntities;
+using HabitatManagement.Business;
 using System.Collections.Generic;
 
 namespace HabitatManagement.Models

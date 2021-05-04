@@ -1,4 +1,4 @@
-﻿using HabitatManagement.BusinessEntities;
+﻿using HabitatManagement.Business;
 using HabitatManagement.WebAPI.Model;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;

@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HabitatManagement.BusinessEntities
+namespace HabitatManagement.Business
 {
     public class FormLogic
     {

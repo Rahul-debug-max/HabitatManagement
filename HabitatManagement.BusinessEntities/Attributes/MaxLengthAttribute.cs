@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace HabitatManagement.BusinessEntities
+namespace HabitatManagement.Business
 {
     /// <summary>
     /// An attribute to give properties the ability to define their default length

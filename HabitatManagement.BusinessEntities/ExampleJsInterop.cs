@@ -2,7 +2,7 @@ using Microsoft.JSInterop;
 using System;
 using System.Threading.Tasks;
 
-namespace HabitatManagement.BusinessEntities
+namespace HabitatManagement.Business
 {
     // This class provides an example of how JavaScript functionality can be wrapped
     // in a .NET class for easy consumption. The associated JavaScript module is
@@ -18,7 +18,7 @@ namespace HabitatManagement.BusinessEntities
         public ExampleJsInterop(IJSRuntime jsRuntime)
         {
             moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
-               "import", "./_content/HabitatManagement.BusinessEntities/exampleJsInterop.js").AsTask());
+               "import", "./_content/HabitatManagement.Business/exampleJsInterop.js").AsTask());
         }
 
         public async ValueTask<string> Prompt(string message)

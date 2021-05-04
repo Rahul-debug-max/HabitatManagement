@@ -7,7 +7,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Linq;
 
-namespace HabitatManagement.BusinessEntities
+namespace HabitatManagement.Business
 {
     public sealed class AttributeHelper
     {
