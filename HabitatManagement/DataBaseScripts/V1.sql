@@ -158,7 +158,44 @@ END
 GO
 
 						
-	
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Project]') AND TYPE in (N'U'))
+BEGIN
+
+    CREATE TABLE [dbo].[Project](
+	    [ID] [int] IDENTITY(1,1) NOT NULL,
+	    [Project] [nvarchar](60) NOT NULL,
+	    [Description] [nvarchar](256) NOT NULL,
+	    [Manager] [nvarchar](60) NULL,
+	    [CreatedDateTime] [datetime] NOT NULL DEFAULT (getdate()),
+	    [LastUpdatedDateTime] [datetime] NOT NULL DEFAULT (getdate()) ,
+	    [CreatedBy] [char](10) NOT NULL,
+	    [UpdatedBy] [char](10) NOT NULL,
+    PRIMARY KEY CLUSTERED 
+    (
+	    [ID] ASC
+    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+    ) ON [PRIMARY]
+
+END
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[ProjectForm]') AND TYPE in (N'U'))
+BEGIN
+
+    CREATE TABLE [dbo].[ProjectForm](
+	    [ProjectId] [int] NOT NULL,
+	    [FormId] [int] NOT NULL
+    PRIMARY KEY CLUSTERED 
+    (
+	    [ProjectId] ASC,
+		[FormId] ASC
+    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+    ) ON [PRIMARY]
+
+END
+GO
+
+
 -------------------------------------------------------------------------------------------------------------------------------
 /* 2DVF */
 -------------------------------------------------------------------------------------------------------------------------------
@@ -1072,6 +1109,303 @@ BEGIN
 	OFFSET @PageSize * (@PageIndex - 1) ROWS            
 	FETCH NEXT @PageSize ROWS ONLY;  
 END
+GO
+
+
+-- Project & Project Form
+
+/****** Object:  StoredProcedure [dbo].[usp_Project_Add]    Script Date: 08-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_Project_Add]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_Project_Add]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_Project_Add]    Script Date: 08-04-2021 15:51:54 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[usp_Project_Add]    
+(    
+     @Project nvarchar(60),
+	 @Description nvarchar(256),
+	 @Manager nvarchar(60),
+	 @CreatedDateTime datetime,
+	 @LastUpdatedDateTime datetime,
+	 @CreatedBy char(10),
+	 @UpdatedBy char(10),
+	 @ErrorOccured BIT OUTPUT,
+	 @ProjectID INT OUTPUT  
+)
+AS    
+BEGIN    
+
+BEGIN TRY    
+ BEGIN TRANSACTION trans    
+
+     INSERT INTO Project    
+        (Project,    
+         [Description],    
+         Manager,    
+         CreatedDateTime,     
+         LastUpdatedDateTime,    
+         CreatedBy,
+		 UpdatedBy
+	  )     
+      VALUES (  
+		@Project,    
+		@Description,    
+		@Manager,    
+		@CreatedDateTime,      
+		@LastUpdatedDateTime,    
+		@CreatedBy,
+		@UpdatedBy
+		  )   
+		  
+ DECLARE @identity INT    
+ SELECT @identity = Scope_Identity(); 
+
+COMMIT Transaction trans    
+    
+ SET @ErrorOccured = 1;     
+ SET @ProjectID = @identity 
+ 
+END TRY    
+BEGIN CATCH    
+ IF (@@TRANCOUNT > 0)  
+ BEGIN  
+  ROLLBACK    
+ END  
+  
+ SET @ErrorOccured = 0;    
+ DECLARE @ErrorMessage nvarchar(4000);        
+ DECLARE @ErrorSeverity int;    
+ DECLARE @ErrorState int;    
+    
+ SELECT    
+ @ErrorMessage = ERROR_MESSAGE(),    
+ @ErrorSeverity = ERROR_SEVERITY(),    
+ @ErrorState = ERROR_STATE();    
+    
+ RAISERROR (@ErrorMessage, -- Message text.      
+ @ErrorSeverity, -- Severity.      
+ @ErrorState -- State.      
+ );    
+    
+END CATCH  
+END    
+GO
+
+
+/****** Object:  StoredProcedure [dbo].[usp_Project_Update]    Script Date: 08-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_Project_Update]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_Project_Update]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_Project_Update]    Script Date: 08-04-2021 15:51:54 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[usp_Project_Update]    
+(    
+     @ProjectId int,
+     @Project nvarchar(60),
+	 @Description nvarchar(256),
+	 @Manager nvarchar(60),
+	 @LastUpdatedDateTime datetime,
+	 @UpdatedBy char(10),
+	 @ErrorOccured BIT OUTPUT   
+)
+AS    
+BEGIN    
+
+BEGIN TRY    
+ BEGIN TRANSACTION trans    
+
+     Update Project    
+       set Project = @Project,
+	       [Description] = @Description,    
+           Manager = @Manager,    
+           LastUpdatedDateTime = @LastUpdatedDateTime,    
+		   UpdatedBy = @UpdatedBy
+       Where ID = @ProjectId
+
+COMMIT Transaction trans    
+    
+ SET @ErrorOccured = 1;     
+
+END TRY    
+BEGIN CATCH    
+ IF (@@TRANCOUNT > 0)  
+ BEGIN  
+  ROLLBACK    
+ END  
+  
+ SET @ErrorOccured = 0;    
+ DECLARE @ErrorMessage nvarchar(4000);        
+ DECLARE @ErrorSeverity int;    
+ DECLARE @ErrorState int;    
+    
+ SELECT    
+ @ErrorMessage = ERROR_MESSAGE(),    
+ @ErrorSeverity = ERROR_SEVERITY(),    
+ @ErrorState = ERROR_STATE();    
+    
+ RAISERROR (@ErrorMessage, -- Message text.      
+ @ErrorSeverity, -- Severity.      
+ @ErrorState -- State.      
+ );    
+    
+END CATCH  
+END    
+GO
+
+
+/****** Object:  StoredProcedure [dbo].[usp_Project_Fetch]    Script Date: 08-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_Project_Fetch]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_Project_Fetch]
+GO
+CREATE PROCEDURE [dbo].[usp_Project_Fetch]    
+(    
+	@ProjectId int
+)   
+AS     
+BEGIN 
+	SELect * from Project where ID = @ProjectId
+END  
+GO
+
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_Project_BlockFetch]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_Project_BlockFetch]
+GO
+CREATE PROCEDURE [dbo].[usp_Project_BlockFetch]        
+ @ProjectId int,                
+ @PageIndex INT = 1,        
+ @PageSize INT = 10,  
+ @RecordCount INT OUTPUT    
+AS         
+BEGIN       
+ IF(@PageIndex IS NULL)      
+ BEGIN      
+  SET @PageIndex = 1         
+ END      
+  
+ SELECT @RecordCount = COUNT(*) FROM Project WHERE ID  = @ProjectId
+        
+ SELECT * FROM Project WHERE ID = @ProjectId
+ ORDER BY Project          
+ OFFSET @PageSize * (@PageIndex - 1) ROWS FETCH NEXT @PageSize ROWS ONLY;    
+
+END      
+GO
+
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_Project_Delete]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_Project_Delete]
+GO
+CREATE PROCEDURE [dbo].[usp_Project_Delete]  
+  @ProjectId int  
+AS  
+BEGIN
+ 
+    DELETE FROM ProjectForm WHERE ProjectId = @ProjectId
+    DELETE FROM Project WHERE ID = @ProjectId
+END  
+GO
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_ProjectForm_BlockFetch]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_ProjectForm_BlockFetch]
+GO
+CREATE PROCEDURE [dbo].[usp_ProjectForm_BlockFetch]        
+ @ProjectId int,                
+ @PageIndex INT = 1,        
+ @PageSize INT = 10,  
+ @RecordCount INT OUTPUT    
+AS         
+BEGIN       
+ IF(@PageIndex IS NULL)      
+ BEGIN      
+  SET @PageIndex = 1         
+ END      
+  
+ SELECT @RecordCount = COUNT(*) FROM ProjectForm WHERE ProjectId  = @ProjectId
+        
+ SELECT * FROM ProjectForm WHERE ProjectId = @ProjectId
+ ORDER BY ProjectId, FormId          
+ OFFSET @PageSize * (@PageIndex - 1) ROWS FETCH NEXT @PageSize ROWS ONLY;    
+
+END      
+GO
+
+/****** Object:  StoredProcedure [dbo].[usp_ProjectForm_Save]    Script Date: 08-04-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_ProjectForm_Save]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_ProjectForm_Save]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_ProjectForm_Save]    Script Date: 08-04-2021 15:51:54 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[usp_ProjectForm_Save]    
+(    
+     @ProjectId int,
+	 @FormIds nvarchar(max),
+	 @ErrorOccured BIT OUTPUT
+)
+AS    
+BEGIN    
+
+BEGIN TRY    
+ BEGIN TRANSACTION trans    
+  
+ DECLARE @FormTable TABLE
+(
+  FormId INT
+)
+
+;with FormCTE as(select STUFF(@FormIds,1,CHARINDEX(',',@FormIds),'') as number,  
+convert(varchar(50),left(@FormIds, CHARINDEX(',',@FormIds)-1 )) FormId  
+union all  
+  
+select STUFF(number,1,CHARINDEX(',',number+','),'') number,  
+convert(varchar(50),left(number,(case when CHARINDEX(',',number) = 0 then len(number) else CHARINDEX(',',number)-1 end)) )FormId    
+from FormCTE where LEN(number) > 0  
+)  
+
+Insert into @FormTable
+  select cast(FormId as int) from FormCTE  
+
+     INSERT INTO ProjectForm    
+       SELECT @ProjectId, ft.FormId from @FormTable ft
+	    INNER JOIN ProjectForm ON ft.FormId <> ProjectForm.FormId where ProjectForm.ProjectId = @ProjectId
+ 
+COMMIT Transaction trans    
+    
+ SET @ErrorOccured = 1;     
+ 
+END TRY    
+BEGIN CATCH    
+ IF (@@TRANCOUNT > 0)  
+ BEGIN  
+  ROLLBACK    
+ END  
+  
+ SET @ErrorOccured = 0;    
+ DECLARE @ErrorMessage nvarchar(4000);        
+ DECLARE @ErrorSeverity int;    
+ DECLARE @ErrorState int;    
+    
+ SELECT    
+ @ErrorMessage = ERROR_MESSAGE(),    
+ @ErrorSeverity = ERROR_SEVERITY(),    
+ @ErrorState = ERROR_STATE();    
+    
+ RAISERROR (@ErrorMessage, -- Message text.      
+ @ErrorSeverity, -- Severity.      
+ @ErrorState -- State.      
+ );    
+    
+END CATCH  
+END    
 GO
 
 -------------------------------------------------------------------------------------------------------------------------------

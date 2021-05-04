@@ -526,7 +526,6 @@ namespace HabitatManagement.Business
 
         #endregion
 
-
         #region Table Field Type Master
 
         public static TableFieldTypeMasterBE FetchTableFieldTypeMaster(int id, int field)
@@ -651,6 +650,187 @@ namespace HabitatManagement.Business
                     {
                         list.Add(ToTableFieldTypeMasterDataBE(sqlDataReader));
                     }
+                }
+            }
+            return list;
+        }
+
+        #endregion
+
+        #region Project
+
+        public static bool AddProject(ProjectBE o, out int id)
+        {
+            bool success = false;
+            id = 0;
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_Project_Add", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                BusinessEntityHelper.ReplaceNullProperties<ProjectBE>(o);
+                FromProjectBE(ref cmd, o);
+                cmd.Parameters.AddWithValue("CreatedDateTime", o.CreatedDateTime);
+                cmd.Parameters.AddWithValue("CreatedBy", o.CreatedBy);
+                cmd.Parameters.Add("ErrorOccured", SqlDbType.Bit);
+                cmd.Parameters["ErrorOccured"].Direction = ParameterDirection.Output;
+                cmd.Parameters["ProjectID"].Direction = ParameterDirection.Output;
+                cmd.ExecuteNonQuery();
+                if (cmd.Parameters["ErrorOccured"].Value != DBNull.Value)
+                {
+                    success = Convert.ToBoolean(cmd.Parameters["ErrorOccured"].Value);
+                }
+                if (cmd.Parameters["ProjectID"].Value != DBNull.Value)
+                {
+                    id = Convert.ToInt32(cmd.Parameters["ProjectID"].Value);
+                }
+            }
+            return success;
+        }
+
+        public static bool UpdateProject(ProjectBE o)
+        {
+            bool success = false;
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_Project_Update", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                BusinessEntityHelper.ReplaceNullProperties<ProjectBE>(o);
+                FromFormDesignTemplateBE(ref cmd, o);
+                cmd.Parameters.AddWithValue("ProjectId", o.ID);
+                cmd.Parameters.Add("ErrorOccured", SqlDbType.Bit);
+                cmd.Parameters["ErrorOccured"].Direction = ParameterDirection.Output;
+                cmd.ExecuteNonQuery();
+                if (cmd.Parameters["ErrorOccured"].Value != DBNull.Value)
+                {
+                    success = Convert.ToBoolean(cmd.Parameters["ErrorOccured"].Value);
+                }
+            }
+            return success;
+        }
+
+        public static bool DeleteProject(int projectId)
+        {
+            bool success = false;
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_Project_Delete", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("ProjectId", projectId);
+                cmd.ExecuteNonQuery();
+                success = true;
+            }
+            return success;
+        }
+
+        public static ProjectBE FetchProject(int projectId)
+        {
+            ProjectBE o = null;
+
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_Project_Fetch", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("ProjectId", projectId);
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                        o = ToProjectBE(reader);
+                }
+            }
+            return o;
+        }
+
+        public static List<ProjectBE> BlockFetchProject(int projectId, int pageIndex, int pageSize, out int totalRecords)
+        {
+            totalRecords = 0;
+            List<ProjectBE> list = new List<ProjectBE>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("usp_Project_BlockFetch", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("ProjectId", projectId);
+                cmd.Parameters.AddWithValue("PageIndex", pageIndex);
+                cmd.Parameters.AddWithValue("PageSize", pageSize);
+                cmd.Parameters.Add("RecordCount", SqlDbType.Int, 8);
+                cmd.Parameters["RecordCount"].Direction = ParameterDirection.Output;
+                using (SqlDataReader sqlDataReader = cmd.ExecuteReader())
+                {
+                    while (sqlDataReader.Read())
+                    {
+                        list.Add(ToProjectBE(sqlDataReader));
+                    }
+                }
+                if (cmd.Parameters["RecordCount"].Value != DBNull.Value)
+                {
+                    totalRecords = Convert.ToInt32(cmd.Parameters["RecordCount"].Value);
+                }
+            }
+            return list;
+        }
+
+
+        #endregion
+
+        #region Project Form
+
+        public static bool SaveProjectForm(int projectId, string formIds)
+        {
+            bool success = false;
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_ProjectForm_Save", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("ProjectId", projectId);
+                cmd.Parameters.AddWithValue("FormIds", formIds ?? string.Empty);
+
+                cmd.Parameters.Add("ErrorOccured", SqlDbType.Bit);
+                cmd.Parameters["ErrorOccured"].Direction = ParameterDirection.Output;
+                cmd.ExecuteNonQuery();
+                if (cmd.Parameters["ErrorOccured"].Value != DBNull.Value)
+                {
+                    success = Convert.ToBoolean(cmd.Parameters["ErrorOccured"].Value);
+                }
+            }
+            return success;
+        }
+
+        public static List<ProjectFormBE> BlockFetchProjectForm(int projectId, int pageIndex, int pageSize, out int totalRecords)
+        {
+            totalRecords = 0;
+            List<ProjectFormBE> list = new List<ProjectFormBE>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("usp_ProjectForm_BlockFetch", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("ProjectId", projectId);
+                cmd.Parameters.AddWithValue("PageIndex", pageIndex);
+                cmd.Parameters.AddWithValue("PageSize", pageSize);
+                cmd.Parameters.Add("RecordCount", SqlDbType.Int, 8);
+                cmd.Parameters["RecordCount"].Direction = ParameterDirection.Output;
+                using (SqlDataReader sqlDataReader = cmd.ExecuteReader())
+                {
+                    while (sqlDataReader.Read())
+                    {
+                        list.Add(ToProjectFormBE(sqlDataReader));
+                    }
+                }
+                if (cmd.Parameters["RecordCount"].Value != DBNull.Value)
+                {
+                    totalRecords = Convert.ToInt32(cmd.Parameters["RecordCount"].Value);
                 }
             }
             return list;
@@ -822,6 +1002,38 @@ namespace HabitatManagement.Business
             cmd.Parameters.AddWithValue("LastUpdatedDateTime", o.LastUpdatedDateTime);
             cmd.Parameters.AddWithValue("CreatedBy", o.CreatedBy);
             cmd.Parameters.AddWithValue("UpdatedBy", o.UpdatedBy);
+        }
+
+
+        private static void FromProjectBE(ref SqlCommand cmd, ProjectBE o)
+        {
+            cmd.Parameters.AddWithValue("Project", o.Project);
+            cmd.Parameters.AddWithValue("Description", o.Description);
+            cmd.Parameters.AddWithValue("Manager", o.Manager);
+            cmd.Parameters.AddWithValue("LastUpdatedDateTime", o.LastUpdatedDateTime);
+            cmd.Parameters.AddWithValue("UpdatedBy", o.UpdatedBy);
+        }
+
+        private static ProjectBE ToProjectBE(SqlDataReader sqlDataReader)
+        {
+            ProjectBE projectBE = new ProjectBE();
+            projectBE.ID = Functions.ToInt(sqlDataReader["ID"]);
+            projectBE.Project = Functions.TrimRight(sqlDataReader["Project"]);
+            projectBE.Description = Functions.TrimRight(sqlDataReader["Description"]);
+            projectBE.Manager = Functions.TrimRight(sqlDataReader["Manager"]);
+            projectBE.CreatedDateTime = Convert.ToDateTime(sqlDataReader["CreatedDateTime"]);
+            projectBE.LastUpdatedDateTime = Convert.ToDateTime(sqlDataReader["LastUpdatedDateTime"]);
+            projectBE.UpdatedBy = Functions.TrimRight(sqlDataReader["UpdatedBy"]);
+            projectBE.CreatedBy = Functions.TrimRight(sqlDataReader["CreatedBy"]);
+            return projectBE;
+        }
+
+        private static ProjectFormBE ToProjectFormBE(SqlDataReader sqlDataReader)
+        {
+            ProjectFormBE projectFormBE = new ProjectFormBE();
+            projectFormBE.ProjectId = Functions.ToInt(sqlDataReader["ProjectId"]);
+            projectFormBE.FormId = Functions.ToInt(sqlDataReader["FormId"]);
+            return projectFormBE;
         }
 
         #endregion

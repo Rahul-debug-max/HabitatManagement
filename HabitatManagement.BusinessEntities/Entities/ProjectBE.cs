@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace HabitatManagement.Business
 {
-    class ProjectBE : BusinessEntity
+    public class ProjectBE : BusinessEntity
     {
         public int ID { get; set; }
         public string Project { get; set; }
