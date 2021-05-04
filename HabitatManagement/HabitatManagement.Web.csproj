@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HabitatManagement.BusinessEntities\HabitatManagement.BusinessEntities.csproj" />
+    <ProjectReference Include="..\HabitatManagement.BusinessEntities\HabitatManagement.Business.csproj" />
   </ItemGroup>
 
 </Project>
