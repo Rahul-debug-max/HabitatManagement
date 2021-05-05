@@ -9,18 +9,9 @@
     $(document).ready(function () {
         ProjectList.onInit({
             addFormURL: '@Url.Action("Index", "ProjectForm")',
-            @*addEditURL: '@Url.Action("ProjectFormCreation", "ProjectForm")',
-            saveDataURL: '@ViewBag.SaveFormDataURL',
-            jqGridDataURL: '@Url.Action("GetProjectFormListData", "ProjectForm")',
-            jqGridColumnURL: '@Url.Action("GetProjectFormListColumnNames", "ProjectForm")',
-            checkListFieldType : '@Convert.ToInt32(FormFieldType.CheckList)',
-            checkboxFieldType : '@Convert.ToInt32(FormFieldType.Checkbox)',
-            textboxFieldType : '@Convert.ToInt32(FormFieldType.Textbox)',
-            dateFieldType : '@Convert.ToInt32(FormFieldType.Date)',
-            dateAndTimeFieldType : '@Convert.ToInt32(FormFieldType.DateAndTime)',
-            signatureFieldType: '@Convert.ToInt32(FormFieldType.Signature)',
-            signatureField: '@Convert.ToString(FormFieldType.Signature)',
-            textAreaFieldType : '@Convert.ToInt32(FormFieldType.TextArea)'*@
+            addEditURL: '@Url.Action("EditProject", "Project")',
+            jqGridDataURL: '@Url.Action("ProjectBlockFetch", "Project")',
+            jqGridColumnURL: '@Url.Action("GetProjectColumnNames", "Project")'
         });
     });
 </script>

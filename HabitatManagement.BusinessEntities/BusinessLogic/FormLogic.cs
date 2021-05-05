@@ -683,8 +683,9 @@ namespace HabitatManagement.Business
                 FromProjectBE(ref cmd, o);
                 cmd.Parameters.AddWithValue("CreatedDateTime", o.CreatedDateTime);
                 cmd.Parameters.AddWithValue("CreatedBy", o.CreatedBy);
-                cmd.Parameters.Add("ErrorOccured", SqlDbType.Bit);
+                cmd.Parameters.Add("ErrorOccured", SqlDbType.Bit);                
                 cmd.Parameters["ErrorOccured"].Direction = ParameterDirection.Output;
+                cmd.Parameters.Add("ProjectID", SqlDbType.Int);
                 cmd.Parameters["ProjectID"].Direction = ParameterDirection.Output;
                 cmd.ExecuteNonQuery();
                 if (cmd.Parameters["ErrorOccured"].Value != DBNull.Value)
@@ -758,7 +759,7 @@ namespace HabitatManagement.Business
             return o;
         }
 
-        public static List<ProjectBE> BlockFetchProject(int projectId, int pageIndex, int pageSize, out int totalRecords)
+        public static List<ProjectBE> BlockFetchProject(int pageIndex, int pageSize, out int totalRecords)
         {
             totalRecords = 0;
             List<ProjectBE> list = new List<ProjectBE>();
@@ -767,8 +768,7 @@ namespace HabitatManagement.Business
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand("usp_Project_BlockFetch", conn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("ProjectId", projectId);
+                cmd.CommandType = CommandType.StoredProcedure;                
                 cmd.Parameters.AddWithValue("PageIndex", pageIndex);
                 cmd.Parameters.AddWithValue("PageSize", pageSize);
                 cmd.Parameters.Add("RecordCount", SqlDbType.Int, 8);

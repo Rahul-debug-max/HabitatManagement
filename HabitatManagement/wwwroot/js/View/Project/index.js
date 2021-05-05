@@ -1,6 +1,6 @@
 ﻿window.ProjectList = (function () {
     var defaults = {
-        addEditPopupTitle: "Form",
+        addEditPopupTitle: "Project",
         addEditURL: '',
         deleteURL: ''
     }
@@ -22,10 +22,6 @@
 
         $('#EditProject').off('click').on('click', function () {
             fireonClick('edit', true);
-        });
-
-        $('.formFeedbackSelector').on('change', function () {
-            reloadGridForPositioner();
         });
 
         $('#AddForm').off('click').on('click', function () {
@@ -53,7 +49,7 @@
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,
-                        data: { formID: $('.formFeedbackSelector').val() > 0 ? $('.formFeedbackSelector').val() : 0, surrogate: 0 },
+                        data: { projectID: 0},
                         buttons: [
                             {
                                 Button: 'save', onClick: function () {
@@ -73,7 +69,7 @@
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,
-                        data: surrogateDate[0],
+                        data: { projectID: surrogateDate[0] },
                         buttons: [
                             {
                                 Button: 'save', onClick: function () {
@@ -105,113 +101,38 @@
     }
 
     var saveDesignTemplate = function (currentDialogID) {
-        var data = [];
-        $('#dvFormFeedback').find("div[data-field]").each(function (inx, ele) {           
-            var field = 0;
-            var fieldValue = '';
-            var digitalSignatureImage64BitString = '';
-
-            obj = $(ele);
-            var field = obj.attr('data-field');
-            var fieldType = obj.attr('field-Type');
-
-            if (fieldType == defaults.checkListFieldType) {
-                $(obj).find('.checkListTR').each(function (inx, ele) {
-                    var checked = '';
-                    var yesCheckBox = $(ele).find('input')[0];
-                    var noCheckBox = $(ele).find('input')[1];
-                    field = $(yesCheckBox).attr('name');
-
-                    if ($(yesCheckBox).is(":checked")) {
-                        checked = 1;
-                    }
-                    else if ($(noCheckBox).is(":checked")) {
-                        checked = 0;
-                    }
-                    data.push({
-                        FormID: $('.projectFormCreation').val(),
-                        Field: field,
-                        FieldValue: checked,
-                        DigitalSignatureImage64BitString: "",
-                        FieldType: ""
-                    });
-                });
-            }
-            else if (fieldType == defaults.checkboxFieldType) {
-                var yesCheckBoxElement = $(obj).find('.formFieldTypeCheckbox').find('input[type=checkbox]')[0];
-                var noCheckBoxElement = $(obj).find('.formFieldTypeCheckbox').find('input[type=checkbox]')[1];
-                var checked = '';
-                if ($(yesCheckBoxElement).is(":checked")) {
-                    checked = 1;
-                }
-                else if ($(noCheckBoxElement).is(":checked")) {
-                    checked = 0;
-                }
-                fieldValue = checked;
-            }
-            else if (fieldType == defaults.textboxFieldType) {
-                fieldValue = $(obj).find('input[name^=' + field + ']').val();
-            }
-            else if (fieldType == defaults.dateFieldType) {
-                fieldValue = $(obj).find('input[name^=' + field + ']').val();
-            }
-            else if (fieldType == defaults.dateAndTimeFieldType) {
-                var date = $(obj).find('input[name^=' + field + ']').val();
-                var time = $(obj).find('.time').find('input').val()
-                fieldValue = date + " " + time;
-            }
-            else if (fieldType == defaults.signatureFieldType) {
-                var singnatureDv = $(obj).find('div[id^="digitalSignature_"]');
-                if (singnatureDv.length > 0) {
-                    digitalSignatureImage64BitString = $(singnatureDv).jSignature('getData');
-                }
-                fieldValue = $(obj).find('#SignatureId').val();
-            }
-            else if (fieldType == defaults.textAreaFieldType) {
-                fieldValue = $(obj).find('textarea[name^=' + field + ']').val();
-            }
-            if (fieldType != defaults.checkListFieldType) {
-                data.push({
-                    FormID: $('.projectFormCreation').val(),
-                    Field: field,
-                    FieldValue: fieldValue,
-                    DigitalSignatureImage64BitString: digitalSignatureImage64BitString,
-                    FieldType: fieldType == defaults.signatureFieldType ? defaults.signatureField : ''
-                });
-            }
-        });        
         var ajx = $.ajax({
-            type: 'Post',
-            url: defaults.saveDataURL,
+            type: 'POST',
             cache: false,
-            data: { data: JSON.stringify(data), surrogate: $('#FormFeedback #Surrogate').val() },
-            dataType: 'Json',
-            traditional: true,
-            success: function (result) {               
-                if (result != null && !result) {
-                    alert('Unable to save. Please contact administrator.');
-                    return;
-                }
-                else {
+            url: defaults.addEditURL,
+            dataType: 'JSON',
+            data: $('#ProjectForm').serialize(),
+            success: function (result) {
+                if (result.success) {
+                    if (result.id != undefined && result.id > 0) {
+                        selectedRow = [];
+                        selectedRow.push(result.id);
+                        $("#ID").val(result.id);
+                    }
                     $(currentDialogID).modal("hide");
-                    reloadGridForPositioner();
+                    reloadGridForPositioner();                    
+                }
+                else if (result.Success != undefined && !result.Success) {
+                    alert('Unable to save. Please contact administrator.')
                 }
             },
-            error: function (jqXHR, feedback, eToStringToStringrrorThrown) {
+            error: function () {
             },
-            beforeSend: function () {
-                $('#wait').show();
-            },
+            beforeSend: function () { $("#wait").css("display", "block"); },
             complete: function () {
-                $('#wait').hide();
+                $("#wait").css("display", "none");
             }
         });
         return ajx;
     }
 
-
     var reloadGridForPositioner = function () {
-        var createdFormListColumnName = [];
+        var projectListColumnName = [];
         $.ajax({
             type: 'GET',
             cache: false,
@@ -222,29 +143,29 @@
                 if (data.columnNames != null) {
                     for (var i = 0; i < data.columnNames.length; i++) {
                         if (data.columnNames[i] != "") {
-                            createdFormListColumnName.push(data.columnNames[i]);
+                            projectListColumnName.push(data.columnNames[i]);
                         }
                     }
                 }
             },
             complete: function () {
-                createdFormGrid(createdFormListColumnName);
+                projectListGrid(projectListColumnName);
             }
         });
     }
 
-    var createdFormGrid = function (createdFormListColumnName) {
+    var projectListGrid = function (projectListColumnName) {
         $("#tblProjectList").jqGrid("GridUnload");
         $("#tblProjectList").jqGrid({
             url: defaults.jqGridDataURL,
             datatype: 'json',
             mtype: 'Post',
-            colNames: createdFormListColumnName,
+            colNames: projectListColumnName,
             colModel: [
-                { key: false, name: 'formID', index: 'formID', search: false, hidden: true },
-                { key: false, name: 'surrogate', index: 'surrogate', search: false },
-                { key: false, name: 'design', index: 'design', search: false },
+                { key: false, name: 'id', index: 'id', search: false, hidden: true },
+                { key: false, name: 'project', index: 'project', search: false },                
                 { key: false, name: 'description', index: 'description', search: false },
+                { key: false, name: 'manager', index: 'manager', search: false },
                 { key: false, name: 'creationDate', index: 'creationDate', search: false }
             ],
             pager: jQuery('#pagerProjectList'),
@@ -270,11 +191,7 @@
                 fireonClick('edit', true);
             },
             beforeRequest: function () {
-                $(this).jqGrid('setGridParam', {
-                    postData: {
-                        formID: $('.formFeedbackSelector').val() > 0 ? $('.formFeedbackSelector').val() : 0
-                    }
-                });
+                
             },
             gridComplete: function (e) {
             },
@@ -286,10 +203,9 @@
     var getSelectedTemplate = function () {
         var gr = $("#tblProjectList").getGridParam('selrow');
         if (gr != null) {
-            var surrogate = $("#tblProjectList").getRowData(gr).surrogate;
-            var formID = $("#tblProjectList").getRowData(gr).formID;
+            var id = $("#tblProjectList").getRowData(gr).id;            
             selectedRow = [];
-            selectedRow.push({ formID: formID, surrogate: surrogate });
+            selectedRow.push(id);
         }
     }
 

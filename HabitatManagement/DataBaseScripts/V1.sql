@@ -1318,25 +1318,27 @@ GO
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_Project_BlockFetch]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[usp_Project_BlockFetch]
 GO
-CREATE PROCEDURE [dbo].[usp_Project_BlockFetch]        
- @ProjectId int,                
- @PageIndex INT = 1,        
- @PageSize INT = 10,  
- @RecordCount INT OUTPUT    
+CREATE PROCEDURE [dbo].[usp_Project_BlockFetch]
+(
+	@PageIndex INT = 1,        
+	@PageSize INT = 10,  
+	@RecordCount INT OUTPUT   
+)
 AS         
-BEGIN       
- IF(@PageIndex IS NULL)      
- BEGIN      
-  SET @PageIndex = 1         
- END      
+BEGIN
+SET NOCOUNT ON;
+	IF(@PageIndex IS NULL)      
+	BEGIN      
+		SET @PageIndex = 1         
+	END      
   
- SELECT @RecordCount = COUNT(*) FROM Project WHERE ID  = @ProjectId
+	SELECT @RecordCount = COUNT(*) FROM Project
         
- SELECT * FROM Project WHERE ID = @ProjectId
- ORDER BY Project          
- OFFSET @PageSize * (@PageIndex - 1) ROWS FETCH NEXT @PageSize ROWS ONLY;    
+	SELECT * FROM Project
+	ORDER BY Project          
+	OFFSET @PageSize * (@PageIndex - 1) ROWS FETCH NEXT @PageSize ROWS ONLY;
 
-END      
+END 
 GO
 
 

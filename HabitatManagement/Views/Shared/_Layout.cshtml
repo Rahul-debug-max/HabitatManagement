@@ -32,7 +32,7 @@
     <script src="~/lib/moments/moment-with-locales.js"></script>
     <script src="~/lib/bootstrapDateTimePicker/js/bootstrap-datetimepicker.min.js"></script>
     <script type="text/javascript">
-      //  moment.locale('en-AU');
+          //  moment.locale('en-AU');
     </script>
 </head>
 <body>
@@ -52,12 +52,12 @@
                         <li class="nav-item mx-2">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item mx-2">
+                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Project" asp-action="Index">Project</a>
                         </li>
-                        <li class="nav-item">
+                        @*<li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="ProjectForm" asp-action="Index">Forms</a>
-                        </li>
+                        </li>*@
                     </ul>
                 </div>
             </div>
@@ -75,6 +75,10 @@
             Copyright: 2021 RSK Business Solutions . All rights reserved.
         </div>
     </footer>
+
+    <div class="spinner-border text-primary" role="status" id="wait" style="display: none;">
+        <span class="sr-only">Loading...</span>
+    </div>
 
     @await RenderSectionAsync("Scripts", required: false)
 
