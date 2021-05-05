@@ -54,6 +54,12 @@ namespace HabitatManagement.Business
 
         public int Surrogate { get; set; }
 
+        public string Project { get; set; }
+
+        public string ProjectDescription { get; set; }
+
+        public int? ProjectId { get; set; }
+
         #endregion
 
         #region Methods

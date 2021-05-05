@@ -18,14 +18,23 @@ namespace HabitatManagement.Controllers
 {
     public class ProjectFormController : Controller
     {
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? projectId)
         {
+            FormDesignTemplateModelBE model = new FormDesignTemplateModelBE();
             using (var httpClient = new HttpClient())
             {
                 string url = DBConfiguration.WebAPIHostingURL;
                 if (!string.IsNullOrWhiteSpace(url))
                 {
-                    string webAPIURL = string.Format("{0}form/GetForms", url);
+                    string webAPIURL = string.Empty;
+                    if (projectId != null)
+                    {
+                        webAPIURL = string.Format("{0}form/GetForms/{1}", url, projectId.Value);
+                    }
+                    else
+                    {
+                        webAPIURL = string.Format("{0}form/GetForms", url);
+                    }
                     using (var response = await httpClient.GetAsync(webAPIURL))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
@@ -35,7 +44,28 @@ namespace HabitatManagement.Controllers
                 }
                 ViewData["SaveFormDataURL"] = string.Format("{0}form/SaveFormData", url);
             }
-            return View();
+
+            if (projectId != null)
+            {
+                ProjectBE projectBE = FormLogic.FetchProject(projectId.Value);
+                if (projectBE != null)
+                {
+                    model.Project = projectBE.Project;
+                    model.ProjectDescription = projectBE.Description;
+                    model.ProjectId = projectId.Value;
+                }
+            }
+
+            bool isAjaxRequest = HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+
+            if (isAjaxRequest)
+            {
+                return PartialView(model);
+            }
+            else
+            {
+                return View(model);
+            }
         }
 
         public JsonResult GetProjectFormListColumnNames()
@@ -108,7 +138,7 @@ namespace HabitatManagement.Controllers
             }
         }
 
-        public async Task<IActionResult> ProjectFormCreation(int? formID, int? surrogate)
+        public async Task<IActionResult> ProjectFormCreation(int? formID, int? surrogate, int? projectID)
         {
             ProjectFormCreationModel model = new ProjectFormCreationModel();
             model.FormID = formID ?? 0;
@@ -118,7 +148,15 @@ namespace HabitatManagement.Controllers
                 string url = DBConfiguration.WebAPIHostingURL;
                 if (!string.IsNullOrWhiteSpace(url))
                 {
-                    string webAPIURL = string.Format("{0}form/GetForms", url);
+                    string webAPIURL = string.Empty;
+                    if (projectID != null)
+                    {
+                        webAPIURL = string.Format("{0}form/GetForms/{1}", url, projectID.Value);
+                    }
+                    else
+                    {
+                        webAPIURL = string.Format("{0}form/GetForms", url);
+                    }
                     using (var response = await httpClient.GetAsync(webAPIURL))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();

@@ -12,7 +12,7 @@ namespace HabitatManagement.Business
     {
         static string _connectionstring = DBConfiguration.Connection;
 
-        public static List<FormDesignTemplateBE> BlockFetchFormDesignTemplate(int pageIndex, int pageSize, out int totalRecords, string searchForm)
+        public static List<FormDesignTemplateBE> BlockFetchFormDesignTemplate(int pageIndex, int pageSize, out int totalRecords, string searchForm, int? projectId = null)
         {
             totalRecords = 0;
             List<FormDesignTemplateBE> list = new List<FormDesignTemplateBE>();
@@ -27,6 +27,16 @@ namespace HabitatManagement.Business
                 cmd.Parameters.AddWithValue("PageSize", pageSize);
                 cmd.Parameters.Add("RecordCount", SqlDbType.Int, 8);
                 cmd.Parameters["RecordCount"].Direction = ParameterDirection.Output;
+
+                if (projectId != null)
+                {
+                    cmd.Parameters.AddWithValue("ProjectId", projectId.Value);
+                }
+                else
+                {
+                    cmd.Parameters.AddWithValue("ProjectId", DBNull.Value);
+                }
+
                 using (SqlDataReader sqlDataReader = cmd.ExecuteReader())
                 {
                     while (sqlDataReader.Read())

@@ -429,10 +429,11 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
- CREATE PROCEDURE [dbo].[usp_FormDesignTemplate_BlockFetch]      
+CREATE PROCEDURE [dbo].[usp_FormDesignTemplate_BlockFetch]      
  @SearchForm VARCHAR (256) = NULL,              
  @PageIndex INT = 1,      
  @PageSize INT = 10,
+ @ProjectId INT = null,
  @RecordCount INT OUTPUT  
 AS       
 BEGIN     
@@ -441,6 +442,9 @@ BEGIN
   SET @PageIndex = 1       
  END    
 
+ IF(@ProjectId IS NULL)    
+ BEGIN
+
  SELECT @RecordCount = COUNT(*) FROM FormDesignTemplate  
  Where ([Design] LIKE '%' + @SearchForm + '%' OR [Description] LIKE '%' + @SearchForm + '%')  
       
@@ -448,11 +452,28 @@ BEGIN
  FROM FormDesignTemplate AS t    
  Where (t.[Design] LIKE '%' + @SearchForm + '%' OR t.[Description] LIKE '%' + @SearchForm + '%')   
  ORDER BY [Design]             
- OFFSET @PageSize * (@PageIndex - 1) ROWS            
- FETCH NEXT @PageSize ROWS ONLY;  
+ OFFSET @PageSize * (@PageIndex - 1) ROWS FETCH NEXT @PageSize ROWS ONLY;  
 
+ END
+ ELSE BEGIN
+
+ SELECT @RecordCount = COUNT(*) FROM FormDesignTemplate 
+ INNER JOIN ProjectForm ON FormDesignTemplate.FormID = ProjectForm.FormId
+ Where ([Design] LIKE '%' + @SearchForm + '%' OR [Description] LIKE '%' + @SearchForm + '%')  
+ AND ProjectForm.ProjectId = @ProjectId
+ 
+ SELECT t.*
+ FROM FormDesignTemplate AS t    
+ INNER JOIN ProjectForm ON t.FormID = ProjectForm.FormId
+  Where (t.[Design] LIKE '%' + @SearchForm + '%' OR t.[Description] LIKE '%' + @SearchForm + '%')   
+  AND ProjectForm.ProjectId = @ProjectId
+  ORDER BY [Design]             
+  OFFSET @PageSize * (@PageIndex - 1) ROWS FETCH NEXT @PageSize ROWS ONLY;  
+
+ END
 END    
 GO
+
 /****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplate_Update]    Script Date: 08-04-2021 15:51:54 ******/
 SET ANSI_NULLS ON
 GO

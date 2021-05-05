@@ -8,6 +8,7 @@
 <script type="text/javascript">
     $(document).ready(function () {
         ProjectList.onInit({
+            addFormURL: '@Url.Action("Index", "ProjectForm")',
             @*addEditURL: '@Url.Action("ProjectFormCreation", "ProjectForm")',
             saveDataURL: '@ViewBag.SaveFormDataURL',
             jqGridDataURL: '@Url.Action("GetProjectFormListData", "ProjectForm")',
@@ -24,7 +25,7 @@
     });
 </script>
 
-<div class="row white-bg " style="padding-top: 8px; padding-bottom: 8px;">
+<div class="row white-bg" style="padding-top: 8px; padding-bottom: 8px;">
 
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -47,6 +48,9 @@
                         </li>
                         <li>
                             <a href="javascript:void(0);" id="EditProject" title="Edit"><span class="glyphicons glyphicons-edit"></span><div class="toolbarlabel">Edit</div></a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" id="AddForm" title="Add Form"><span class="glyphicons glyphicons-file"></span><div class="toolbarlabel">Form</div></a>
                         </li>
                     </ul>
                     <div class="clearfix"></div>

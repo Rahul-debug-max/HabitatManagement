@@ -49,7 +49,7 @@
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,
-                        data: { formID: $('.formFeedbackSelector').val() > 0 ? $('.formFeedbackSelector').val() : 0, surrogate: 0 },
+                        data: { formID: $('.formFeedbackSelector').val() > 0 ? $('.formFeedbackSelector').val() : 0, surrogate: 0, projectID: defaults.projectId },
                         buttons: [
                             {
                                 Button: 'save', onClick: function () {

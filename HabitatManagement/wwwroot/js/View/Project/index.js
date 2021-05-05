@@ -27,6 +27,10 @@
         $('.formFeedbackSelector').on('change', function () {
             reloadGridForPositioner();
         });
+
+        $('#AddForm').off('click').on('click', function () {
+            fireonClick('addForm', true);
+        });
     }
 
     var fireonClick = function (clickFor, selectionRequired) {
@@ -80,6 +84,21 @@
                             }
                         ]
                     });
+                    break;
+                case 'addForm':
+                    $.ajax({
+                        cache: false,
+                        async: false,
+                        data: { projectId: surrogateDate[0] },
+                        url: defaults.addFormURL,
+                        success: function (result) {
+                            $(".bodyContainer").html(result);  
+                        },
+                        error: function () {
+                        },
+                        beforeSend: function () { $("#wait").css("display", "block"); },
+                        complete: function () { $("#wait").css("display", "none"); }
+                    });		
                     break;
             }
         }

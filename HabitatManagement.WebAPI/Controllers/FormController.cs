@@ -18,10 +18,10 @@ namespace HabitatManagement.WebAPI.Controllers
     {
         [HttpGet]
         [EnableCors("AllowOrigin")]
-        [Route("GetForms")]
-        public IEnumerable<SelectListItem> GetForms()
+        [Route("GetForms/{projectId:int?}")]
+        public IEnumerable<SelectListItem> GetForms(int? projectId)
         {
-            IEnumerable<FormDesignTemplateBE> listFormDesignTemplate = FormLogic.BlockFetchFormDesignTemplate(1, Int32.MaxValue, out int totalRecords, "");
+            IEnumerable<FormDesignTemplateBE> listFormDesignTemplate = FormLogic.BlockFetchFormDesignTemplate(1, Int32.MaxValue, out int totalRecords, "", projectId);
             List<SelectListItem> forms = new List<SelectListItem>();
             forms = listFormDesignTemplate.Select(m => new SelectListItem()
             {
