@@ -27,37 +27,37 @@
 
 <form id="PermitFormField" asp-controller="Home" asp-action="PermitFormField">
     <div class="container-fluid">
-        <div class="form-group row">
-            <label class="col-sm-3 text-right col-form-label" asp-for="Section" id="lblSection">Section</label>
+        <div class="form-group mx-0 mx-lg-2 row">
+            <label class="col-sm-3 text-left text-lg-right col-form-label paddrght-none" asp-for="Section" id="lblSection">Section</label>
             <div class="col-sm-9">
                 <select asp-for="Section" asp-items="@ViewBag.SectionList" class="form-control"></select>
             </div>
         </div>
 
-        <div class="form-group row">
-            <label class="col-sm-3 text-right col-form-label" asp-for="FieldType" id="lblFieldType">Field Type</label>
+        <div class="form-group mx-0 mx-lg-2 row">
+            <label class="col-sm-3 text-left text-lg-right col-form-label paddrght-none" asp-for="FieldType" id="lblFieldType">Field Type</label>
             <div class="col-sm-9">
                 <select asp-for="FieldType" asp-items="Html.GetEnumSelectList<FormFieldType>()" class="form-control"></select>
             </div>
         </div>
 
-        <div class="form-group row">
-            <label class="col-sm-3 text-right col-form-label" asp-for="FieldName" id="lblDesign">Field Name</label>
+        <div class="form-group mx-0 mx-lg-2 row">
+            <label class="col-sm-3 text-left text-lg-right col-form-label paddrght-none" asp-for="FieldName" id="lblDesign">Field Name</label>
             <div class="col-sm-9">
                 @Html.TextArea("FieldName", Model.FieldName, new { @class = "form-control textAreaVerticalResizing", @rows = 6 })
             </div>
         </div>
 
         <div id="tblFieldTypeSection" style="display:none;">
-            <div class="form-group row">
-                <label class="col-sm-3 text-right col-form-label" asp-for="TableRowCount" id="lbTableRowCount">Table Row Count</label>
+            <div class="form-group mx-0 mx-lg-2 row">
+                <label class="col-sm-3 text-left text-lg-right col-form-label paddrght-none" asp-for="TableRowCount" id="lbTableRowCount">Table Row Count</label>
                 <div class="col-sm-9">
                     @Html.TextBox("TableRowCount", Model.TableRowCount, new { @class = "form-control" })
                 </div>
             </div>
 
-            <div class="form-group row">
-                <label class="col-sm-3 text-right col-form-label" asp-for="TableRowCount" id="lbTableColumn">Table Column Header</label>
+            <div class="form-group mx-0 mx-lg-2 row">
+                <label class="col-sm-3 text-left text-lg-right col-form-label paddrght-none" asp-for="TableRowCount" id="lbTableColumn">Table Column Header</label>
                 <div class="col-sm-9 input-group">
                     @Html.TextBox("TableColumn", "", new { @class = "form-control", @placeholder="Column Name" } )
                     <select asp-items="Html.GetEnumSelectList<FormFieldType>()" id="ColumnFieldType" class="form-control"></select>

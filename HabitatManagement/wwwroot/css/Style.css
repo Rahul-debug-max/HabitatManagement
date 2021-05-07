@@ -14,7 +14,7 @@ ul {
 
 body {
     font-family: Verdana, Geneva, sans-serif;
-    font-size: 12px;
+    font-size: 100%;
     color: #3c3c3c;
     background-image: url('/images/homebackgroud-2.png') !important;
     background-size: cover !important;
