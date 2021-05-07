@@ -5,6 +5,7 @@ using System.Reflection;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Data.SqlClient;
 
 namespace HabitatManagement.Business
 {
@@ -258,6 +259,22 @@ namespace HabitatManagement.Business
                         p.SetValue(o, System.Web.HttpUtility.HtmlDecode(s), null);
                 }
             }
+        }
+
+        public static bool ReaderHasColumn(SqlDataReader reader, string columnName)
+        {
+            bool columnFound = false;
+
+            for (int col = 0; col < reader.FieldCount; col++)
+            {
+                if (reader.GetName(col) == columnName)
+                {
+                    columnFound = true;
+                    break;
+                }
+            }
+
+            return columnFound;
         }
     }
 }

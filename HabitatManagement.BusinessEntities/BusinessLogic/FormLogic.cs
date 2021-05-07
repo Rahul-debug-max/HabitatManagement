@@ -353,7 +353,7 @@ namespace HabitatManagement.Business
                 SqlCommand cmd = new SqlCommand("usp_TemplateFormFieldData_FetchAll", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("FormId", formId);
-                cmd.Parameters.AddWithValue("Surrogate", surrogate);
+                cmd.Parameters.AddWithValue("ReferenceNumber", surrogate);
                 using (SqlDataReader sqlDataReader = cmd.ExecuteReader())
                 {
                     while (sqlDataReader.Read())
@@ -387,37 +387,17 @@ namespace HabitatManagement.Business
             return success;
         }
 
-        public static int GetMaxProjectFormSurroagate()
-        {
-            int formSurrogate = 0;
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(_connectionstring))
-                {
-                    conn.Open();
-
-                    SqlCommand cmd = new SqlCommand("usp_TemplateFormFieldData_Fetch_MaxSurrogate", conn);
-                    cmd.CommandType = CommandType.StoredProcedure;                                        
-                    formSurrogate = Convert.ToInt32(cmd.ExecuteScalar());
-                }
-            }
-            catch
-            {
-
-            }
-            return formSurrogate;
-        }
-
-        public static List<TemplateFormFieldDataBE> BlockFetchByForm(int pageIndex, int pageSize, out int totalRecords, int formID)
+        public static List<SubmittedFormBE> BlockFetchSubmittedForm(int pageIndex, int pageSize, out int totalRecords, int projectID, int formID)
         {
             totalRecords = 0;
-            List<TemplateFormFieldDataBE> list = new List<TemplateFormFieldDataBE>();
+            List<SubmittedFormBE> list = new List<SubmittedFormBE>();
 
             using (SqlConnection conn = new SqlConnection(_connectionstring))
             {
                 conn.Open();
-                SqlCommand cmd = new SqlCommand("usp_TemplateFormFieldData_BlockFetch_ByForm", conn);
+                SqlCommand cmd = new SqlCommand("usp_SubmittedForm_BlockFetch", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("ProjectID", projectID);
                 cmd.Parameters.AddWithValue("FormID", formID);
                 cmd.Parameters.AddWithValue("PageIndex", pageIndex);
                 cmd.Parameters.AddWithValue("PageSize", pageSize);
@@ -427,7 +407,7 @@ namespace HabitatManagement.Business
                 {
                     while (sqlDataReader.Read())
                     {
-                        list.Add(ToTemplateFormFieldDataByFormBE(sqlDataReader));
+                        list.Add(ToSubmittedFormBE(sqlDataReader));
                     }
                 }
                 if (cmd.Parameters["RecordCount"].Value != DBNull.Value)
@@ -683,7 +663,7 @@ namespace HabitatManagement.Business
                 FromProjectBE(ref cmd, o);
                 cmd.Parameters.AddWithValue("CreatedDateTime", o.CreatedDateTime);
                 cmd.Parameters.AddWithValue("CreatedBy", o.CreatedBy);
-                cmd.Parameters.Add("ErrorOccured", SqlDbType.Bit);                
+                cmd.Parameters.Add("ErrorOccured", SqlDbType.Bit);
                 cmd.Parameters["ErrorOccured"].Direction = ParameterDirection.Output;
                 cmd.Parameters.Add("ProjectID", SqlDbType.Int);
                 cmd.Parameters["ProjectID"].Direction = ParameterDirection.Output;
@@ -768,7 +748,7 @@ namespace HabitatManagement.Business
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand("usp_Project_BlockFetch", conn);
-                cmd.CommandType = CommandType.StoredProcedure;                
+                cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("PageIndex", pageIndex);
                 cmd.Parameters.AddWithValue("PageSize", pageSize);
                 cmd.Parameters.Add("RecordCount", SqlDbType.Int, 8);
@@ -795,24 +775,24 @@ namespace HabitatManagement.Business
 
         public static bool SaveProjectForm(int projectId, string formIds)
         {
-            bool success = false;
-            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            bool success = true;
+            try
             {
-                conn.Open();
-
-                SqlCommand cmd = new SqlCommand("usp_ProjectForm_Save", conn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("ProjectId", projectId);
-                cmd.Parameters.AddWithValue("FormIds", formIds ?? string.Empty);
-
-                cmd.Parameters.Add("ErrorOccured", SqlDbType.Bit);
-                cmd.Parameters["ErrorOccured"].Direction = ParameterDirection.Output;
-                cmd.ExecuteNonQuery();
-                if (cmd.Parameters["ErrorOccured"].Value != DBNull.Value)
+                using (SqlConnection conn = new SqlConnection(_connectionstring))
                 {
-                    success = Convert.ToBoolean(cmd.Parameters["ErrorOccured"].Value);
-                }
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand("usp_ProjectForm_Save", conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("ProjectId", projectId);
+                    cmd.Parameters.AddWithValue("FormIds", formIds ?? string.Empty);
+                    cmd.ExecuteNonQuery();
+                }                
             }
+            catch
+            {
+                success = false;
+            }            
             return success;
         }
 
@@ -867,6 +847,7 @@ namespace HabitatManagement.Business
                 cmd.Parameters.AddWithValue("CreatedBy", o.CreatedBy);
                 cmd.Parameters.Add("ErrorOccured", SqlDbType.Bit);
                 cmd.Parameters["ErrorOccured"].Direction = ParameterDirection.Output;
+                cmd.Parameters.Add("ReferenceNumber", SqlDbType.Int);
                 cmd.Parameters["ReferenceNumber"].Direction = ParameterDirection.Output;
                 cmd.ExecuteNonQuery();
                 if (cmd.Parameters["ErrorOccured"].Value != DBNull.Value)
@@ -998,8 +979,8 @@ namespace HabitatManagement.Business
 
         private static void FromTemplateFormFieldDataBE(ref SqlCommand cmd, TemplateFormFieldDataBE o)
         {
-            cmd.Parameters.AddWithValue("Surrogate", o.Surrogate);
-            cmd.Parameters.AddWithValue("FormID", o.FormID);            
+            cmd.Parameters.AddWithValue("ReferenceNumber", o.ReferenceNumber);
+            cmd.Parameters.AddWithValue("FormID", o.FormID);
             cmd.Parameters.AddWithValue("Field", o.Field);
             cmd.Parameters.AddWithValue("FieldValue", o.FieldValue);
             cmd.Parameters.AddWithValue("CreationDate", o.CreationDate);
@@ -1026,7 +1007,7 @@ namespace HabitatManagement.Business
         private static TemplateFormFieldDataBE ToTemplateFormFieldDataBE(SqlDataReader rdr)
         {
             TemplateFormFieldDataBE o = new TemplateFormFieldDataBE();
-            o.Surrogate = Convert.ToInt32(rdr["Surrogate"]);
+            o.ReferenceNumber = Convert.ToInt32(rdr["ReferenceNumber"]);
             o.FormID = Convert.ToInt32(rdr["FormID"]);
             o.Field = Convert.ToInt32(rdr["Field"]);
             o.FieldValue = Convert.ToString(rdr["FieldValue"]);
@@ -1037,7 +1018,7 @@ namespace HabitatManagement.Business
         private static TemplateFormFieldDataBE ToTemplateFormFieldDataByFormBE(SqlDataReader rdr)
         {
             TemplateFormFieldDataBE o = new TemplateFormFieldDataBE();
-            o.Surrogate = Convert.ToInt32(rdr["Surrogate"]);
+            o.ReferenceNumber = Convert.ToInt32(rdr["ReferenceNumber"]);
             o.FormID = Convert.ToInt32(rdr["FormID"]);
             o.Design = Functions.TrimRight(rdr["Design"]);
             o.Description = Functions.TrimRight(rdr["Description"]);
@@ -1177,6 +1158,13 @@ namespace HabitatManagement.Business
             submittedFormBE.LastUpdatedDateTime = Convert.ToDateTime(sqlDataReader["LastUpdatedDateTime"]);
             submittedFormBE.UpdatedBy = Functions.TrimRight(sqlDataReader["UpdatedBy"]);
             submittedFormBE.CreatedBy = Functions.TrimRight(sqlDataReader["CreatedBy"]);
+
+            if (BusinessEntityHelper.ReaderHasColumn(sqlDataReader, "Design"))
+                submittedFormBE.SetCustomData("Design", Functions.TrimRight(sqlDataReader["Design"]));
+
+            if (BusinessEntityHelper.ReaderHasColumn(sqlDataReader, "DesignDescription"))
+                submittedFormBE.SetCustomData("DesignDescription", Functions.TrimRight(sqlDataReader["DesignDescription"]));
+
             return submittedFormBE;
         }
 

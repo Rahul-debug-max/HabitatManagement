@@ -9,5 +9,7 @@ namespace HabitatManagement.Models
     public class ProjectModel : ProjectBE
     {
         public string CreationDate { get; set; }
+
+        public List<int> ProjectFormList { get; set; }
     }
 }

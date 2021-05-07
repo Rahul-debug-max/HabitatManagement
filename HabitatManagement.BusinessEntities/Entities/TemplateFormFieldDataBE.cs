@@ -8,7 +8,7 @@ namespace HabitatManagement.Business
 {
     public class TemplateFormFieldDataBE : BusinessEntity
     {
-        public int Surrogate { get; set; }
+        public int ReferenceNumber { get; set; }
         public int FormID { get; set; }
         public int Field { get; set; }
         public string FieldValue { get; set; }

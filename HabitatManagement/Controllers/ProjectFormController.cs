@@ -88,19 +88,19 @@ namespace HabitatManagement.Controllers
             }
         }
 
-        public async Task<IActionResult> GetProjectFormListData(int formID, string sidx, string sord, int page = 1, int rows = 10)
+        public async Task<IActionResult> GetProjectFormListData(int formID, int projectID, string sidx, string sord, int page = 1, int rows = 10)
         {
             var jsonData = new
             {
                 total = 0,
                 page,
                 records = 0,
-                rows = new List<CreatedFormListModal>()
+                rows = new List<ProjectSubmitedFormListModal>()
             };
 
             try
             {
-                List<TemplateFormFieldDataBE> list = FormLogic.BlockFetchByForm(page, rows, out int totalRecords, formID);
+                List<SubmittedFormBE> list = FormLogic.BlockFetchSubmittedForm(page, rows, out int totalRecords, projectID, formID);
 
                 if (list == null)
                 {
@@ -109,13 +109,13 @@ namespace HabitatManagement.Controllers
                 else
                 {
                     var resultFormTemplate = (from obj in list
-                                              select new CreatedFormListModal
+                                              select new ProjectSubmitedFormListModal
                                               {
-                                                  Surrogate = obj.Surrogate.ToString(),
-                                                  FormID = obj.FormID.ToString(),
-                                                  Design = obj.Design,
-                                                  Description = obj.Description,
-                                                  CreationDate = obj.CreationDate.ToString()
+                                                  Surrogate = obj.ReferenceNumber.ToString(),
+                                                  FormSurrogate = obj.FormId.ToString(),
+                                                  Design = obj.GetCustomDataValue<string>("Design"),
+                                                  Description = obj.GetCustomDataValue<string>("DesignDescription"),
+                                                  CreationDate = obj.CreatedDateTime.ToString()
                                               }).ToList();
 
                     var totalPages = (int)Math.Ceiling((float)totalRecords / (float)rows);
@@ -170,16 +170,17 @@ namespace HabitatManagement.Controllers
 
     }
 
-    public class CreatedFormListModal
+    public class ProjectSubmitedFormListModal : SubmittedFormBE
     {
         public string Surrogate { get; set; }
 
-        public string FormID { get; set; }
+        public string FormSurrogate { get; set; }
+
+        public string CreationDate { get; set; }
 
         public string Design { get; set; }
 
         public string Description { get; set; }
 
-        public string CreationDate { get; set; }
     }
 }

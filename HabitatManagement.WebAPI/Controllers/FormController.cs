@@ -29,7 +29,7 @@ namespace HabitatManagement.WebAPI.Controllers
                 Value = m.FormID.ToString()
             }).ToList();
 
-            forms.Insert(0, new SelectListItem { Text = "--Select Form--", Value = "-1" });
+            //forms.Insert(0, new SelectListItem { Text = "--Select Form--", Value = "-1" });
             return forms;
         }
 
@@ -74,18 +74,27 @@ namespace HabitatManagement.WebAPI.Controllers
                 List<TemplateFormFieldDataBE> templateFormFieldDatas = JsonConvert.DeserializeObject<List<TemplateFormFieldDataBE>>(data);
                 if (templateFormFieldDatas != null)
                 {
-                    int formDataSurrogate = Functions.ToInt(Request.Form["surrogate"]);                    
+                    int referenceNumber = Functions.ToInt(Request.Form["surrogate"]);
+                    int projectID = Functions.ToInt(Request.Form["projectID"]);
                     int formID = templateFormFieldDatas.Select(m => m.FormID).Distinct().FirstOrDefault();
-                    if (formDataSurrogate <= 0)
+                    if (referenceNumber <= 0)
                     {
-                        formDataSurrogate = FormLogic.GetMaxProjectFormSurroagate() + 1;
-                        templateFormFieldDatas.ForEach(m => m.Surrogate = formDataSurrogate);
-                        templateFormFieldDatas.ForEach(m => m.CreationDate = DateTime.Now);
+                        SubmittedFormBE submittedForm = new SubmittedFormBE();
+                        submittedForm.ProjectId = projectID;
+                        submittedForm.FormId = formID;
+                        submittedForm.Status = SubmittedFormStatusField.Submitted;
+                        submittedForm.CreatedDateTime = DateTime.Now;
+                        submittedForm.LastUpdatedDateTime = DateTime.Now;
+                        submittedForm.CreatedBy = "RSK";
+                        submittedForm.UpdatedBy = "RSK";
+                        success = FormLogic.AddSubmittedForm(submittedForm, out referenceNumber);                 
+                        templateFormFieldDatas.ForEach(m => m.ReferenceNumber = referenceNumber);
+                        templateFormFieldDatas.ForEach(m => m.CreationDate = submittedForm.CreatedDateTime);
                     }
                     else
                     {
-                        templateFormFieldDatas.ForEach(m => m.Surrogate = formDataSurrogate);
-                        List<TemplateFormFieldDataBE> templateFormFieldDataValue = FormLogic.FetchAllTemplateFormFieldData(formID, formDataSurrogate);   
+                        templateFormFieldDatas.ForEach(m => m.ReferenceNumber = referenceNumber);
+                        List<TemplateFormFieldDataBE> templateFormFieldDataValue = FormLogic.FetchAllTemplateFormFieldData(formID, referenceNumber);   
                         if(templateFormFieldDataValue != null && templateFormFieldDataValue.Count > 0)
                         {
                             templateFormFieldDatas.ForEach(m => m.CreationDate = templateFormFieldDataValue[0].CreationDate);
@@ -126,7 +135,7 @@ namespace HabitatManagement.WebAPI.Controllers
                     }
                 }
             }
-            catch
+            catch(Exception e)
             {
                 success = false;
             }

@@ -41,9 +41,9 @@ BEGIN
 	    [Description] [nvarchar](60) NOT NULL,
 	    [Active] [bit] NOT NULL DEFAULT ((1)),
 	    [CreatedDateTime] [datetime] NOT NULL DEFAULT (getdate()),
-	    [LastUpdatedDateTime] [datetime] NOT NULL DEFAULT (getdate()) ,
+	    [LastUpdatedDateTime] [datetime] NULL,
 	    [CreatedBy] [char](10) NOT NULL,
-	    [UpdatedBy] [char](10) NOT NULL,
+	    [UpdatedBy] [char](10) NULL,
     PRIMARY KEY CLUSTERED 
     (
 	    [FormID] ASC
@@ -78,22 +78,29 @@ IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Te
 BEGIN
 
 CREATE TABLE [dbo].TemplateFormFieldData(
-    [Surrogate] [int] NOT NULL,
+    [ReferenceNumber] [int] NOT NULL,
 	[FormID] [int] NOT NULL,
 	[Field] [int] NOT NULL,
 	[FieldValue] [nvarchar](max) NULL,
-    [CreationDate] DATETIME DEFAULT(GETDATE())
+    [CreationDate] DATETIME DEFAULT(GETDATE()) NOT NULL
 )
 END
 GO
 
 IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[TemplateFormFieldData]') AND TYPE in (N'U'))
 BEGIN
-	IF (COL_LENGTH('[dbo].[TemplateFormFieldData]','Surrogate') IS NULL)	
+	IF (COL_LENGTH('[dbo].[TemplateFormFieldData]','Surrogate') IS NOT NULL)	
 	BEGIN
 		ALTER TABLE [dbo].[TemplateFormFieldData]
-		ADD Surrogate [int] DEFAULT(1) NOT NULL
+		drop column Surrogate
 	END
+
+	IF (COL_LENGTH('[dbo].[TemplateFormFieldData]','ReferenceNumber') IS NULL)	
+	BEGIN
+		ALTER TABLE [dbo].[TemplateFormFieldData]
+		ADD ReferenceNumber [int] DEFAULT(0) NOT NULL
+	END
+
 	IF (COL_LENGTH('[dbo].[TemplateFormFieldData]','CreationDate') IS NULL)	
 	BEGIN
 		ALTER TABLE [dbo].[TemplateFormFieldData]
@@ -110,8 +117,8 @@ CREATE TABLE [dbo].[DigitalSignature](
 	[UserID] [char](40) NOT NULL,
 	[Blob] [image] NULL,
 	[DigitalSignatoryTypeSurrogate] [int] NULL,
-    [CreationDateTime] [datetime] NOT NULL,
-	[LastUpdatedDate] [datetime] NOT NULL DEFAULT (getdate()),
+    [CreationDateTime] DATETIME DEFAULT(GETDATE()) NOT NULL,
+	[LastUpdatedDate] DATETIME NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[SignatureID] ASC
@@ -167,9 +174,9 @@ BEGIN
 	    [Description] [nvarchar](256) NOT NULL,
 	    [Manager] [nvarchar](60) NULL,
 	    [CreatedDateTime] [datetime] NOT NULL DEFAULT (getdate()),
-	    [LastUpdatedDateTime] [datetime] NOT NULL DEFAULT (getdate()) ,
-	    [CreatedBy] [char](10) NOT NULL,
-	    [UpdatedBy] [char](10) NOT NULL,
+	    [LastUpdatedDateTime] [datetime] NULL,
+	    [CreatedBy] [char](10) NULL,
+	    [UpdatedBy] [char](10) NULL,
     PRIMARY KEY CLUSTERED 
     (
 	    [ID] ASC
@@ -204,15 +211,14 @@ BEGIN
 	    [FormId] [int] NOT NULL,
 		[Status] [int] NOT NULL,
 	    [CreatedDateTime] [datetime] NOT NULL DEFAULT (getdate()),
-	    [LastUpdatedDateTime] [datetime] NOT NULL DEFAULT (getdate()) ,
-	    [CreatedBy] [char](10) NOT NULL,
-	    [UpdatedBy] [char](10) NOT NULL,
+	    [LastUpdatedDateTime] [datetime] NULL,
+	    [CreatedBy] [char](10) NULL,
+	    [UpdatedBy] [char](10) NULL,
     PRIMARY KEY CLUSTERED 
     (
 	    [ReferenceNumber] ASC
     )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
     ) ON [PRIMARY]
-
 END
 GO
 
@@ -231,13 +237,56 @@ GO
 -------------------------------------------------------------------------------------------------------------------------------
 /* 5FUNCTIONS */
 -------------------------------------------------------------------------------------------------------------------------------
+IF EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[Split]') AND xtype IN (N'FN', N'IF', N'TF'))
+DROP FUNCTION [dbo].[Split]
+GO
+
+CREATE FUNCTION [dbo].[Split] 
+(
+	@Input nvarchar(max),
+	@Character char(1)
+)
+RETURNS @Output TABLE (
+  Item nvarchar(1000)
+)
+AS
+BEGIN
+	DECLARE @StartIndex int,
+			@EndIndex int
+
+	SET @StartIndex = 1
+	IF SUBSTRING(@Input, LEN(@Input) - 1, LEN(@Input)) <> @Character
+	BEGIN
+		SET @Input = @Input + @Character
+	END
+
+	WHILE CHARINDEX(@Character, @Input) > 0
+	BEGIN
+		SET @EndIndex = CHARINDEX(@Character, @Input)
+
+		INSERT INTO @Output (Item)
+			SELECT
+			SUBSTRING(@Input, @StartIndex, @EndIndex - 1)
+
+		SET @Input = SUBSTRING(@Input, @EndIndex + 1, LEN(@Input))
+	END
+	
+	RETURN
+END
+GO
 
 -------------------------------------------------------------------------------------------------------------------------------
 /* 6SP */
 -------------------------------------------------------------------------------------------------------------------------------
 
 ---------------------- Start of Drop Extra Sproc from data base ----------------------
-
+/****** Object:  StoredProcedure [dbo].[usp_TemplateFormFieldData_BlockFetch_ByForm]    Script Date: 06-05-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TemplateFormFieldData_BlockFetch_ByForm]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_TemplateFormFieldData_BlockFetch_ByForm]
+GO
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TemplateFormFieldData_Fetch_MaxSurrogate]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].usp_TemplateFormFieldData_Fetch_MaxSurrogate
+GO
 /****** Object:  StoredProcedure [dbo].[usp_PermitFormScreenDesignTemplateDetail_Update]    Script Date: 08-04-2021 15:51:54 ******/
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_PermitFormScreenDesignTemplateDetail_Update]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[usp_PermitFormScreenDesignTemplateDetail_Update]
@@ -804,13 +853,13 @@ DROP PROCEDURE [dbo].usp_TemplateFormFieldData_FetchAll
 GO
 CREATE PROCEDURE [dbo].usp_TemplateFormFieldData_FetchAll
 (      
-	@Surrogate int,
+	@ReferenceNumber int,
 	@FormID INT      
 )     
 AS       
 BEGIN
 SET NOCOUNT ON;       
-	SELECT t.* FROM TemplateFormFieldData AS t  WHERE t.FormID = @FormID AND t.Surrogate = @Surrogate   
+	SELECT t.* FROM TemplateFormFieldData AS t  WHERE t.FormID = @FormID AND t.ReferenceNumber = @ReferenceNumber 
 END  
 GO
 
@@ -913,7 +962,7 @@ DROP PROCEDURE [dbo].[usp_TemplateFormFieldData_Update]
 GO
 CREATE PROCEDURE [dbo].[usp_TemplateFormFieldData_Update]
 (
-	@Surrogate INT,
+	@ReferenceNumber INT,
     @FormID INT,      
     @Field INT,      
     @FieldValue NVARCHAR(max),
@@ -925,16 +974,16 @@ BEGIN
 	BEGIN TRY    
 	BEGIN TRANSACTION trans      
       
-	IF EXISTS(SELECT 1 FROM TemplateFormFieldData WHERE FormID = @FormID AND Surrogate = @Surrogate AND Field = @Field)
+	IF EXISTS(SELECT 1 FROM TemplateFormFieldData WHERE FormID = @FormID AND ReferenceNumber = @ReferenceNumber AND Field = @Field)
 	BEGIN
 		UPDATE TemplateFormFieldData      
 		SET FieldValue = @FieldValue
-		WHERE FormID = @FormID AND Field = @Field AND Surrogate = @Surrogate
+		WHERE FormID = @FormID AND Field = @Field AND ReferenceNumber = @ReferenceNumber
 	END
 	ELSE 
 	BEGIN
-		INSERT INTO TemplateFormFieldData (Surrogate,FormID, Field, FieldValue,CreationDate)      
-		SELECT @Surrogate, @FormID, @Field, @FieldValue,@CreationDate
+		INSERT INTO TemplateFormFieldData (ReferenceNumber,FormID, Field, FieldValue,CreationDate)      
+		SELECT @ReferenceNumber, @FormID, @Field, @FieldValue,@CreationDate
 	END
 
 	COMMIT Transaction trans      
@@ -1112,46 +1161,6 @@ SET NOCOUNT ON;
    SELECT t.* FROM TableFieldTypeMasterData AS t  WHERE t.TableFieldTypeMasterId IN (select Id from TableFieldTypeMaster where @Field = @Field)   
 END    
 GO
-
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TemplateFormFieldData_Fetch_MaxSurrogate]') AND type in (N'P', N'PC'))
-DROP PROCEDURE [dbo].usp_TemplateFormFieldData_Fetch_MaxSurrogate
-GO
-CREATE PROCEDURE usp_TemplateFormFieldData_Fetch_MaxSurrogate
-AS
-BEGIN
-	SELECT ISNULL(MAX(Surrogate),0) AS MaxSurrogate FROM TemplateFormFieldData
-END
-GO
-
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TemplateFormFieldData_BlockFetch_ByForm]') AND type in (N'P', N'PC'))
-DROP PROCEDURE [dbo].usp_TemplateFormFieldData_BlockFetch_ByForm
-GO
-CREATE PROCEDURE usp_TemplateFormFieldData_BlockFetch_ByForm
-(
-	@FormID INT,
-	@PageIndex INT = 1,      
-	@PageSize INT = 10,
-	@RecordCount INT OUTPUT  
-)
-AS
-BEGIN
-	IF(@PageIndex IS NULL)    
-	BEGIN    
-		SET @PageIndex = 1       
-	END
-
-	SELECT @RecordCount = COUNT(Surrogate) FROM TemplateFormFieldData 
-	WHERE (@FormID = 0 OR FormID = @FormID) GROUP BY Surrogate
-
-
-	SELECT DISTINCT Surrogate,t1.FormID,t1.Design,t1.[Description],t.CreationDate FROM TemplateFormFieldData t JOIN  
-	[dbo].FormDesignTemplate t1 ON t.FormID = t1.FormID 
-	WHERE (@FormID = 0 OR t.FormID = @FormID) ORDER BY t.CreationDate            
-	OFFSET @PageSize * (@PageIndex - 1) ROWS            
-	FETCH NEXT @PageSize ROWS ONLY;  
-END
-GO
-
 
 -- Project & Project Form
 
@@ -1391,63 +1400,20 @@ GO
 CREATE PROCEDURE [dbo].[usp_ProjectForm_Save]    
 (    
      @ProjectId int,
-	 @FormIds nvarchar(max),
-	 @ErrorOccured BIT OUTPUT
+	 @FormIds nvarchar(max)
 )
 AS    
 BEGIN    
+SET NOCOUNT ON;
 
-BEGIN TRY    
- BEGIN TRANSACTION trans    
-  
- DECLARE @FormTable TABLE
-(
-  FormId INT
-)
+	IF EXISTS(SELECT 1 FROM ProjectForm)
+	BEGIN
+		DELETE FROM ProjectForm WHERE ProjectId = @ProjectId;
+	END   
 
-;with FormCTE as(select STUFF(@FormIds,1,CHARINDEX(',',@FormIds),'') as number,  
-convert(varchar(50),left(@FormIds, CHARINDEX(',',@FormIds)-1 )) FormId  
-union all  
-  
-select STUFF(number,1,CHARINDEX(',',number+','),'') number,  
-convert(varchar(50),left(number,(case when CHARINDEX(',',number) = 0 then len(number) else CHARINDEX(',',number)-1 end)) )FormId    
-from FormCTE where LEN(number) > 0  
-)  
-
-Insert into @FormTable
-  select cast(FormId as int) from FormCTE  
-
-     INSERT INTO ProjectForm    
-       SELECT @ProjectId, ft.FormId from @FormTable ft
-	    INNER JOIN ProjectForm ON ft.FormId <> ProjectForm.FormId where ProjectForm.ProjectId = @ProjectId
+	INSERT INTO ProjectForm    
+	SELECT @ProjectId,Item FROM Split(@FormIds,',');
  
-COMMIT Transaction trans    
-    
- SET @ErrorOccured = 1;     
- 
-END TRY    
-BEGIN CATCH    
- IF (@@TRANCOUNT > 0)  
- BEGIN  
-  ROLLBACK    
- END  
-  
- SET @ErrorOccured = 0;    
- DECLARE @ErrorMessage nvarchar(4000);        
- DECLARE @ErrorSeverity int;    
- DECLARE @ErrorState int;    
-    
- SELECT    
- @ErrorMessage = ERROR_MESSAGE(),    
- @ErrorSeverity = ERROR_SEVERITY(),    
- @ErrorState = ERROR_STATE();    
-    
- RAISERROR (@ErrorMessage, -- Message text.      
- @ErrorSeverity, -- Severity.      
- @ErrorState -- State.      
- );    
-    
-END CATCH  
 END    
 GO
 
@@ -1614,25 +1580,29 @@ GO
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_SubmittedForm_BlockFetch]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[usp_SubmittedForm_BlockFetch]
 GO
-CREATE PROCEDURE [dbo].[usp_SubmittedForm_BlockFetch]        
- @ProjectId int,                
- @FormId int,                
- @PageIndex INT = 1,        
- @PageSize INT = 10,  
- @RecordCount INT OUTPUT    
-AS         
-BEGIN       
- IF(@PageIndex IS NULL)      
- BEGIN      
-  SET @PageIndex = 1         
- END      
-  
- SELECT @RecordCount = COUNT(*) FROM SubmittedForm WHERE ProjectId = @ProjectId and FormId = @FormId
-        
- SELECT * FROM SubmittedForm WHERE ProjectId = @ProjectId and FormId = @FormId
- ORDER BY ProjectId, FormId          
- OFFSET @PageSize * (@PageIndex - 1) ROWS FETCH NEXT @PageSize ROWS ONLY;    
+CREATE PROCEDURE usp_SubmittedForm_BlockFetch
+(
+	@FormID INT,
+	@ProjectID INT,
+	@PageIndex INT = 1,      
+	@PageSize INT = 10,
+	@RecordCount INT OUTPUT  
+)
+AS
+BEGIN
+	IF(@PageIndex IS NULL)    
+	BEGIN    
+		SET @PageIndex = 1       
+	END
 
+	SELECT @RecordCount = COUNT(*) FROM SubmittedForm 
+	WHERE ProjectId = @ProjectID AND (@FormID = 0 OR FormID = @FormID)
+
+	SELECT t.*,t1.Design, t1.[Description] as DesignDescription FROM SubmittedForm t JOIN  
+	[dbo].FormDesignTemplate t1 ON t.FormID = t1.FormID 
+	WHERE ProjectId = @ProjectID AND (@FormID = 0 OR t.FormID = @FormID) ORDER BY FormId, ReferenceNumber        
+	OFFSET @PageSize * (@PageIndex - 1) ROWS            
+	FETCH NEXT @PageSize ROWS ONLY;  
 END      
 GO
 

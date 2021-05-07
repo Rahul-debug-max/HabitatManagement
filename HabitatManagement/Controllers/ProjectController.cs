@@ -93,7 +93,7 @@ namespace HabitatManagement.Controllers
             }
         }
 
-        public ActionResult EditProject(int projectID)
+        public async Task<ActionResult> EditProject(int projectID)
         {
             ProjectModel model = new ProjectModel();
 
@@ -103,6 +103,31 @@ namespace HabitatManagement.Controllers
                 project = new ProjectBE();
             }
             BusinessEntityHelper.ConvertBEToBEForUI<ProjectBE, ProjectModel>(project, model);
+            using (var httpClient = new HttpClient())
+            {
+                string url = DBConfiguration.WebAPIHostingURL;
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    string webAPIURL = string.Empty;
+
+                    webAPIURL = string.Format("{0}form/GetForms", url);
+
+                    using (var response = await httpClient.GetAsync(webAPIURL))
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        List<SelectListItem> forms = JsonConvert.DeserializeObject<List<SelectListItem>>(apiResponse);
+                        ViewData["FormList"] = forms;
+                    }
+                }
+            }
+            List<ProjectFormBE> list = FormLogic.BlockFetchProjectForm(projectID, 1, int.MaxValue, out int totalRecords);
+            
+            if(list != null)
+            {
+                model.ProjectFormList = list.Select(m => m.FormId).ToList();
+            }
+
+
             return View(model);
         }
 
@@ -132,6 +157,14 @@ namespace HabitatManagement.Controllers
                 project.UpdatedBy = "Habitat";
                 success = FormLogic.UpdateProject(project);
             }
+
+
+            if (success)
+            {
+                int projectID = model.ID > 0 ? model.ID : id;
+                success = FormLogic.SaveProjectForm(projectID, string.Join(',', model.ProjectFormList));
+            }
+
             return Json(new { success, id });
         }
     }

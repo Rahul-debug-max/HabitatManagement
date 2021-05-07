@@ -49,7 +49,7 @@
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,
-                        data: { formID: $('.formFeedbackSelector').val() > 0 ? $('.formFeedbackSelector').val() : 0, surrogate: 0, projectID: defaults.projectId },
+                        data: { projectID: defaults.projectId, formID: $('.formFeedbackSelector').val() > 0 ? $('.formFeedbackSelector').val() : 0 },
                         buttons: [
                             {
                                 Button: 'save', onClick: function () {
@@ -69,7 +69,7 @@
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,
-                        data: surrogateDate[0],
+                        data: { projectID: defaults.projectId, formID: surrogateDate[0].formID, surrogate: surrogateDate[0].surrogate },
                         buttons: [
                             {
                                 Button: 'save', onClick: function () {
@@ -87,7 +87,7 @@
 
     var saveDesignTemplate = function (currentDialogID) {
         var data = [];
-        $('#dvFormFeedback').find("div[data-field]").each(function (inx, ele) {           
+        $('#dvFormFeedback').find("div[data-field]").each(function (inx, ele) {
             var field = 0;
             var fieldValue = '';
             var digitalSignatureImage64BitString = '';
@@ -160,15 +160,16 @@
                     FieldType: fieldType == defaults.signatureFieldType ? defaults.signatureField : ''
                 });
             }
-        });        
+        });
+      
         var ajx = $.ajax({
             type: 'Post',
             url: defaults.saveDataURL,
             cache: false,
-            data: { data: JSON.stringify(data), surrogate: $('#FormFeedback #Surrogate').val() },
+            data: { data: JSON.stringify(data), surrogate: $('#FormFeedback #Surrogate').val(), projectID: defaults.projectId },
             dataType: 'Json',
             traditional: true,
-            success: function (result) {               
+            success: function (result) {
                 if (result != null && !result) {
                     alert('Unable to save. Please contact administrator.');
                     return;
@@ -189,7 +190,6 @@
         });
         return ajx;
     }
-
 
     var reloadGridForPositioner = function () {
         var createdFormListColumnName = [];
@@ -222,7 +222,7 @@
             mtype: 'Post',
             colNames: createdFormListColumnName,
             colModel: [
-                { key: false, name: 'formID', index: 'formID', search: false, hidden: true },
+                { key: false, name: 'formfurrogate', index: 'formfurrogate', search: false, hidden: true },
                 { key: false, name: 'surrogate', index: 'surrogate', search: false },
                 { key: false, name: 'design', index: 'design', search: false },
                 { key: false, name: 'description', index: 'description', search: false },
@@ -253,7 +253,8 @@
             beforeRequest: function () {
                 $(this).jqGrid('setGridParam', {
                     postData: {
-                        formID: $('.formFeedbackSelector').val() > 0 ? $('.formFeedbackSelector').val() : 0
+                        formID: $('.formFeedbackSelector').val() > 0 ? $('.formFeedbackSelector').val() : 0,
+                        projectID: defaults.projectId
                     }
                 });
             },
@@ -268,7 +269,7 @@
         var gr = $("#tblProjectFormList").getGridParam('selrow');
         if (gr != null) {
             var surrogate = $("#tblProjectFormList").getRowData(gr).surrogate;
-            var formID = $("#tblProjectFormList").getRowData(gr).formID;
+            var formID = $("#tblProjectFormList").getRowData(gr).formfurrogate;
             selectedRow = [];
             selectedRow.push({ formID: formID, surrogate: surrogate });
         }

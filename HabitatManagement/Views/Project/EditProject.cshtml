@@ -3,11 +3,22 @@
 @{
     Layout = null;
 }
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#ProjectFormList').multiselects({
+            maxHeight: 300, //Scrolling view           
+            disableIfEmpty: true,
+            nonSelectedText: "Select Forms"
+        });
+    });
+</script>
+
 <form id="ProjectForm" asp-controller="Project" asp-action="EditProject">
     <div class="container-fluid">
         <div class="form-group row">
             <label class="col-lg-2 text-right col-form-label paddlftrght-none" asp-for="Project">Project</label>
-            <div class="col-lg-7">
+            <div class="col-lg-10">
                 @Html.TextBox("Project", Model.Project, new { @class = "form-control", @maxlength = "60" })
                 <span asp-validation-for="Project" class="text-danger"></span>
             </div>
@@ -26,6 +37,16 @@
                 <span asp-validation-for="Manager" class="text-danger"></span>
             </div>
         </div>
+
+
+        <div class="form-group row">
+            <label class="col-lg-2 text-right col-form-label paddlftrght-none">Forms</label>
+            <div class="col-lg-10">
+                <select asp-for="ProjectFormList" asp-items="@ViewBag.FormList" multiple="multiple"></select>
+            </div>
+        </div>
+
+
         @Html.HiddenFor(m => m.ID)
     </div>
 </form>
