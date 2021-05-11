@@ -56,7 +56,7 @@ namespace HabitatManagement.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        //[Authorize]
         [EnableCors("AllowOrigin")]
         [Route("GetFormList")]
         public IEnumerable<FormDesignTemplateBE> GetFormList()
@@ -66,7 +66,7 @@ namespace HabitatManagement.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        //[Authorize]
         [EnableCors("AllowOrigin")]
         [Route("GetFormHtmlList")]
         public List<SelectListItem> GetFormHtmlList()

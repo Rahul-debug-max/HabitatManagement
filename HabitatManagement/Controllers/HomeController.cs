@@ -275,7 +275,7 @@ namespace HabitatManagement.Controllers
                 string url = DBConfiguration.WebAPIHostingURL;
                 if (!string.IsNullOrWhiteSpace(url))
                 {
-                    string webAPIURL = string.Format("{0}form/GetFormHtml/{1}/{2}/{3}", url, formID, surrogate ?? 0, isRenderForDragnDrop != null ? isRenderForDragnDrop.Value : false);
+                    string webAPIURL = string.Format("{0}form/GetFormHtml/{1}/{2}/{3}", url, formID, isRenderForDragnDrop != null ? isRenderForDragnDrop.Value : false, surrogate);
                     using (var response = await httpClient.GetAsync(webAPIURL))
                     {
                         htmlForm = await response.Content.ReadAsStringAsync();
@@ -297,7 +297,7 @@ namespace HabitatManagement.Controllers
                 string url = DBConfiguration.WebAPIHostingURL;
                 if (!string.IsNullOrWhiteSpace(url))
                 {
-                    string webAPIURL = string.Format("{0}form/GetFormHtml/{1}/{2}/{3}", url, formID, surrogate, false);
+                    string webAPIURL = string.Format("{0}form/GetFormHtml/{1}/{2}/{3}", url, formID, false, surrogate);
                     using (var response = await httpClient.GetAsync(webAPIURL))
                     {
                         htmlForm = await response.Content.ReadAsStringAsync();

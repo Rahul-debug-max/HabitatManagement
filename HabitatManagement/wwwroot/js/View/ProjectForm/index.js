@@ -64,7 +64,7 @@
                         }
                     });
                     break;
-                case 'edit':
+                case 'edit':                  
                     WCMDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-xl",
@@ -222,7 +222,7 @@
             mtype: 'Post',
             colNames: createdFormListColumnName,
             colModel: [
-                { key: false, name: 'formfurrogate', index: 'formfurrogate', search: false, hidden: true },
+                { key: false, name: 'formSurrogate', index: 'formSurrogate', search: false, hidden: true },
                 { key: false, name: 'surrogate', index: 'surrogate', search: false },
                 { key: false, name: 'design', index: 'design', search: false },
                 { key: false, name: 'description', index: 'description', search: false },
@@ -265,11 +265,11 @@
         $("#tblProjectFormList").jqGrid('setLabel', 'Select', '', { 'text-align': 'center' });
     }
 
-    var getSelectedTemplate = function () {
+    var getSelectedTemplate = function () {       
         var gr = $("#tblProjectFormList").getGridParam('selrow');
         if (gr != null) {
             var surrogate = $("#tblProjectFormList").getRowData(gr).surrogate;
-            var formID = $("#tblProjectFormList").getRowData(gr).formfurrogate;
+            var formID = $("#tblProjectFormList").getRowData(gr).formSurrogate;
             selectedRow = [];
             selectedRow.push({ formID: formID, surrogate: surrogate });
         }

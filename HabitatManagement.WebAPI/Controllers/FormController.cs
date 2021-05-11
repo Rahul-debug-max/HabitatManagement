@@ -46,18 +46,18 @@ namespace HabitatManagement.WebAPI.Controllers
 
         [HttpGet]
         [EnableCors("AllowOrigin")]
-        [Route("GetFormHtml/{formID:int}/{surrogate:int}/{isRenderForDragnDrop:bool}")]
-        public string GetFormHtml(int formID, int surrogate, bool isRenderForDragnDrop)
+        [Route("GetFormHtml/{formID:int}/{isRenderForDragnDrop:bool}/{surrogate:int?}")]
+        public string GetFormHtml(int formID, bool isRenderForDragnDrop, int? surrogate)
         {
             List<FormDesignTemplateDetailBE> templateDetails = FormLogic.FetchAllFormDesignTemplateDetail(formID);
             List<TemplateFormFieldDataBE> templateFormFieldData = new List<TemplateFormFieldDataBE>();
-            if (surrogate > 0)
+            if (surrogate.HasValue && surrogate > 0)
             {
-                templateFormFieldData = FormLogic.FetchAllTemplateFormFieldData(formID, surrogate);
+                templateFormFieldData = FormLogic.FetchAllTemplateFormFieldData(formID, surrogate.Value);
             }
             FormDesignTemplateModelBE model = new FormDesignTemplateModelBE(templateDetails, templateFormFieldData);
             model.FormID = formID;
-            model.Surrogate = surrogate;
+            model.Surrogate = surrogate.HasValue ? surrogate.Value : 0;
             model.RenderForDragnDrop = isRenderForDragnDrop;
             return model.FormSectionFields();
         }

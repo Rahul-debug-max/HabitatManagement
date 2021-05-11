@@ -67,7 +67,7 @@ namespace HabitatManagement.Business
         public string FormSectionFields()
         {
             StringBuilder sb = new StringBuilder();
-            var sectionGroupFields = _fields.OrderBy(m=> m.SectionSequence).ThenBy(m => m.Sequence).GroupBy(o => o.Section).Select(x => x).ToList();
+            var sectionGroupFields = _fields.OrderBy(m => m.SectionSequence).ThenBy(m => m.Sequence).GroupBy(o => o.Section).Select(x => x).ToList();
 
             if (sectionGroupFields != null && sectionGroupFields.Count > 0)
             {
@@ -89,7 +89,7 @@ namespace HabitatManagement.Business
             sb.AppendFormat("<div class=\"container-fluid formOuterStyle bgLightGray sortable_list connectedSortable\" data-section = \"{0}\" >", groupingFields.Key);
             var sortableGroupingFields = groupingFields.OrderBy(s => s.Sequence).ToList() ?? new List<FormDesignTemplateDetailBE>();
             sb.AppendFormat("<label class=\"col-lg-12 col-form-label fontBold\">{0}</label>", sortableGroupingFields[0].SectionDescription);
-            List<FormDesignTemplateDetailBE> formDesignTemplateDetailsCheckList = sortableGroupingFields.Where(s => s.FieldType == FormFieldType.CheckList).OrderBy(s=>s.Field).ThenBy(s=>s.Sequence).Select(s => s).ToList();
+            List<FormDesignTemplateDetailBE> formDesignTemplateDetailsCheckList = sortableGroupingFields.Where(s => s.FieldType == FormFieldType.CheckList).OrderBy(s => s.Field).ThenBy(s => s.Sequence).Select(s => s).ToList();
             bool isCheckList = false;
 
             foreach (var field in sortableGroupingFields)
@@ -106,13 +106,13 @@ namespace HabitatManagement.Business
                         sb.Append("<div class=\"col-lg-8 formFieldTypeCheckbox\" style=\"padding-top:7px;\">");
                         if (RenderForDragnDrop)
                         {
-                            sb.AppendFormat("<label class=\"align-items-center d-inline-flex\"> Yes <input type=\"checkbox\" class=\"ml-2\" forType=\"yes\" name=\"{0}\" disabled>  </label>", field.Field);
-                            sb.AppendFormat("<label class=\"align-items-center d-inline-flex\" style=\"margin-left:22px;\"> No <input type=\"checkbox\" class=\"ml-2\" forType=\"no\" name=\"{0}\" disabled> </label>", field.Field);
+                            sb.AppendFormat("<div class=\"custom-control custom-checkbox d-inline-flex ml-2\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"yes\" name=\"{0}\" disabled>  <label class=\"custom-control-label\">Yes</label>", field.Field);
+                            sb.AppendFormat("<div class=\"custom-control custom-checkbox d-inline-flex ml-2\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"no\" name=\"{0}\" disabled> <label class=\"custom-control-label\">No</label>", field.Field);
                         }
                         else
                         {
-                            sb.AppendFormat("<label class=\"align-items-center d-inline-flex\"> Yes <input type=\"checkbox\" class=\"ml-2\" forType=\"yes\" name=\"{0}\" {1}>  </label>", field.Field, !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "");
-                            sb.AppendFormat("<label class=\"align-items-center d-inline-flex\" style=\"margin-left:22px;\"> No <input type=\"checkbox\" class=\"ml-2\" forType=\"no\" name=\"{0}\" {1}> </label>", field.Field, !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && !Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "");
+                            sb.AppendFormat("<div class=\"custom-control custom-checkbox d-inline-flex ml-2\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"yes\" name=\"{0}\" {1}><label class=\"custom-control-label\">Yes</label></div>", field.Field, !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "");
+                            sb.AppendFormat("<div class=\"custom-control custom-checkbox d-inline-flex ml-2\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"no\" name=\"{0}\" {1}><label class=\"custom-control-label\">No</label></div>", field.Field, !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && !Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "");
                         }
                         sb.Append("</div>");
                         sb.Append("</div>");
@@ -247,7 +247,7 @@ namespace HabitatManagement.Business
                         sb.Append("</div>");
                         if (!RenderForDragnDrop)
                         {
-                            var digitalSignatureImage64BitString = FormLogic.GetDigitalSignature(string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) ? 0 :  Convert.ToInt32(_templateFormFieldData?.FieldValue));
+                            var digitalSignatureImage64BitString = FormLogic.GetDigitalSignature(string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) ? 0 : Convert.ToInt32(_templateFormFieldData?.FieldValue));
                             sb.AppendFormat("<input type=\"hidden\" id='SignatureResponse' readonly=\"readonly\" class=\"form-control\" value=\"{0}\"  />", digitalSignatureImage64BitString);
                             sb.AppendFormat("<input type=\"hidden\" id='SignatureId' readonly=\"readonly\" class=\"form-control\" value=\"{0}\"  />", _templateFormFieldData?.FieldValue);
                         }
@@ -271,16 +271,16 @@ namespace HabitatManagement.Business
                                     if (RenderForDragnDrop)
                                     {
                                         sb.AppendFormat("<tr> <td> {0} </td>", formDesignTemplateDetail.FieldName);
-                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" name=\"checkListEntityType\" disabled></td>");
-                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" name=\"checkListEntityType\" disabled></td>");
+                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"><div class=\"custom-control custom-checkbox\"><input type=\"checkbox\" class=\"custom-control-input\" name=\"checkListEntityType\" disabled><span class=\"custom-control-label\"></span></div></td>");
+                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"><div class=\"custom-control custom-checkbox\"><input type=\"checkbox\" class=\"custom-control-input\" name=\"checkListEntityType\" disabled><span class=\"custom-control-label\"></span></div></td>");
                                         sb.Append("</tr>");
                                     }
                                     else
                                     {
                                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == formDesignTemplateDetail.Field).FirstOrDefault();
                                         sb.AppendFormat("<tr class=\"checkListTR\"> <td data-field = \"{1}\"> {0} </td>", formDesignTemplateDetail.FieldName, formDesignTemplateDetail.Field);
-                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" forType=\"yes\" name=\"{1}\" {0}></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "", formDesignTemplateDetail.Field);
-                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <input type=\"checkbox\" forType=\"no\" name=\"{1}\" {0}></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && !Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "", formDesignTemplateDetail.Field);
+                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"><div class=\"custom-control custom-checkbox\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"yes\" name=\"{1}\" {0}><span class=\"custom-control-label\"></span></div></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "", formDesignTemplateDetail.Field);
+                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <div class=\"custom-control custom-checkbox\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"no\" name=\"{1}\" {0}><span class=\"custom-control-label\"></span></div></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && !Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "", formDesignTemplateDetail.Field);
                                         sb.Append("</tr>");
                                     }
                                 }

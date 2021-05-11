@@ -42,61 +42,61 @@ namespace HabitatManagement.WebAPI
                 c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             });
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = Configuration["Jwt:Issuer"],
-                    ValidAudience = Configuration["Jwt:Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
-                };
+            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            //{
+            //    options.TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        ValidateIssuer = true,
+            //        ValidateAudience = true,
+            //        ValidateLifetime = true,
+            //        ValidateIssuerSigningKey = true,
+            //        ValidIssuer = Configuration["Jwt:Issuer"],
+            //        ValidAudience = Configuration["Jwt:Issuer"],
+            //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+            //    };
 
-                options.Events = new JwtBearerEvents
-                {
-                    //OnAuthenticationFailed = (context) =>
-                    //{
-                    //    Console.WriteLine(context.Exception);
-                    //    return Task.CompletedTask;
-                    //},
-                    OnAuthenticationFailed = context =>
-                    {
-                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-                        {
-                            context.Response.Headers.Add("Token-Expired", "true");
-                        }
-                        else if (context.Exception.GetType() == typeof(SecurityTokenValidationException))
-                        {
-                            context.Response.Headers.Add("Token-Validation", "false");
-                        }
-                        else if (context.Exception.GetType() == typeof(ArgumentException))
-                        {
-                            context.Response.Headers.Add("Token-Key-Invalid", "true");
-                        }
-                        return Task.CompletedTask;
-                    },
-                    OnMessageReceived = (context) =>
-                    {
-                        return Task.CompletedTask;
-                    },
-                    OnTokenValidated = (context) =>
-                    {
-                        return Task.CompletedTask;
-                    },
-                    //OnChallenge = async context =>
-                    //{
-                    //    // Call this to skip the default logic and avoid using the default response
-                    //    context.HandleResponse();          
-                    //    // Write to the response in any way you wish
-                    //    context.Response.StatusCode = 401;
-                    //    context.Response.Headers.Append("Token-Invalid", "true");
-                    //    await context.Response.WriteAsync("You are not authorized.");
-                    //}
-                };
-            });
+            //    options.Events = new JwtBearerEvents
+            //    {
+            //        //OnAuthenticationFailed = (context) =>
+            //        //{
+            //        //    Console.WriteLine(context.Exception);
+            //        //    return Task.CompletedTask;
+            //        //},
+            //        OnAuthenticationFailed = context =>
+            //        {
+            //            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+            //            {
+            //                context.Response.Headers.Add("Token-Expired", "true");
+            //            }
+            //            else if (context.Exception.GetType() == typeof(SecurityTokenValidationException))
+            //            {
+            //                context.Response.Headers.Add("Token-Validation", "false");
+            //            }
+            //            else if (context.Exception.GetType() == typeof(ArgumentException))
+            //            {
+            //                context.Response.Headers.Add("Token-Key-Invalid", "true");
+            //            }
+            //            return Task.CompletedTask;
+            //        },
+            //        OnMessageReceived = (context) =>
+            //        {
+            //            return Task.CompletedTask;
+            //        },
+            //        OnTokenValidated = (context) =>
+            //        {
+            //            return Task.CompletedTask;
+            //        },
+            //        //OnChallenge = async context =>
+            //        //{
+            //        //    // Call this to skip the default logic and avoid using the default response
+            //        //    context.HandleResponse();          
+            //        //    // Write to the response in any way you wish
+            //        //    context.Response.StatusCode = 401;
+            //        //    context.Response.Headers.Append("Token-Invalid", "true");
+            //        //    await context.Response.WriteAsync("You are not authorized.");
+            //        //}
+            //    };
+            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -109,8 +109,8 @@ namespace HabitatManagement.WebAPI
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseCors(options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
-            app.UseAuthentication();
-            app.UseAuthorization();
+            //app.UseAuthentication();
+            //app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
