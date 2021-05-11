@@ -11,5 +11,7 @@ namespace HabitatManagement.Models
         public string CreationDate { get; set; }
 
         public List<int> ProjectFormList { get; set; }
+
+        public string Client { get; set; }
     }
 }

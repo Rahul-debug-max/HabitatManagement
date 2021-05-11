@@ -165,24 +165,32 @@ END
 GO
 
 						
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Client]') AND TYPE in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[Client](
+	    [ID] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	    [Name] [nvarchar](250) NOT NULL
+	)
+END
+GO
+
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Project]') AND TYPE in (N'U'))
 BEGIN
 
     CREATE TABLE [dbo].[Project](
-	    [ID] [int] IDENTITY(1,1) NOT NULL,
-	    [Project] [nvarchar](60) NOT NULL,
-	    [Description] [nvarchar](256) NOT NULL,
+	    [ID] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
+		[ClientID] INT NULL,
+	    [Project] [nvarchar](60) NULL,
+		[ProjectName] [nvarchar](256) NOT NULL,
+	    [Description] [nvarchar](500) NOT NULL,
 	    [Manager] [nvarchar](60) NULL,
-	    [CreatedDateTime] [datetime] NOT NULL DEFAULT (getdate()),
+		[SiteAddress] [nvarchar](256) NULL,
+		[SitePostcode] [nvarchar](60) NULL,
+	    [CreatedDateTime] [datetime] NOT NULL DEFAULT (GETDATE()),
 	    [LastUpdatedDateTime] [datetime] NULL,
 	    [CreatedBy] [char](10) NULL,
-	    [UpdatedBy] [char](10) NULL,
-    PRIMARY KEY CLUSTERED 
-    (
-	    [ID] ASC
-    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-    ) ON [PRIMARY]
-
+	    [UpdatedBy] [char](10) NULL   
+    )
 END
 GO
 
@@ -1176,8 +1184,12 @@ GO
 CREATE PROCEDURE [dbo].[usp_Project_Add]    
 (    
      @Project nvarchar(60),
-	 @Description nvarchar(256),
+	 @ClientID INT,
+	 @ProjectName nvarchar(256),
+	 @Description nvarchar(500),
 	 @Manager nvarchar(60),
+	 @SiteAddress nvarchar(256),
+	 @SitePostcode nvarchar(60),
 	 @CreatedDateTime datetime,
 	 @LastUpdatedDateTime datetime,
 	 @CreatedBy char(10),
@@ -1192,18 +1204,26 @@ BEGIN TRY
  BEGIN TRANSACTION trans    
 
      INSERT INTO Project    
-        (Project,    
-         [Description],    
-         Manager,    
+        (Project,
+		 ProjectName,
+         [Description],
+		 ClientID,
+         Manager,   
+		 SiteAddress,
+		 SitePostcode,
          CreatedDateTime,     
          LastUpdatedDateTime,    
          CreatedBy,
 		 UpdatedBy
 	  )     
       VALUES (  
-		@Project,    
-		@Description,    
-		@Manager,    
+		@Project,
+		@ProjectName,
+		@Description,
+		@ClientID,
+		@Manager,
+		@SiteAddress,
+		@SitePostcode,
 		@CreatedDateTime,      
 		@LastUpdatedDateTime,    
 		@CreatedBy,
@@ -1257,10 +1277,14 @@ GO
 CREATE PROCEDURE [dbo].[usp_Project_Update]    
 (    
      @ProjectId int,
-     @Project nvarchar(60),
-	 @Description nvarchar(256),
+	 @Project nvarchar(60),
+	 @ClientID INT,
+	 @ProjectName nvarchar(256),
+	 @Description nvarchar(500),
 	 @Manager nvarchar(60),
-	 @LastUpdatedDateTime datetime,
+	 @SiteAddress nvarchar(256),
+	 @SitePostcode nvarchar(60),	 
+	 @LastUpdatedDateTime datetime,	
 	 @UpdatedBy char(10),
 	 @ErrorOccured BIT OUTPUT   
 )
@@ -1271,9 +1295,13 @@ BEGIN TRY
  BEGIN TRANSACTION trans    
 
      Update Project    
-       set Project = @Project,
+       SET Project = @Project,
+		   ClientID = @ClientID,
+		   ProjectName = @ProjectName,
 	       [Description] = @Description,    
            Manager = @Manager,    
+		   SiteAddress = @SiteAddress,
+		   SitePostcode = @SitePostcode,
            LastUpdatedDateTime = @LastUpdatedDateTime,    
 		   UpdatedBy = @UpdatedBy
        Where ID = @ProjectId
@@ -1343,7 +1371,7 @@ SET NOCOUNT ON;
   
 	SELECT @RecordCount = COUNT(*) FROM Project
         
-	SELECT * FROM Project
+	SELECT t.*,t1.[Name] as ClientName FROM Project t LEFT JOIN Client t1 ON t.ClientID = t1.ID
 	ORDER BY Project          
 	OFFSET @PageSize * (@PageIndex - 1) ROWS FETCH NEXT @PageSize ROWS ONLY;
 
@@ -1604,6 +1632,50 @@ BEGIN
 	OFFSET @PageSize * (@PageIndex - 1) ROWS            
 	FETCH NEXT @PageSize ROWS ONLY;  
 END      
+GO
+
+/****** Object:  StoredProcedure [dbo].[usp_Client_BlockFetch]    Script Date: 11-05-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_Client_BlockFetch]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_Client_BlockFetch]
+GO
+
+/****** Object:  StoredProcedure [dbo].[usp_Client_Fetch]    Script Date: 11-05-2021 15:51:54 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_Client_Fetch]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].[usp_Client_Fetch]
+GO
+
+CREATE PROCEDURE [dbo].[usp_Client_BlockFetch]
+(
+	@PageIndex INT = 1,        
+	@PageSize INT = 10,  
+	@RecordCount INT OUTPUT   
+)
+AS
+BEGIN
+SET NOCOUNT ON;
+	IF(@PageIndex IS NULL)      
+	BEGIN      
+		SET @PageIndex = 1         
+	END      
+  
+	SELECT @RecordCount = COUNT(*) FROM Client
+        
+	SELECT * FROM Client
+	ORDER BY [ID]          
+	OFFSET @PageSize * (@PageIndex - 1) ROWS FETCH NEXT @PageSize ROWS ONLY;
+END
+GO
+
+
+
+CREATE PROCEDURE [dbo].[usp_Client_Fetch]    
+(    
+	@ID int
+)   
+AS     
+BEGIN 
+	SELECT * from Client where ID = @ID
+END  
 GO
 
 -------------------------------------------------------------------------------------------------------------------------------

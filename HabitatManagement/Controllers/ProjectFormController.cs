@@ -39,6 +39,7 @@ namespace HabitatManagement.Controllers
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         List<SelectListItem> forms = JsonConvert.DeserializeObject<List<SelectListItem>>(apiResponse);
+                        forms.Insert(0, new SelectListItem { Text = "--Select Form--", Value = "-1" });
                         ViewData["FormList"] = forms;
                     }
                 }

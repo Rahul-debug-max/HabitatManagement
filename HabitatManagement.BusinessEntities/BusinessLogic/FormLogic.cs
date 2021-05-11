@@ -647,6 +647,58 @@ namespace HabitatManagement.Business
 
         #endregion
 
+        #region Client
+        public static ClientBE FetchClient(int id)
+        {
+            ClientBE o = null;
+
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("usp_Client_Fetch", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("ID", id);
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                        o = ToClientBE(reader);
+                }
+            }
+            return o;
+        }
+
+        public static List<ClientBE> BlockFetchClient(int pageIndex, int pageSize, out int totalRecords)
+        {
+            totalRecords = 0;
+            List<ClientBE> list = new List<ClientBE>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionstring))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("usp_Client_BlockFetch", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("PageIndex", pageIndex);
+                cmd.Parameters.AddWithValue("PageSize", pageSize);
+                cmd.Parameters.Add("RecordCount", SqlDbType.Int, 8);
+                cmd.Parameters["RecordCount"].Direction = ParameterDirection.Output;
+                using (SqlDataReader sqlDataReader = cmd.ExecuteReader())
+                {
+                    while (sqlDataReader.Read())
+                    {
+                        list.Add(ToClientBE(sqlDataReader));
+                    }
+                }
+                if (cmd.Parameters["RecordCount"].Value != DBNull.Value)
+                {
+                    totalRecords = Convert.ToInt32(cmd.Parameters["RecordCount"].Value);
+                }
+            }
+            return list;
+        }
+
+        #endregion
+
         #region Project
 
         public static bool AddProject(ProjectBE o, out int id)
@@ -1106,11 +1158,25 @@ namespace HabitatManagement.Business
         }
 
 
+        private static ClientBE ToClientBE(SqlDataReader sqlDataReader)
+        {
+            ClientBE clientBE = new ClientBE();
+            clientBE.ID = Functions.ToInt(sqlDataReader["ID"]);
+            clientBE.Name = Functions.TrimRight(sqlDataReader["Name"]);
+          
+            return clientBE;
+        }
+
+
         private static void FromProjectBE(ref SqlCommand cmd, ProjectBE o)
         {
+            cmd.Parameters.AddWithValue("ClientID", o.ClientID);
             cmd.Parameters.AddWithValue("Project", o.Project);
+            cmd.Parameters.AddWithValue("ProjectName", o.ProjectName);
             cmd.Parameters.AddWithValue("Description", o.Description);
             cmd.Parameters.AddWithValue("Manager", o.Manager);
+            cmd.Parameters.AddWithValue("SiteAddress", o.SiteAddress);
+            cmd.Parameters.AddWithValue("SitePostcode", o.SitePostcode);            
             cmd.Parameters.AddWithValue("LastUpdatedDateTime", o.LastUpdatedDateTime);
             cmd.Parameters.AddWithValue("UpdatedBy", o.UpdatedBy);
         }
@@ -1119,13 +1185,21 @@ namespace HabitatManagement.Business
         {
             ProjectBE projectBE = new ProjectBE();
             projectBE.ID = Functions.ToInt(sqlDataReader["ID"]);
+            projectBE.ClientID = Functions.ToInt(sqlDataReader["ClientID"]);
             projectBE.Project = Functions.TrimRight(sqlDataReader["Project"]);
+            projectBE.ProjectName = Functions.TrimRight(sqlDataReader["ProjectName"]);
             projectBE.Description = Functions.TrimRight(sqlDataReader["Description"]);
             projectBE.Manager = Functions.TrimRight(sqlDataReader["Manager"]);
+            projectBE.SiteAddress = Functions.TrimRight(sqlDataReader["SiteAddress"]);
+            projectBE.SitePostcode = Functions.TrimRight(sqlDataReader["SitePostcode"]);
             projectBE.CreatedDateTime = Convert.ToDateTime(sqlDataReader["CreatedDateTime"]);
             projectBE.LastUpdatedDateTime = Convert.ToDateTime(sqlDataReader["LastUpdatedDateTime"]);
             projectBE.UpdatedBy = Functions.TrimRight(sqlDataReader["UpdatedBy"]);
             projectBE.CreatedBy = Functions.TrimRight(sqlDataReader["CreatedBy"]);
+
+            if (BusinessEntityHelper.ReaderHasColumn(sqlDataReader, "ClientName"))
+                projectBE.SetCustomData("ClientName", Functions.TrimRight(sqlDataReader["ClientName"]));
+
             return projectBE;
         }
 

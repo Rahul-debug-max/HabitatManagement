@@ -31,8 +31,12 @@ namespace HabitatManagement.Controllers
                 {
                     "ID",
                     "Project",
+                    "Project Name",
                     "Description",
                     "Manager Name",
+                    "Client",
+                    "Site Address",
+                    "Site Postcode",
                     "Created Date"
             };
                 return this.Json(new { columnNames });
@@ -68,8 +72,12 @@ namespace HabitatManagement.Controllers
                                               {
                                                   ID = o.ID,
                                                   Project = o.Project,
+                                                  ProjectName = o.ProjectName,
                                                   Description = o.Description,
                                                   Manager = o.Manager,
+                                                  Client = o.GetCustomDataValue<string>("ClientName"),
+                                                  SiteAddress = o.SiteAddress,
+                                                  SitePostcode = o.SitePostcode,                                                  
                                                   CreationDate = o.CreatedDateTime.ToString()
                                               }).ToList();
 
@@ -115,8 +123,17 @@ namespace HabitatManagement.Controllers
                     using (var response = await httpClient.GetAsync(webAPIURL))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
-                        List<SelectListItem> forms = JsonConvert.DeserializeObject<List<SelectListItem>>(apiResponse);
+                        List<SelectListItem> forms = JsonConvert.DeserializeObject<List<SelectListItem>>(apiResponse);                        
                         ViewData["FormList"] = forms;
+                    }
+
+                    webAPIURL = string.Format("{0}project/GetClient", url);
+
+                    using (var response = await httpClient.GetAsync(webAPIURL))
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        List<SelectListItem> client = JsonConvert.DeserializeObject<List<SelectListItem>>(apiResponse);
+                        ViewData["ClientList"] = client;
                     }
                 }
             }
@@ -146,14 +163,21 @@ namespace HabitatManagement.Controllers
                 project.LastUpdatedDateTime = DateTime.Now;
                 project.CreatedBy = "Habitat";
                 project.UpdatedBy = "Habitat";
+                project.ID = project.ID < 0 ? 0 : project.ID;
+                project.ClientID = project.ClientID < 0 ? 0 : project.ClientID;
                 success = FormLogic.AddProject(project, out id);
             }
             else
             {
                 project.Project = model.Project;
+                project.ProjectName = model.ProjectName;
                 project.Description = model.Description;
                 project.Manager = model.Manager;
+                project.SiteAddress = model.SiteAddress;
+                project.SitePostcode = model.SitePostcode;
+                project.ClientID = model.ClientID;
                 project.LastUpdatedDateTime = DateTime.Now;
+                project.ClientID = project.ClientID < 0 ? 0 : project.ClientID;
                 project.UpdatedBy = "Habitat";
                 success = FormLogic.UpdateProject(project);
             }

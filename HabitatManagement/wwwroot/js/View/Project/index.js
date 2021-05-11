@@ -163,9 +163,13 @@
             colNames: projectListColumnName,
             colModel: [
                 { key: false, name: 'id', index: 'id', search: false, hidden: true },
-                { key: false, name: 'project', index: 'project', search: false },                
-                { key: false, name: 'description', index: 'description', search: false },
+                { key: false, name: 'project', index: 'project', search: false },
+                { key: false, name: 'projectName', index: 'projectName', search: false, width: 300 },
+                { key: false, name: 'description', index: 'description', search: false, width: 300 },
                 { key: false, name: 'manager', index: 'manager', search: false },
+                { key: false, name: 'client', index: 'client', search: false }, 
+                { key: false, name: 'siteAddress', index: 'siteAddress', search: false, width: 300},
+                { key: false, name: 'sitePostcode', index: 'sitePostcode', search: false},
                 { key: false, name: 'creationDate', index: 'creationDate', search: false }
             ],
             pager: jQuery('#pagerProjectList'),

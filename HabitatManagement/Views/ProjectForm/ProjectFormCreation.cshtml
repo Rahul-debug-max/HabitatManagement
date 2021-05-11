@@ -17,7 +17,7 @@
 </style>
 
 <form id="FormFeedback" asp-controller="Form" asp-action="SaveFormFeedback">
-    <div class="container-fluid">
+    <div class="container-fluid p-0">
         <div class="form-group row col-lg-6" id="projectFormDiv">
             <label class="col-sm-2 text-left text-lg-right col-form-label" asp-for="FormID">Form</label>
             <div class="col-sm-10">
@@ -32,7 +32,7 @@
             </div>
         </div>
 
-        <div class="col-lg-12 dvFeedbackSection" style="display:none;">
+        <div class="dvFeedbackSection" style="display:none;">
             <div id="dvFormFeedback"></div>
         </div>
     </div>

@@ -201,7 +201,7 @@ namespace HabitatManagement.Business
                         sb.Append("</span>");
                         sb.Append("</div>");
                         sb.Append("</div>");
-                        sb.Append("<div class=\"col-lg-3 ml-lg-n5\">");
+                        sb.Append("<div class=\"col-lg-3 ml-lg-n3\">");
                         sb.Append("<div class=\"input-group time\" name=\"timepicker\" style=\"width:134px;\">");
                         if (RenderForDragnDrop)
                         {

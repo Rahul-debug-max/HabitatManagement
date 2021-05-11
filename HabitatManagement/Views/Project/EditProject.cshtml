@@ -4,23 +4,20 @@
     Layout = null;
 }
 
-<script type="text/javascript">
-    $(document).ready(function () {
-        $('#ProjectFormList').multiselects({
-            maxHeight: 300, //Scrolling view           
-            disableIfEmpty: true,
-            nonSelectedText: "Select Forms"
-        });
-    });
-</script>
-
 <form id="ProjectForm" asp-controller="Project" asp-action="EditProject">
     <div class="container-fluid">
         <div class="form-group mx-0 mx-lg-2 row">
-            <label class="col-lg-2 text-left text-lg-right col-form-label paddrght-none" asp-for="Project">Project</label>
+            <label class="col-lg-2 text-left text-lg-right col-form-label paddrght-none" asp-for="Project">Project Number</label>
             <div class="col-lg-10">
                 @Html.TextBox("Project", Model.Project, new { @class = "form-control", @maxlength = "60" })
                 <span asp-validation-for="Project" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group mx-0 mx-lg-2 row">
+            <label class="col-lg-2 text-left text-lg-right col-form-label paddrght-none" asp-for="ProjectName">Project Name</label>
+            <div class="col-lg-10">
+                @Html.TextBox("ProjectName", Model.ProjectName, new { @class = "form-control" })
+                <span asp-validation-for="ProjectName" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group mx-0 mx-lg-2 row">
@@ -38,13 +35,44 @@
             </div>
         </div>
         <div class="form-group mx-0 mx-lg-2 row">
-            <label class="col-lg-2 text-left text-lg-right col-form-label paddrght-none">Forms</label>
+            <label class="col-lg-2 text-left text-lg-right col-form-label paddrght-none" asp-for="SiteAddress">Site Address</label>
             <div class="col-lg-10">
-                <select asp-for="ProjectFormList" asp-items="@ViewBag.FormList" multiple="multiple"></select>
+                @Html.TextBox("SiteAddress", Model.SiteAddress, new { @class = "form-control", @maxlength = "256" })
+            </div>
+        </div>
+        <div class="form-group mx-0 mx-lg-2 row">
+            <label class="col-lg-2 text-left text-lg-right col-form-label paddrght-none" asp-for="SitePostcode">Site Postcode</label>
+            <div class="col-lg-6">
+                @Html.TextBox("SitePostcode", Model.SitePostcode, new { @class = "form-control", @maxlength = "60" })
+            </div>
+        </div>
+        <div class="form-group mx-0 mx-lg-2 row">
+            <label class="col-lg-2 text-left text-lg-right col-form-label paddrght-none" asp-for="ClientID">Client</label>
+            <div class="col-lg-6">
+                <select asp-for="ClientID" asp-items="@ViewBag.ClientList" class="custom-select"></select>
+            </div>
+        </div>
+        <div class="form-group mx-0 mx-lg-2 row">
+            <label class="col-lg-2 text-left text-lg-right col-form-label paddrght-none">Forms</label>
+            <div class="col-lg-6">
+                <select asp-for="ProjectFormList" asp-items="@ViewBag.FormList" multiple="multiple" required></select>
             </div>
         </div>
 
         @Html.HiddenFor(m => m.ID)
     </div>
 </form>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#ProjectFormList').multiselect({
+            buttonContainer: '<div class="btn-group col-lg-6 paddlftrght-none" />',
+            includeSelectAllOption: true,
+            selectedClass: "active multiselect-active-item-fallback",
+            maxHeight: 300, //Scrolling view
+            disableIfEmpty: true,
+            nonSelectedText: "Select Forms"
+        });
+    });
+</script>
 
