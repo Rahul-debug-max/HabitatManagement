@@ -169,8 +169,7 @@
             data: { data: JSON.stringify(data), surrogate: $('#FormFeedback #Surrogate').val(), projectID: defaults.projectId },
             dataType: 'Json',
             traditional: true,
-            success: function (result) {
-                debugger;
+            success: function (result) {             
                 if (result != null && !result) {
                     alert('Unable to save. Please contact administrator.');
                     return;

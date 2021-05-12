@@ -17,7 +17,7 @@ namespace HabitatManagement.Business
         Signature = 7,
         TextArea = 8,
         CheckList = 9,
-        Table = 10,
+        //Table = 10,
         // Email = 11,
         // Image = 12,
         Label = 13,

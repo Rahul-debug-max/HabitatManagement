@@ -839,12 +839,12 @@ namespace HabitatManagement.Business
                     cmd.Parameters.AddWithValue("ProjectId", projectId);
                     cmd.Parameters.AddWithValue("FormIds", formIds ?? string.Empty);
                     cmd.ExecuteNonQuery();
-                }                
+                }
             }
             catch
             {
                 success = false;
-            }            
+            }
             return success;
         }
 
@@ -1034,8 +1034,7 @@ namespace HabitatManagement.Business
             cmd.Parameters.AddWithValue("ReferenceNumber", o.ReferenceNumber);
             cmd.Parameters.AddWithValue("FormID", o.FormID);
             cmd.Parameters.AddWithValue("Field", o.Field);
-            cmd.Parameters.AddWithValue("FieldValue", o.FieldValue);
-            cmd.Parameters.AddWithValue("CreationDate", o.CreationDate);
+            cmd.Parameters.AddWithValue("FieldValue", o.FieldValue);           
         }
 
         private static TemplateFormSectionBE ToTemplateFormSectionBE(SqlDataReader rdr)
@@ -1085,8 +1084,8 @@ namespace HabitatManagement.Business
             o.UserID = Convert.ToString(rdr["UserID"]);
             o.Blob = rdr["Blob"] != DBNull.Value ? (byte[])(rdr["Blob"]) : null;
             o.DigitalSignatoryTypeSurrogate = Convert.ToInt32(rdr["DigitalSignatoryTypeSurrogate"]);
-            o.CreationDateTime = Convert.ToDateTime(rdr["CreationDateTime"]);
-            o.LastUpdatedDate = Convert.ToDateTime(rdr["LastUpdatedDate"]);
+            o.CreationDateTime = Functions.ToDateTime(rdr["CreationDateTime"]);
+            o.LastUpdatedDate = Functions.ToDateTime(rdr["LastUpdatedDate"]);
 
             return o;
         }
@@ -1138,8 +1137,8 @@ namespace HabitatManagement.Business
             designTemplate.Design = Convert.ToString(sqlDataReader["Design"]);
             designTemplate.Description = Convert.ToString(sqlDataReader["Description"]);
             designTemplate.Active = Convert.ToBoolean(sqlDataReader["Active"]);
-            designTemplate.CreatedDateTime = Convert.ToDateTime(sqlDataReader["CreatedDateTime"]);
-            designTemplate.LastUpdatedDateTime = Convert.ToDateTime(sqlDataReader["LastUpdatedDateTime"]);
+            designTemplate.CreatedDateTime = Functions.ToDateTime(sqlDataReader["CreatedDateTime"]);
+            designTemplate.LastUpdatedDateTime = Functions.ToDateTime(sqlDataReader["LastUpdatedDateTime"]);
             designTemplate.UpdatedBy = Convert.ToString(sqlDataReader["UpdatedBy"]);
             designTemplate.CreatedBy = Convert.ToString(sqlDataReader["CreatedBy"]);
             return designTemplate;
@@ -1163,7 +1162,7 @@ namespace HabitatManagement.Business
             ClientBE clientBE = new ClientBE();
             clientBE.ID = Functions.ToInt(sqlDataReader["ID"]);
             clientBE.Name = Functions.TrimRight(sqlDataReader["Name"]);
-          
+
             return clientBE;
         }
 
@@ -1176,7 +1175,7 @@ namespace HabitatManagement.Business
             cmd.Parameters.AddWithValue("Description", o.Description);
             cmd.Parameters.AddWithValue("Manager", o.Manager);
             cmd.Parameters.AddWithValue("SiteAddress", o.SiteAddress);
-            cmd.Parameters.AddWithValue("SitePostcode", o.SitePostcode);            
+            cmd.Parameters.AddWithValue("SitePostcode", o.SitePostcode);
             cmd.Parameters.AddWithValue("LastUpdatedDateTime", o.LastUpdatedDateTime);
             cmd.Parameters.AddWithValue("UpdatedBy", o.UpdatedBy);
         }
@@ -1192,8 +1191,8 @@ namespace HabitatManagement.Business
             projectBE.Manager = Functions.TrimRight(sqlDataReader["Manager"]);
             projectBE.SiteAddress = Functions.TrimRight(sqlDataReader["SiteAddress"]);
             projectBE.SitePostcode = Functions.TrimRight(sqlDataReader["SitePostcode"]);
-            projectBE.CreatedDateTime = Convert.ToDateTime(sqlDataReader["CreatedDateTime"]);
-            projectBE.LastUpdatedDateTime = Convert.ToDateTime(sqlDataReader["LastUpdatedDateTime"]);
+            projectBE.CreatedDateTime = Functions.ToDateTime(sqlDataReader["CreatedDateTime"]);
+            projectBE.LastUpdatedDateTime = Functions.ToDateTime(sqlDataReader["LastUpdatedDateTime"]);
             projectBE.UpdatedBy = Functions.TrimRight(sqlDataReader["UpdatedBy"]);
             projectBE.CreatedBy = Functions.TrimRight(sqlDataReader["CreatedBy"]);
 
@@ -1228,8 +1227,8 @@ namespace HabitatManagement.Business
             submittedFormBE.ProjectId = Functions.ToInt(sqlDataReader["ProjectId"]);
             submittedFormBE.FormId = Functions.ToInt(sqlDataReader["FormId"]);
             submittedFormBE.Status = (SubmittedFormStatusField)Functions.ToInt(sqlDataReader["Status"]);
-            submittedFormBE.CreatedDateTime = Convert.ToDateTime(sqlDataReader["CreatedDateTime"]);
-            submittedFormBE.LastUpdatedDateTime = Convert.ToDateTime(sqlDataReader["LastUpdatedDateTime"]);
+            submittedFormBE.CreatedDateTime = Functions.ToDateTime(sqlDataReader["CreatedDateTime"]);
+            submittedFormBE.LastUpdatedDateTime = Functions.ToDateTime(sqlDataReader["LastUpdatedDateTime"]);
             submittedFormBE.UpdatedBy = Functions.TrimRight(sqlDataReader["UpdatedBy"]);
             submittedFormBE.CreatedBy = Functions.TrimRight(sqlDataReader["CreatedBy"]);
 

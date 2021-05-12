@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace HabitatManagement.WebAPI.Controllers
 {
@@ -71,71 +72,77 @@ namespace HabitatManagement.WebAPI.Controllers
             bool success = true;
             try
             {
-                List<TemplateFormFieldDataBE> templateFormFieldDatas = JsonConvert.DeserializeObject<List<TemplateFormFieldDataBE>>(data);
-                if (templateFormFieldDatas != null)
+                using (var scope = new TransactionScope())
                 {
-                    int referenceNumber = Functions.ToInt(Request.Form["surrogate"]);
-                    int projectID = Functions.ToInt(Request.Form["projectID"]);
-                    int formID = templateFormFieldDatas.Select(m => m.FormID).Distinct().FirstOrDefault();
-                    if (referenceNumber <= 0)
+                    List<TemplateFormFieldDataBE> templateFormFieldDatas = JsonConvert.DeserializeObject<List<TemplateFormFieldDataBE>>(data);
+                    if (templateFormFieldDatas != null)
                     {
-                        SubmittedFormBE submittedForm = new SubmittedFormBE();
-                        submittedForm.ProjectId = projectID;
-                        submittedForm.FormId = formID;
-                        submittedForm.Status = SubmittedFormStatusField.Submitted;
-                        submittedForm.CreatedDateTime = DateTime.Now;
-                        submittedForm.LastUpdatedDateTime = DateTime.Now;
-                        submittedForm.CreatedBy = "RSK";
-                        submittedForm.UpdatedBy = "RSK";
-                        success = FormLogic.AddSubmittedForm(submittedForm, out referenceNumber);                 
-                        templateFormFieldDatas.ForEach(m => m.ReferenceNumber = referenceNumber);
-                        templateFormFieldDatas.ForEach(m => m.CreationDate = submittedForm.CreatedDateTime);
-                    }
-                    else
-                    {
-                        templateFormFieldDatas.ForEach(m => m.ReferenceNumber = referenceNumber);
-                        List<TemplateFormFieldDataBE> templateFormFieldDataValue = FormLogic.FetchAllTemplateFormFieldData(formID, referenceNumber);   
-                        if(templateFormFieldDataValue != null && templateFormFieldDataValue.Count > 0)
+                        int referenceNumber = Functions.ToInt(Request.Form["surrogate"]);
+                        int projectID = Functions.ToInt(Request.Form["projectID"]);
+                        int formID = templateFormFieldDatas.Select(m => m.FormID).Distinct().FirstOrDefault();
+                        if (referenceNumber <= 0)
                         {
-                            templateFormFieldDatas.ForEach(m => m.CreationDate = templateFormFieldDataValue[0].CreationDate);
-                        }  
-                    }
-                    foreach (var templateFormFieldDataBE in templateFormFieldDatas)
-                    {
-                        string digitalSignatureImage64BitString = templateFormFieldDataBE.DigitalSignatureImage64BitString;
-                        string signatureID = templateFormFieldDataBE.FieldValue;
-                        if (templateFormFieldDataBE.FieldType == FormFieldType.Signature.ToString())
-                        {
-                            int digitalSignatureSurrogate = 0;
-                            DigitalSignatureBE digitalSignature = FormLogic.FetchDigitalSignature(Functions.ToInt(signatureID));
-                            if (digitalSignature != null)
-                            {
-                                digitalSignature.DigitalSignatureImage64BitString = digitalSignatureImage64BitString ?? string.Empty;
-                                digitalSignature.LastUpdatedDate = DateTime.Now;
-                                FormLogic.UpdateDigitalSignature(digitalSignature);
-                            }
-                            else if (!string.IsNullOrWhiteSpace(digitalSignatureImage64BitString))
-                            {
-                                digitalSignature = new DigitalSignatureBE();
-                                digitalSignature.CreationDateTime = DateTime.Now;
-                                digitalSignature.LastUpdatedDate = DateTime.Now;
-                                digitalSignature.DigitalSignatureImage64BitString = digitalSignatureImage64BitString ?? string.Empty;
-                                FormLogic.AddDigitalSignature(digitalSignature, out digitalSignatureSurrogate);
-                            }
-                            if (digitalSignatureSurrogate > 0)
-                            {
-                                templateFormFieldDataBE.FieldValue = digitalSignatureSurrogate.ToString();
-                            }
+                            SubmittedFormBE submittedForm = new SubmittedFormBE();
+                            submittedForm.ProjectId = projectID;
+                            submittedForm.FormId = formID;
+                            submittedForm.Status = SubmittedFormStatusField.Submitted;
+                            submittedForm.CreatedDateTime = DateTime.Now;
+                            submittedForm.LastUpdatedDateTime = DateTime.Now;
+                            submittedForm.CreatedBy = "RSK";
+                            submittedForm.UpdatedBy = "RSK";
+                            success = FormLogic.AddSubmittedForm(submittedForm, out referenceNumber);
+                            templateFormFieldDatas.ForEach(m => m.ReferenceNumber = referenceNumber);                            
                         }
+                        else
+                        {
+                            templateFormFieldDatas.ForEach(m => m.ReferenceNumber = referenceNumber);
+                            List<TemplateFormFieldDataBE> templateFormFieldDataValue = FormLogic.FetchAllTemplateFormFieldData(formID, referenceNumber);                            
+                        }
+                        if (success)
+                        {
+                            foreach (var templateFormFieldDataBE in templateFormFieldDatas)
+                            {
+                                string digitalSignatureImage64BitString = templateFormFieldDataBE.DigitalSignatureImage64BitString;
+                                string signatureID = templateFormFieldDataBE.FieldValue;
+                                if (templateFormFieldDataBE.FieldType == FormFieldType.Signature.ToString())
+                                {
+                                    int digitalSignatureSurrogate = 0;
+                                    DigitalSignatureBE digitalSignature = FormLogic.FetchDigitalSignature(Functions.ToInt(signatureID));
+                                    if (digitalSignature != null)
+                                    {
+                                        digitalSignature.DigitalSignatureImage64BitString = digitalSignatureImage64BitString ?? string.Empty;
+                                        digitalSignature.LastUpdatedDate = DateTime.Now;
+                                        FormLogic.UpdateDigitalSignature(digitalSignature);
+                                    }
+                                    else if (!string.IsNullOrWhiteSpace(digitalSignatureImage64BitString))
+                                    {
+                                        digitalSignature = new DigitalSignatureBE();
+                                        digitalSignature.CreationDateTime = DateTime.Now;
+                                        digitalSignature.LastUpdatedDate = DateTime.Now;
+                                        digitalSignature.DigitalSignatureImage64BitString = digitalSignatureImage64BitString ?? string.Empty;
+                                        FormLogic.AddDigitalSignature(digitalSignature, out digitalSignatureSurrogate);
+                                    }
+                                    if (digitalSignatureSurrogate > 0)
+                                    {
+                                        templateFormFieldDataBE.FieldValue = digitalSignatureSurrogate.ToString();
+                                    }
+                                }
 
-                        if (templateFormFieldDataBE.FormID > 0 && templateFormFieldDataBE.Field > 0)
-                        {
-                            success = FormLogic.SaveTemplateFormFieldData(templateFormFieldDataBE);
+                                if (templateFormFieldDataBE.FormID > 0 && templateFormFieldDataBE.Field > 0)
+                                {
+                                    success = FormLogic.SaveTemplateFormFieldData(templateFormFieldDataBE);
+                                }
+                            }
                         }
                     }
+
+                    if (success)
+                    {
+                        scope.Complete();
+                    }                   
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 success = false;
             }

@@ -974,7 +974,6 @@ CREATE PROCEDURE [dbo].[usp_TemplateFormFieldData_Update]
     @FormID INT,      
     @Field INT,      
     @FieldValue NVARCHAR(max),
-	@CreationDate datetime,
     @ErrorOccured BIT OUTPUT      
 )      
 AS    
@@ -990,8 +989,8 @@ BEGIN
 	END
 	ELSE 
 	BEGIN
-		INSERT INTO TemplateFormFieldData (ReferenceNumber,FormID, Field, FieldValue,CreationDate)      
-		SELECT @ReferenceNumber, @FormID, @Field, @FieldValue,@CreationDate
+		INSERT INTO TemplateFormFieldData (ReferenceNumber,FormID, Field, FieldValue)      
+		SELECT @ReferenceNumber, @FormID, @Field, @FieldValue
 	END
 
 	COMMIT Transaction trans      

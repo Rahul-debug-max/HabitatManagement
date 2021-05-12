@@ -96,9 +96,9 @@ namespace HabitatManagement.Business
             {
                 switch (field.FieldType)
                 {
-                    case FormFieldType.Table:
-                        sb.Append(TableHtml(field));
-                        break;
+                    //case FormFieldType.Table:
+                    //    sb.Append(TableHtml(field));
+                    //    break;
                     case FormFieldType.Checkbox:
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
                         sb.AppendFormat("<div class=\"form-group mx-0 mx-lg-2 row\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
@@ -106,8 +106,8 @@ namespace HabitatManagement.Business
                         sb.Append("<div class=\"col-lg-8 formFieldTypeCheckbox\" style=\"padding-top:7px;\">");
                         if (RenderForDragnDrop)
                         {
-                            sb.AppendFormat("<div class=\"custom-control custom-checkbox d-inline-flex ml-2\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"yes\" name=\"{0}\" disabled>  <label class=\"custom-control-label\">Yes</label>", field.Field);
-                            sb.AppendFormat("<div class=\"custom-control custom-checkbox d-inline-flex ml-2\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"no\" name=\"{0}\" disabled> <label class=\"custom-control-label\">No</label>", field.Field);
+                            sb.AppendFormat("<div class=\"custom-control custom-checkbox d-inline-flex ml-2\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"yes\" name=\"{0}\" disabled>  <label class=\"custom-control-label\">Yes</label></div>", field.Field);
+                            sb.AppendFormat("<div class=\"custom-control custom-checkbox d-inline-flex ml-2\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"no\" name=\"{0}\" disabled> <label class=\"custom-control-label\">No</label></div>", field.Field);
                         }
                         else
                         {
@@ -186,7 +186,7 @@ namespace HabitatManagement.Business
                         bool success = DateTime.TryParse(_templateFormFieldData?.FieldValue, out dateAndTime);
                         sb.AppendFormat("<div class=\"form-group mx-0 mx-lg-2 row\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
                         sb.AppendFormat("<label class=\"col-lg-4 text-left text-lg-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
-                        sb.Append("<div class=\"col-lg-3\">");
+                        sb.Append("<div class=\"col-sm-3\">");
                         sb.AppendFormat("<div class=\"input-group date pl-0\" name=\"datetimepicker\">");
                         if (RenderForDragnDrop)
                         {
@@ -201,7 +201,7 @@ namespace HabitatManagement.Business
                         sb.Append("</span>");
                         sb.Append("</div>");
                         sb.Append("</div>");
-                        sb.Append("<div class=\"col-lg-3 ml-lg-n3\">");
+                        sb.Append("<div class=\"col-sm-3 ml-lg-n3\">");
                         sb.Append("<div class=\"input-group time\" name=\"timepicker\" style=\"width:134px;\">");
                         if (RenderForDragnDrop)
                         {

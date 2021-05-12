@@ -4,7 +4,7 @@
 @{
     Layout = null;
 }
-<script src="~/js/View/editFormField.js"></script>
+@*<script src="~/js/View/editFormField.js"></script>
 
 <script type="text/javascript">
     $(function () {
@@ -12,8 +12,8 @@
             tableFieldType: @Html.Raw((int)FormFieldType.Table)
         });
     });
-</script>
-<style>
+</script>*@
+@*<style>
     .tableType td, .tableType th {
         border: 1px solid black;
         padding: 3px 10px 3px 15px;
@@ -23,7 +23,7 @@
         width: 100%;
         border-collapse: collapse;
     }
-</style>
+</style>*@
 
 <form id="PermitFormField" asp-controller="Home" asp-action="PermitFormField">
     <div class="container-fluid">
@@ -48,7 +48,7 @@
             </div>
         </div>
 
-        <div id="tblFieldTypeSection" style="display:none;">
+        @*<div id="tblFieldTypeSection" style="display:none;">
             <div class="form-group mx-0 mx-lg-2 row">
                 <label class="col-sm-3 text-left text-lg-right col-form-label paddrght-none" asp-for="TableRowCount" id="lbTableRowCount">Table Row Count</label>
                 <div class="col-sm-9">
@@ -68,7 +68,7 @@
             </div>
 
             <div id="dvTable"></div>
-        </div>
+        </div>*@
 
         @Html.HiddenFor(m => m.FormID)
         @Html.HiddenFor(m => m.Sequence)
