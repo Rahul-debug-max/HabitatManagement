@@ -186,7 +186,7 @@ namespace HabitatManagement.Controllers
             if (success)
             {
                 int projectID = model.ID > 0 ? model.ID : id;
-                success = FormLogic.SaveProjectForm(projectID, string.Join(',', model.ProjectFormList));
+                success = FormLogic.SaveProjectForm(projectID, model.ProjectFormList != null ? string.Join(',', model.ProjectFormList) : string.Empty);
             }
 
             return Json(new { success, id });

@@ -140,7 +140,7 @@ namespace HabitatManagement.Controllers
             {
                 formDesignTemplate = new FormDesignTemplateBE();
             }
-            formDesignTemplate.Design = model.Design.ToUpper();
+            formDesignTemplate.Design = model.Design != null ? model.Design.ToUpper() : string.Empty;
             formDesignTemplate.Description = model.Description;
             formDesignTemplate.Active = model.Active;
 

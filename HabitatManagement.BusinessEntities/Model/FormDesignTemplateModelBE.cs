@@ -271,16 +271,16 @@ namespace HabitatManagement.Business
                                     if (RenderForDragnDrop)
                                     {
                                         sb.AppendFormat("<tr> <td> {0} </td>", formDesignTemplateDetail.FieldName);
-                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"><div class=\"custom-control custom-checkbox\"><input type=\"checkbox\" class=\"custom-control-input\" name=\"checkListEntityType\" disabled><span class=\"custom-control-label\"></span></div></td>");
-                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"><div class=\"custom-control custom-checkbox\"><input type=\"checkbox\" class=\"custom-control-input\" name=\"checkListEntityType\" disabled><span class=\"custom-control-label\"></span></div></td>");
+                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"><div class=\"custom-control custom-checkbox\"><input type=\"checkbox\" class=\"custom-control-input\" name=\"checkListEntityType\" disabled><label class=\"custom-control-label\"></label></div></td>");
+                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"><div class=\"custom-control custom-checkbox\"><input type=\"checkbox\" class=\"custom-control-input\" name=\"checkListEntityType\" disabled><label class=\"custom-control-label\"></label></div></td>");
                                         sb.Append("</tr>");
                                     }
                                     else
                                     {
                                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == formDesignTemplateDetail.Field).FirstOrDefault();
                                         sb.AppendFormat("<tr class=\"checkListTR\"> <td data-field = \"{1}\"> {0} </td>", formDesignTemplateDetail.FieldName, formDesignTemplateDetail.Field);
-                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"><div class=\"custom-control custom-checkbox\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"yes\" name=\"{1}\" {0}><span class=\"custom-control-label\"></span></div></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "", formDesignTemplateDetail.Field);
-                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <div class=\"custom-control custom-checkbox\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"no\" name=\"{1}\" {0}><span class=\"custom-control-label\"></span></div></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && !Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "", formDesignTemplateDetail.Field);
+                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"><div class=\"custom-control custom-checkbox\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"yes\" name=\"{1}\" {0}><label class=\"custom-control-label\"></label></div></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "", formDesignTemplateDetail.Field);
+                                        sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <div class=\"custom-control custom-checkbox\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"no\" name=\"{1}\" {0}><label class=\"custom-control-label\"></label></div></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && !Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "", formDesignTemplateDetail.Field);
                                         sb.Append("</tr>");
                                     }
                                 }

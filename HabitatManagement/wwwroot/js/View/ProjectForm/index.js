@@ -170,6 +170,7 @@
             dataType: 'Json',
             traditional: true,
             success: function (result) {
+                debugger;
                 if (result != null && !result) {
                     alert('Unable to save. Please contact administrator.');
                     return;
