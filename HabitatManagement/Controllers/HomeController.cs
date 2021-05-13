@@ -204,6 +204,9 @@ namespace HabitatManagement.Controllers
                 model = new TemplateFormSectionBE();
             }
 
+            System.Drawing.Color colorCode = System.Drawing.Color.FromArgb(model.BackgroundColor > 0 ? model.BackgroundColor : 33554431);
+            model.ColourCode = string.Format("rgba({0},{1},{2},{3})", colorCode.R, colorCode.G, colorCode.B, colorCode.A);
+
             return View(model);
         }
 
@@ -222,6 +225,7 @@ namespace HabitatManagement.Controllers
             templateFormSection.FormID = model.FormID;
             templateFormSection.Section = model.Section.ToUpper();
             templateFormSection.Description = model.Description;
+            templateFormSection.BackgroundColor = model.BackgroundColor;
             if (!sectionExist)
             {
                 success = FormLogic.AddTemplateFormSection(templateFormSection);

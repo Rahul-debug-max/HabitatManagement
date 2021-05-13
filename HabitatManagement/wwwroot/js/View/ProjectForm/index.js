@@ -176,11 +176,11 @@
             else if (fieldType == defaults.textAreaFieldType) {
                 fieldValue = $(obj).find('textarea[name^=' + field + ']').val();
             }
-            if (fieldType != defaults.checkListFieldType) {
+            if (fieldType != defaults.checkListFieldType) {               
                 data.push({
                     FormID: $('.projectFormCreation').val(),
                     Field: field,
-                    FieldValue: fieldValue.trim(),
+                    FieldValue: (fieldValue != null && fieldValue != undefined && !($.isNumeric(fieldValue))) ? fieldValue.trim() : fieldValue,                    
                     DigitalSignatureImage64BitString: digitalSignatureImage64BitString,
                     FieldType: fieldType == defaults.signatureFieldType ? defaults.signatureField : ''
                 });

@@ -30,6 +30,8 @@ namespace HabitatManagement.Business
 
         public int TableRowCount { get; set; }
 
+        public int BackgroundColor { get; set; }
+
 
     }
 }

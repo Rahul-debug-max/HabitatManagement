@@ -5,6 +5,8 @@
     Layout = null;
 }
 
+<link href="~/js/colorpicker-master/css/evol-colorpicker.css" rel="stylesheet" />
+<script src="~/js/colorpicker-master/js/evol-colorpicker-modified.js"></script>
 <form id="TemplateSectionForm" asp-controller="Home" asp-action="TemplateSection">
     <div class="container-fluid">
         <div class="form-group mx-0 mx-lg-2 row">
@@ -16,7 +18,7 @@
                 }
                 else
                 {
-                    @Html.TextBox("Section", Model.Section, new { @class = "form-control uppercaseTextBox"})
+                    @Html.TextBox("Section", Model.Section, new { @class = "form-control uppercaseTextBox" })
                 }
             </div>
         </div>
@@ -26,6 +28,44 @@
                 @Html.TextAreaFor(m => m.Description, new { @class = "form-control textAreaVerticalResizing", @rows = 6 })
             </div>
         </div>
+        <div class="form-group mx-0 mx-lg-2 row">
+            <label class="col-sm-2 text-left text-lg-right col-form-label paddrght-none" asp-for="ColourCode">Background Color</label>
+            <div id="dvColourCode" class="col-sm-5 evo-cp-wrap input-group colorpicker-component colorpicker-element">
+                @Html.TextBoxFor(m => m.ColourCode, new { @class = "form-control" })
+                <div class="input-group-append">
+                    <span class="input-group-text"><i class="colorpicker-addon"></i></span>
+                </div>
+        </div>
         @Html.HiddenFor(m => m.FormID)
+        @Html.HiddenFor(m => m.BackgroundColor)
     </div>
 </form>
+
+<script type="text/javascript">
+    $(function () {
+        var color = null;
+        @if (!string.IsNullOrWhiteSpace(Model.ColourCode)) {
+            @: color = rgbToHex('@Model.ColourCode.Trim()');
+        }
+
+            $('#ColourCode').colorpicker({
+                defaultPalette: 'web',
+                showOn: 'button',
+                color: color,
+                defaultColor: "#ffffff"
+            });
+    });
+    function rgbToHex(rgb) {
+
+        rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+        if (rgb != null) {
+            return (rgb && rgb.length === 4) ? "#" +
+                ("0" + parseInt(rgb[1], 10).toString(16)).slice(-2) +
+                ("0" + parseInt(rgb[2], 10).toString(16)).slice(-2) +
+                ("0" + parseInt(rgb[3], 10).toString(16)).slice(-2) : '';
+        }
+        else {
+            return "";
+        }
+    }
+</script>

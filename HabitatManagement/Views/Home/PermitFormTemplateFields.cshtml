@@ -19,10 +19,6 @@
         font-weight: bold;
     }
 
-    /*    .bgLightGray {
-        background-color: lightgray;
-    }*/
-
     .conditionDigitalSignature canvas {
         height: 97px !important;
         background-color: white !important;
@@ -266,14 +262,13 @@
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddlftrght-none xspaddrght dvFormFeedbackData">
     @if (!Model.RenderForDragnDrop)
     {
-    <ul style="color:red; padding-left:17px;display:none;" class="formErrorMessage">
+    <ul style="color:red; display:none;" class="formErrorMessage mb-2 pl-3">
         <li>
             <span class="text-danger field-validation-error" data-valmsg-for="Form" data-valmsg-replace="true">
-                <span for="Form" generated="true" class="">Please fill the form</span>
+                <span for="Form" generated="true" class="">Fill the form</span>
             </span>
         </li>
     </ul>
-
     }
     @Html.Raw(Model.HtmlForm)
 </div>

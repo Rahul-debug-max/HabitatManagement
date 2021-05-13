@@ -68,6 +68,16 @@ body {
     cursor: pointer;
 }
 
+.form-group {
+    margin-bottom: 6px;
+}
+
+.evo-pop {
+    top: 38px !important;
+    left: 15px !important;
+    width: 93% !important;
+}  
+
 @keyframes spin {
     0% {
         transform: rotate(360deg);
@@ -3652,7 +3662,7 @@ td.bgcolbordernone {
     left: 0px !important;
 }
 
-.colorpicker-element .add-on i, .colorpicker-element .input-group-addon i {
+.colorpicker-element .add-on i, .colorpicker-element .input-group-text i {
     display: inline-block;
     cursor: pointer;
     height: 16px;

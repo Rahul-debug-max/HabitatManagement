@@ -180,8 +180,10 @@
         }
     }
 
-    var saveSectionDetail = function (dialogID) {
-
+    var saveSectionDetail = function (dialogID) {       
+        var rgb = $("#ColourCode").colorpicker("HexToRGB");
+        var colour = rgb ? ((rgb.a << 24) | (rgb.r << 16) | (rgb.g << 8) | (rgb.b << 0)) : 0;
+        $("#BackgroundColor").val(colour);
         var ajx = $.ajax({
             type: 'POST',
             cache: false,

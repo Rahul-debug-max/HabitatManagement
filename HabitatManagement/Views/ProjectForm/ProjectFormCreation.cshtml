@@ -23,11 +23,11 @@
             <div class="col-sm-10">
                 @if (Model.Surrogate > 0)
                 {
-                <select asp-for="FormID" asp-items="@ViewBag.FormList" readonly="readonly" class="custom-select projectFormCreation"></select>
+                    <select asp-for="FormID" asp-items="@ViewBag.FormList" readonly="readonly" class="custom-select projectFormCreation"></select>
                 }
                 else
                 {
-                <select asp-for="FormID" asp-items="@ViewBag.FormList" class="custom-select projectFormCreation"></select>
+                    <select asp-for="FormID" asp-items="@ViewBag.FormList" class="custom-select projectFormCreation"></select>
                 }
             </div>
         </div>
@@ -36,7 +36,7 @@
             <div id="dvFormFeedback"></div>
         </div>
     </div>
-    @Html.HiddenFor(m => m.Surrogate)
+    @Html.HiddenFor(m => m.Surrogate)    
 </form>
 
 <script type="text/javascript">
