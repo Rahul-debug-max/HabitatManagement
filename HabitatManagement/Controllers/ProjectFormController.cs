@@ -79,6 +79,7 @@ namespace HabitatManagement.Controllers
                     "Reference Number",
                     "Design",
                     "Description",
+                    "Status",
                     "Created Date"
             };
                 return this.Json(new { columnNames });
@@ -116,6 +117,7 @@ namespace HabitatManagement.Controllers
                                                   FormSurrogate = obj.FormId.ToString(),
                                                   Design = obj.GetCustomDataValue<string>("Design"),
                                                   Description = obj.GetCustomDataValue<string>("DesignDescription"),
+                                                  FormStatus = obj.Status.ToString(),
                                                   CreationDate = obj.CreatedDateTime.ToString()
                                               }).ToList();
 
@@ -182,6 +184,8 @@ namespace HabitatManagement.Controllers
         public string Design { get; set; }
 
         public string Description { get; set; }
+
+        public string FormStatus { get; set; }
 
     }
 }

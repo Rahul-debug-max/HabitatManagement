@@ -8,8 +8,7 @@ namespace HabitatManagement.Business
 {
     public enum SubmittedFormStatusField
     {
-        Submitted = 1,
-        Approved = 2,
-        Completed = 3,  // Form not edit
+        InProgress = 1,        
+        Completed = 2,  // Form not edit
     }
 }

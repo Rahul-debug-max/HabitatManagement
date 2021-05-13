@@ -226,6 +226,7 @@
                 { key: false, name: 'surrogate', index: 'surrogate', search: false },
                 { key: false, name: 'design', index: 'design', search: false },
                 { key: false, name: 'description', index: 'description', search: false },
+                { key: false, name: 'formStatus', index: 'formStatus', search: false },
                 { key: false, name: 'creationDate', index: 'creationDate', search: false }
             ],
             pager: jQuery('#pagerProjectFormList'),
