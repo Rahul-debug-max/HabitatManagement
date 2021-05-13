@@ -259,12 +259,12 @@
                         dialogButtons.DetailBtn.click = value.onClick;
                     }
                     buttons.push(dialogButtons.DetailBtn);
+                    break;
                 case 'complete':
                     if (typeof (value.onClick) == 'function') {
                         dialogButtons.CompleteBtn.click = value.onClick;
                     }
                     buttons.push(dialogButtons.CompleteBtn);
-                    break;
                     break;
             }
         });
