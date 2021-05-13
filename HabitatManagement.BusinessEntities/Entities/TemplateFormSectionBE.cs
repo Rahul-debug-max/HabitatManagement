@@ -13,6 +13,9 @@ namespace HabitatManagement.Business
         [MaxFieldLength(20)]
         public string Section { get; set; }
         public string Description { get; set; }
+
+        public string BackgroundColor { get; set; }
+
         public int Sequence { get; set; }
     }
 }

@@ -135,8 +135,17 @@ CREATE TABLE [dbo].TemplateFormSection(
 	[FormID] [int] NOT NULL,
 	[Section] [nvarchar](20) NOT NULL,
 	[Description] [nvarchar](max) NOT NULL,
+	[BackgroundColor] nvarchar(10) NULL,
 	[Sequence] [int] NULL
 )
+END
+ELSE
+BEGIN
+	IF (COL_LENGTH('[dbo].[TemplateFormSection]','BackgroundColor') IS NULL)	
+	BEGIN
+		ALTER TABLE [dbo].[TemplateFormSection]
+		ADD [BackgroundColor] nvarchar(10) NULL
+	END
 END
 GO
 

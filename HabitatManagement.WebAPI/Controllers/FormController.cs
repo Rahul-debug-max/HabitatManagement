@@ -85,7 +85,7 @@ namespace HabitatManagement.WebAPI.Controllers
                             SubmittedFormBE submittedForm = new SubmittedFormBE();
                             submittedForm.ProjectId = projectID;
                             submittedForm.FormId = formID;
-                            submittedForm.Status = SubmittedFormStatusField.Submitted;
+                            submittedForm.Status = SubmittedFormStatusField.InProgress;
                             submittedForm.CreatedDateTime = DateTime.Now;
                             submittedForm.LastUpdatedDateTime = DateTime.Now;
                             submittedForm.CreatedBy = "RSK";
