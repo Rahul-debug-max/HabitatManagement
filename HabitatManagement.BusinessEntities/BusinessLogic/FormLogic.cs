@@ -921,7 +921,7 @@ namespace HabitatManagement.Business
             {
                 conn.Open();
 
-                SqlCommand cmd = new SqlCommand("usp_Project_Update", conn);
+                SqlCommand cmd = new SqlCommand("usp_SubmittedForm_Update", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 BusinessEntityHelper.ReplaceNullProperties<SubmittedFormBE>(o);
                 FromSubmittedFormBE(ref cmd, o);

@@ -144,7 +144,18 @@
                 icons: "glyphicons glyphicons-list",
                 "class": "btn btn-info",
                 type: "button"
-            }
+            },
+            CompleteBtn: {
+                text: "",
+                id: "btnCompleteRow",
+                title: "Complete",
+                click: function () {
+
+                },
+                icons: "glyphicons glyphicons-flag",
+                "class": "btn btn-info",
+                type: "button"
+            },
         };
 
         dialog.dialogDefaults = {
@@ -248,6 +259,12 @@
                         dialogButtons.DetailBtn.click = value.onClick;
                     }
                     buttons.push(dialogButtons.DetailBtn);
+                case 'complete':
+                    if (typeof (value.onClick) == 'function') {
+                        dialogButtons.CompleteBtn.click = value.onClick;
+                    }
+                    buttons.push(dialogButtons.CompleteBtn);
+                    break;
                     break;
             }
         });

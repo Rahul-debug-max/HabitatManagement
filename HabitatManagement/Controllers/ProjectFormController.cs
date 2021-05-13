@@ -44,6 +44,7 @@ namespace HabitatManagement.Controllers
                     }
                 }
                 ViewData["SaveFormDataURL"] = string.Format("{0}form/SaveFormData", url);
+                ViewData["CompleteFormDataURL"] = string.Format("{0}form/CompleteFormData", url);
             }
 
             if (projectId != null)

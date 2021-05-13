@@ -27,6 +27,10 @@
         $('.formFeedbackSelector').on('change', function () {
             reloadGridForPositioner();
         });
+
+        $('#CompleteProjectForm').off('click').on('click', function () {
+            fireonClick('complete', true);
+        });   
     }
 
     var fireonClick = function (clickFor, selectionRequired) {
@@ -41,6 +45,13 @@
             }
         }
 
+        if (isValid && clickFor == "complete" && selectedRow[0].formStatus == defaults.formStatusCompleted) {
+            WCMDialog.openOkBtnDialog({
+                requiredDialogTitle: "Invalid form",
+                requiredDialogMessage: "Select valid form"
+            });
+            isValid = false;
+        }
         if (isValid) {
             var surrogateDate = selectedRow;
             switch (clickFor) {
@@ -64,28 +75,42 @@
                         }
                     });
                     break;
-                case 'edit':                  
+                case 'edit':
+                    var buttons = [{
+                        Button: 'save', onClick: function () {
+                            var dialogID = $(this).attr("aria-modalID");
+                            currentDialogID = $("#" + dialogID);
+                            saveDesignTemplate(currentDialogID, false, null);
+                        }
+                    }];
+
+                    if (surrogateDate[0].formStatus != defaults.formStatusCompleted) {
+                        buttons.push({
+                            Button: 'complete', onClick: function () {
+                                var dialogID = $(this).attr("aria-modalID");
+                                currentDialogID = $("#" + dialogID);
+                                saveDesignTemplate(currentDialogID, true, surrogateDate[0].surrogate);
+                            }
+                        });
+                    }
+
                     WCMDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,
                         data: { projectID: defaults.projectId, formID: surrogateDate[0].formID, surrogate: surrogateDate[0].surrogate },
-                        buttons: [
-                            {
-                                Button: 'save', onClick: function () {
-                                    var dialogID = $(this).attr("aria-modalID");
-                                    currentDialogID = $("#" + dialogID);
-                                    saveDesignTemplate(currentDialogID);
-                                }
-                            }
-                        ]
+                        buttons: buttons
                     });
+                    break;
+                case 'complete':
+                        completeForm(null, surrogateDate[0].surrogate);
                     break;
             }
         }
     }
 
-    var saveDesignTemplate = function (currentDialogID) {
+    var saveDesignTemplate = function (currentDialogID, isComplete, surrogate) {
+        var isFormFilled = false;
         var data = [];
         $('#dvFormFeedback').find("div[data-field]").each(function (inx, ele) {
             var field = 0;
@@ -143,7 +168,7 @@
             }
             else if (fieldType == defaults.signatureFieldType) {
                 var singnatureDv = $(obj).find('div[id^="digitalSignature_"]');
-                if (singnatureDv.length > 0) {
+                if (singnatureDv.length > 0 && $(singnatureDv).jSignature('isFilled')) {
                     digitalSignatureImage64BitString = $(singnatureDv).jSignature('getData');
                 }
                 fieldValue = $(obj).find('#SignatureId').val();
@@ -155,27 +180,81 @@
                 data.push({
                     FormID: $('.projectFormCreation').val(),
                     Field: field,
-                    FieldValue: fieldValue,
+                    FieldValue: fieldValue.trim(),
                     DigitalSignatureImage64BitString: digitalSignatureImage64BitString,
                     FieldType: fieldType == defaults.signatureFieldType ? defaults.signatureField : ''
                 });
             }
         });
-      
+
+        if (data.length > 0) {
+            $.each(data, function (index, value) {
+                if (value.FieldValue != "") {
+                    isFormFilled = true;
+                    return false;
+                }
+            });
+        }
+        if (!isFormFilled && $(".formErrorMessage").length > 0) {
+            $(".formErrorMessage").show();
+            $('.modal').animate({ scrollTop: 0 }, 0);
+        }
+        else {
+            $(".formErrorMessage").hide();
+        }
+        if (isFormFilled) {
+            var ajx = $.ajax({
+                type: 'Post',
+                url: defaults.saveDataURL,
+                cache: false,
+                data: { data: JSON.stringify(data), surrogate: $('#FormFeedback #Surrogate').val(), projectID: defaults.projectId },
+                dataType: 'Json',
+                traditional: true,
+                success: function (result) {
+                    if (result != null && !result) {
+                        alert('Unable to save. Please contact administrator.');
+                        return;
+                    }
+                    else {
+                        $(currentDialogID).modal("hide");
+                        reloadGridForPositioner();
+                    }
+                },
+                error: function (jqXHR, feedback, eToStringToStringrrorThrown) {
+                },
+                beforeSend: function () {
+                    $('#wait').show();
+                },
+                complete: function () {
+                    $('#wait').hide();
+
+                    if (isComplete && surrogate != null) {
+                        completeForm(currentDialogID, surrogate);
+                    }
+                }
+            });
+            return ajx;
+        }
+    }
+
+    var completeForm = function (currentDialogID, surrogate) {
+
         var ajx = $.ajax({
             type: 'Post',
-            url: defaults.saveDataURL,
+            url: defaults.completeFormURL,
             cache: false,
-            data: { data: JSON.stringify(data), surrogate: $('#FormFeedback #Surrogate').val(), projectID: defaults.projectId },
+            data: { surrogate: surrogate },
             dataType: 'Json',
             traditional: true,
-            success: function (result) {             
+            success: function (result) {
                 if (result != null && !result) {
-                    alert('Unable to save. Please contact administrator.');
+                    alert('Unable to complete. Please contact administrator.');
                     return;
                 }
                 else {
-                    $(currentDialogID).modal("hide");
+                    if (currentDialogID != null) {
+                        $(currentDialogID).modal("hide");
+                    }
                     reloadGridForPositioner();
                 }
             },
@@ -266,13 +345,14 @@
         $("#tblProjectFormList").jqGrid('setLabel', 'Select', '', { 'text-align': 'center' });
     }
 
-    var getSelectedTemplate = function () {       
+    var getSelectedTemplate = function () {
         var gr = $("#tblProjectFormList").getGridParam('selrow');
         if (gr != null) {
             var surrogate = $("#tblProjectFormList").getRowData(gr).surrogate;
             var formID = $("#tblProjectFormList").getRowData(gr).formSurrogate;
+            var formStatus = $("#tblProjectFormList").getRowData(gr).formStatus;
             selectedRow = [];
-            selectedRow.push({ formID: formID, surrogate: surrogate });
+            selectedRow.push({ formID: formID, surrogate: surrogate, formStatus: formStatus });
         }
     }
 

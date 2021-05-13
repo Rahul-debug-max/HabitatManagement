@@ -149,5 +149,41 @@ namespace HabitatManagement.WebAPI.Controllers
 
             return success;
         }
+
+
+        [HttpPost]
+        [DisableRequestSizeLimit]
+        [EnableCors("AllowOrigin")]
+        [Route("CompleteFormData")]
+        public bool CompleteFormData([FromForm] int? surrogate)
+        {
+            bool success = true;
+            try
+            {
+                using (var scope = new TransactionScope())
+                {
+                    if (surrogate.HasValue)
+                    {
+                        SubmittedFormBE submittedFormBE = FormLogic.FetchSubmittedForm(surrogate.Value);
+                        if (submittedFormBE != null)
+                        {
+                            submittedFormBE.Status = SubmittedFormStatusField.Completed;
+                            submittedFormBE.LastUpdatedDateTime = DateTime.Now;
+                            success = FormLogic.UpdateSubmittedForm(submittedFormBE);
+                        }
+                    }
+                    if (success)
+                    {
+                        scope.Complete();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                success = false;
+            }
+
+            return success;
+        }
     }
 }

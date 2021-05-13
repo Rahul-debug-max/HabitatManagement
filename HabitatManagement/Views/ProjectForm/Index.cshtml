@@ -31,7 +31,9 @@
             signatureFieldType: '@Convert.ToInt32(FormFieldType.Signature)',
             signatureField: '@Convert.ToString(FormFieldType.Signature)',
             textAreaFieldType: '@Convert.ToInt32(FormFieldType.TextArea)',
-            projectId: '@Model.ProjectId'
+            projectId: '@Model.ProjectId',
+            formStatusCompleted: '@SubmittedFormStatusField.Completed.ToString()',
+            completeFormURL: '@ViewBag.CompleteFormDataURL',
         });
     });
 </script>
@@ -87,6 +89,9 @@
                         </li>
                         <li>
                             <a href="javascript:void(0);" id="EditProjectForm" title="Edit"><span class="glyphicons glyphicons-edit"></span><div class="toolbarlabel">Edit</div></a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" id="CompleteProjectForm" title="Edit"><span class="glyphicons glyphicons-flag"></span><div class="toolbarlabel">Complete</div></a>
                         </li>
                     </ul>
                     <div class="clearfix"></div>
