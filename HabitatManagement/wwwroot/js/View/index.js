@@ -35,7 +35,7 @@
         var isValid = true;
         if (selectionRequired) {
             if (checkBoxSelectionData.length <= 0 && selectedRow.length <= 0) {
-                WCMDialog.openOkBtnDialog({
+                ExtendedDialog.openOkBtnDialog({
                     requiredDialogTitle: "Entity not selected",
                     requiredDialogMessage: "Select entity"
                 });
@@ -47,7 +47,7 @@
             var surrogateDate = checkBoxSelectionData.length > 0 ? checkBoxSelectionData : selectedRow;
             switch (clickFor) {
                 case 'del':
-                    WCMDialog.openConfirmationDialogWithAJAX({
+                    ExtendedDialog.openConfirmationDialogWithAJAX({
                         url: defaults.deleteURL,
                         formData: { formID: surrogateDate },
                         traditional: true,
@@ -67,7 +67,7 @@
                     });
                     break;
                 case 'add':
-                    WCMDialog.RenderPageInDialogAndOpen({
+                    ExtendedDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,
@@ -90,7 +90,7 @@
                     });
                     break;
                 case 'edit':
-                    WCMDialog.RenderPageInDialogAndOpen({
+                    ExtendedDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,
@@ -150,7 +150,7 @@
 
     var openDetailPopup = function () {
         var surrogateDate = checkBoxSelectionData.length > 0 ? checkBoxSelectionData : selectedRow;
-        WCMDialog.RenderPageInDialogAndOpen(
+        ExtendedDialog.RenderPageInDialogAndOpen(
             {
                 title: "Screen Design Details",
                 url: defaults.detailURL,
@@ -177,7 +177,7 @@
     }
 
     var openTaskFeedbackScreenLayout = function () {
-        WCMDialog.RenderPageInDialogAndOpen(
+        ExtendedDialog.RenderPageInDialogAndOpen(
             {
                 title: "Permit Form Layout",
                 url: defaults.screenLayoutURL,

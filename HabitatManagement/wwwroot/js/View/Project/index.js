@@ -33,7 +33,7 @@
         var isValid = true;
         if (selectionRequired) {
             if (selectedRow.length <= 0) {
-                WCMDialog.openOkBtnDialog({
+                ExtendedDialog.openOkBtnDialog({
                     requiredDialogTitle: "Entity not selected",
                     requiredDialogMessage: "Select entity"
                 });
@@ -45,7 +45,7 @@
             var surrogateDate = selectedRow;
             switch (clickFor) {
                 case 'add':
-                    WCMDialog.RenderPageInDialogAndOpen({
+                    ExtendedDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,
@@ -65,7 +65,7 @@
                     });
                     break;
                 case 'edit':
-                    WCMDialog.RenderPageInDialogAndOpen({
+                    ExtendedDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,

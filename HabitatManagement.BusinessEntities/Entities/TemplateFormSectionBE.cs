@@ -14,9 +14,7 @@ namespace HabitatManagement.Business
         public string Section { get; set; }
         public string Description { get; set; }
 
-        public int BackgroundColor { get; set; }
-
-        public string ColourCode { get; set; }
+        public string BackgroundColor { get; set; }        
 
         public int Sequence { get; set; }
     }

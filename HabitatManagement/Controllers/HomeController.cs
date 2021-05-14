@@ -204,9 +204,10 @@ namespace HabitatManagement.Controllers
                 model = new TemplateFormSectionBE();
             }
 
-            System.Drawing.Color colorCode = System.Drawing.Color.FromArgb(model.BackgroundColor > 0 ? model.BackgroundColor : 33554431);
-            model.ColourCode = string.Format("rgba({0},{1},{2},{3})", colorCode.R, colorCode.G, colorCode.B, colorCode.A);
-
+            if(string.IsNullOrWhiteSpace(model.BackgroundColor))
+            {
+                model.BackgroundColor = "#ffffff";
+            }
             return View(model);
         }
 

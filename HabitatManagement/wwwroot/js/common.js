@@ -732,6 +732,6 @@
     dialogs.default = defaults;
 
     // Reuseable dialog object
-    window.WCMDialog = dialogs;
+    window.ExtendedDialog = dialogs;
 
 }());

@@ -1043,7 +1043,7 @@ namespace HabitatManagement.Business
             o.FormID = Functions.ToInt(rdr["FormID"]);
             o.Section = Functions.TrimRight(rdr["Section"]);
             o.Description = Functions.TrimRight(rdr["Description"]);
-            o.BackgroundColor = Functions.ToInt(rdr["BackgroundColor"]);
+            o.BackgroundColor = Functions.TrimRight(rdr["BackgroundColor"]);
             o.Sequence = Functions.ToInt(rdr["Sequence"]);
             return o;
         }
@@ -1120,7 +1120,7 @@ namespace HabitatManagement.Business
             o.Sequence = Functions.ToInt(rdr["Sequence"]);
             o.SectionDescription = Functions.TrimRight(rdr["SectionDescription"]);
             o.SectionSequence = Functions.ToInt(rdr["SectionSequence"]);
-            o.BackgroundColor = Functions.ToInt(rdr["BackgroundColor"]);
+            o.BackgroundColor = Functions.TrimRight(rdr["BackgroundColor"]);
             return o;
         }
 

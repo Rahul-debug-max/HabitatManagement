@@ -49,14 +49,14 @@
         var isValid = true;
         if (selectionRequired) {
             if ((selectedSectionRow.length <= 0 && (clickFor == "delSection" || clickFor == "editSection"))) {
-                WCMDialog.openOkBtnDialog({
+                ExtendedDialog.openOkBtnDialog({
                     requiredDialogTitle: "Entity not selected",
                     requiredDialogMessage: "Select entity"
                 });
                 isValid = false;
             }
             else if ((selectedRow.length <= 0 && (clickFor == "del" || clickFor == "edit"))) {
-                WCMDialog.openOkBtnDialog({
+                ExtendedDialog.openOkBtnDialog({
                     requiredDialogTitle: "Entity not selected",
                     requiredDialogMessage: "Select entity"
                 });
@@ -69,7 +69,7 @@
             var surrogateSectionDate = selectedSectionRow;
             switch (clickFor) {
                 case 'delSection':
-                    WCMDialog.openConfirmationDialogWithAJAX({
+                    ExtendedDialog.openConfirmationDialogWithAJAX({
                         url: defaults.deleteSectionURL,
                         formData: surrogateSectionDate[0],
                         traditional: true,
@@ -88,7 +88,7 @@
                     });
                     break;
                 case 'addSection':
-                    WCMDialog.RenderPageInDialogAndOpen({
+                    ExtendedDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-xl",
                         url: defaults.addEditSectionURL,
@@ -107,7 +107,7 @@
                     });
                     break;
                 case 'editSection':
-                    WCMDialog.RenderPageInDialogAndOpen({
+                    ExtendedDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-xl",
                         url: defaults.addEditSectionURL,
@@ -123,7 +123,7 @@
                     });
                     break;
                 case 'del':
-                    WCMDialog.openConfirmationDialogWithAJAX({
+                    ExtendedDialog.openConfirmationDialogWithAJAX({
                         url: defaults.deleteURL,
                         formData: { formID: defaults.formID, fieldID: surrogateDate[0] },
                         traditional: true,
@@ -142,7 +142,7 @@
                     });
                     break;
                 case 'add':
-                    WCMDialog.RenderPageInDialogAndOpen({
+                    ExtendedDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,
@@ -161,7 +161,7 @@
                     });
                     break;
                 case 'edit':
-                    WCMDialog.RenderPageInDialogAndOpen({
+                    ExtendedDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,
@@ -181,9 +181,7 @@
     }
 
     var saveSectionDetail = function (dialogID) {       
-        var rgb = $("#ColourCode").colorpicker("HexToRGB");
-        var colour = rgb ? ((rgb.a << 24) | (rgb.r << 16) | (rgb.g << 8) | (rgb.b << 0)) : 0;
-        $("#BackgroundColor").val(colour);
+                
         var ajx = $.ajax({
             type: 'POST',
             cache: false,

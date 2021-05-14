@@ -37,7 +37,7 @@
         var isValid = true;
         if (selectionRequired) {
             if (selectedRow.length <= 0) {
-                WCMDialog.openOkBtnDialog({
+                ExtendedDialog.openOkBtnDialog({
                     requiredDialogTitle: "Entity not selected",
                     requiredDialogMessage: "Select entity"
                 });
@@ -46,7 +46,7 @@
         }
 
         if (isValid && clickFor == "complete" && selectedRow[0].formStatus == defaults.formStatusCompleted) {
-            WCMDialog.openOkBtnDialog({
+            ExtendedDialog.openOkBtnDialog({
                 requiredDialogTitle: "Invalid form",
                 requiredDialogMessage: "Select valid form"
             });
@@ -56,7 +56,7 @@
             var surrogateDate = selectedRow;
             switch (clickFor) {
                 case 'add':
-                    WCMDialog.RenderPageInDialogAndOpen({
+                    ExtendedDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,
@@ -76,15 +76,17 @@
                     });
                     break;
                 case 'edit':
-                    var buttons = [{
-                        Button: 'save', onClick: function () {
-                            var dialogID = $(this).attr("aria-modalID");
-                            currentDialogID = $("#" + dialogID);
-                            saveDesignTemplate(currentDialogID, false, null);
-                        }
-                    }];
+                    var buttons = [];
 
                     if (surrogateDate[0].formStatus != defaults.formStatusCompleted) {
+                        buttons.push({
+                            Button: 'save', onClick: function () {
+                                var dialogID = $(this).attr("aria-modalID");
+                                currentDialogID = $("#" + dialogID);
+                                saveDesignTemplate(currentDialogID, false, null);
+                            }
+                        });
+
                         buttons.push({
                             Button: 'complete', onClick: function () {
                                 var dialogID = $(this).attr("aria-modalID");
@@ -94,7 +96,7 @@
                         });
                     }
 
-                    WCMDialog.RenderPageInDialogAndOpen({
+                    ExtendedDialog.RenderPageInDialogAndOpen({
                         title: defaults.addEditPopupTitle,
                         modalDialogClass: "modal-xl",
                         url: defaults.addEditURL,
@@ -189,7 +191,7 @@
 
         if (data.length > 0) {
             $.each(data, function (index, value) {
-                if (value.FieldValue != "") {
+                if (value.FieldValue != "" || value.DigitalSignatureImage64BitString != '') {
                     isFormFilled = true;
                     return false;
                 }
@@ -302,11 +304,11 @@
             colNames: createdFormListColumnName,
             colModel: [
                 { key: false, name: 'formSurrogate', index: 'formSurrogate', search: false, hidden: true },
-                { key: false, name: 'surrogate', index: 'surrogate', search: false },
-                { key: false, name: 'design', index: 'design', search: false },
-                { key: false, name: 'description', index: 'description', search: false },
-                { key: false, name: 'formStatus', index: 'formStatus', search: false },
-                { key: false, name: 'creationDate', index: 'creationDate', search: false }
+                { key: false, name: 'surrogate', index: 'surrogate', search: false, width:100 },
+                { key: false, name: 'design', index: 'design', search: false, width: 250 },
+                { key: false, name: 'description', index: 'description', search: false, width: 250 },
+                { key: false, name: 'formStatus', index: 'formStatus', search: false, width: 100 },
+                { key: false, name: 'creationDate', index: 'creationDate', search: false, width: 120 }
             ],
             pager: jQuery('#pagerProjectFormList'),
             rowNum: 10,

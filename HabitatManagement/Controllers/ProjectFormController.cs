@@ -153,7 +153,7 @@ namespace HabitatManagement.Controllers
                 if (!string.IsNullOrWhiteSpace(url))
                 {
                     string webAPIURL = string.Empty;
-                    if (projectID != null)
+                    if (projectID != null && surrogate <= 0)
                     {
                         webAPIURL = string.Format("{0}form/GetForms/{1}", url, projectID.Value);
                     }

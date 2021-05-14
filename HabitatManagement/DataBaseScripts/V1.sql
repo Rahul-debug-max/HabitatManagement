@@ -135,7 +135,7 @@ CREATE TABLE [dbo].TemplateFormSection(
 	[FormID] [int] NOT NULL,
 	[Section] [nvarchar](20) NOT NULL,
 	[Description] [nvarchar](max) NOT NULL,
-	[BackgroundColor] int NULL,
+	[BackgroundColor] [nvarchar](20) NULL,
 	[Sequence] [int] NULL
 )
 END
@@ -144,13 +144,13 @@ BEGIN
 	IF (COL_LENGTH('[dbo].[TemplateFormSection]','BackgroundColor') IS NULL)	
 	BEGIN
 		ALTER TABLE [dbo].[TemplateFormSection]
-		ADD [BackgroundColor] int NULL
+		ADD [BackgroundColor] [nvarchar](20) NULL
 	END
 	IF COL_LENGTH('[dbo].[TemplateFormSection]','BackgroundColor') IS NOT NULL 
-	AND (SELECT DATA_TYPE from INFORMATION_SCHEMA.COLUMNS  where  TABLE_NAME = 'TemplateFormSection' and COLUMN_NAME = 'BackgroundColor') = 'nvarchar'
+	AND (SELECT DATA_TYPE from INFORMATION_SCHEMA.COLUMNS  where  TABLE_NAME = 'TemplateFormSection' and COLUMN_NAME = 'BackgroundColor') = 'int'
 	BEGIN
 		ALTER TABLE [dbo].[TemplateFormSection]
-		ALTER COLUMN [BackgroundColor] [int] NULL
+		ALTER COLUMN [BackgroundColor] [nvarchar](20) NULL
 	END
 END
 GO
@@ -921,7 +921,7 @@ CREATE PROCEDURE [dbo].[usp_TemplateFormSection_Add]
 	@FormID [int] NULL,
 	@Section [nvarchar](20) NULL,
 	@Description [nvarchar](max) NULL,
-	@BackgroundColor INT NULL,
+	@BackgroundColor [nvarchar](20) NULL,
 	@Sequence int NULL  
 AS
 BEGIN
@@ -955,7 +955,7 @@ CREATE PROCEDURE [dbo].[usp_TemplateFormSection_Update]
     @FormID [int] NULL,
     @Section [nvarchar](20) NULL,
     @Description [nvarchar](max) NULL,
-	@BackgroundColor INT NULL,
+	@BackgroundColor [nvarchar](20) NULL,
     @Sequence int NULL  
 AS    
 BEGIN
@@ -1452,7 +1452,7 @@ AS
 BEGIN    
 SET NOCOUNT ON;
 
-	IF EXISTS(SELECT 1 FROM ProjectForm)
+	IF EXISTS(SELECT 1 FROM ProjectForm WHERE ProjectId = @ProjectId)
 	BEGIN
 		DELETE FROM ProjectForm WHERE ProjectId = @ProjectId;
 	END   

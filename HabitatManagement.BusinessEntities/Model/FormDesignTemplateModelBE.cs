@@ -88,7 +88,7 @@ namespace HabitatManagement.Business
             StringBuilder sb = new StringBuilder();
             var sortableGroupingFields = groupingFields.OrderBy(s => s.Sequence).ToList() ?? new List<FormDesignTemplateDetailBE>();
             sb.AppendFormat("<div class=\"container-fluid formOuterStyle sortable_list connectedSortable\" data-section = \"{0}\" >",  groupingFields.Key);           
-            sb.AppendFormat("<div class=\"col-lg-12 col-form-label fontBold mb-2\" {0} >{1}</div>", sortableGroupingFields[0].BackgroundColor > 0 ? string.Format("style = 'background-color:{0};'", System.Drawing.ColorTranslator.ToHtml(System.Drawing.Color.FromArgb(sortableGroupingFields[0].BackgroundColor))) : "", sortableGroupingFields[0].SectionDescription);
+            sb.AppendFormat("<div class=\"col-lg-12 col-form-label fontBold mb-2\" {0} >{1}</div>", !string.IsNullOrWhiteSpace(sortableGroupingFields[0].BackgroundColor) ? string.Format("style = 'background-color:{0};'", sortableGroupingFields[0].BackgroundColor) : "", sortableGroupingFields[0].SectionDescription);
             List<FormDesignTemplateDetailBE> formDesignTemplateDetailsCheckList = sortableGroupingFields.Where(s => s.FieldType == FormFieldType.CheckList).OrderBy(s => s.Field).ThenBy(s => s.Sequence).Select(s => s).ToList();
             bool isCheckList = false;
 
