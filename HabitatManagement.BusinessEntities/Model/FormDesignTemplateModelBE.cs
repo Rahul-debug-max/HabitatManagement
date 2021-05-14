@@ -58,6 +58,8 @@ namespace HabitatManagement.Business
 
         public string ProjectDescription { get; set; }
 
+        public string FormDialogTitle { get; set; }
+
         public int? ProjectId { get; set; }
 
         #endregion

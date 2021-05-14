@@ -152,7 +152,7 @@
         var surrogateDate = checkBoxSelectionData.length > 0 ? checkBoxSelectionData : selectedRow;
         ExtendedDialog.RenderPageInDialogAndOpen(
             {
-                title: "Screen Design Details",
+                title: "Form Design Details",
                 url: defaults.detailURL,
                 data: { formID: surrogateDate[0] },
                 modalDialogClass: "modal-xl",
@@ -179,7 +179,7 @@
     var openTaskFeedbackScreenLayout = function () {
         ExtendedDialog.RenderPageInDialogAndOpen(
             {
-                title: "Permit Form Layout",
+                title: "Form Layout",
                 url: defaults.screenLayoutURL,
                 data: { formID: $("#FormID").val(), isRenderForDragnDrop: true },
                 modalDialogClass: "modal-xl",

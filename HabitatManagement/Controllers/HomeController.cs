@@ -291,6 +291,13 @@ namespace HabitatManagement.Controllers
             model.RenderForDragnDrop = isRenderForDragnDrop != null ? isRenderForDragnDrop.Value : false;
             model.HtmlForm = htmlForm;
             model.FormID = formID;
+            string formDialogTitle = "";
+            FormDesignTemplateBE formDesignTemplate = FormLogic.FetchFormDesignTemplate(formID);
+            if(Functions.IsNotNull(formDesignTemplate))
+            {
+                formDialogTitle = formDesignTemplate.Description + " - " + formDesignTemplate.Design;
+            }
+            model.FormDialogTitle = formDialogTitle;
             return View(model);
         }
 

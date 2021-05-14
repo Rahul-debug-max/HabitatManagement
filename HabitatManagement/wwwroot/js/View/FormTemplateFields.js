@@ -5,7 +5,7 @@
     }
     var onInit = function (obj) {
         $.extend(defaults, obj);
-        makeDivSortable();
+        makeDivSortable();               
     }
 
     var makeDivSortable = function () {
