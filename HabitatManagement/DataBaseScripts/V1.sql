@@ -136,6 +136,7 @@ CREATE TABLE [dbo].TemplateFormSection(
 	[Section] [nvarchar](20) NOT NULL,
 	[Description] [nvarchar](max) NOT NULL,
 	[BackgroundColor] [nvarchar](20) NULL,
+	[TextColor] [nvarchar](20) NULL,
 	[Sequence] [int] NULL
 )
 END
@@ -146,6 +147,12 @@ BEGIN
 		ALTER TABLE [dbo].[TemplateFormSection]
 		ADD [BackgroundColor] [nvarchar](20) NULL
 	END
+	IF (COL_LENGTH('[dbo].[TemplateFormSection]','TextColor') IS NULL)	
+	BEGIN
+		ALTER TABLE [dbo].[TemplateFormSection]
+		ADD [TextColor] [nvarchar](20) NULL
+	END
+
 	IF COL_LENGTH('[dbo].[TemplateFormSection]','BackgroundColor') IS NOT NULL 
 	AND (SELECT DATA_TYPE from INFORMATION_SCHEMA.COLUMNS  where  TABLE_NAME = 'TemplateFormSection' and COLUMN_NAME = 'BackgroundColor') = 'int'
 	BEGIN
@@ -664,7 +671,7 @@ CREATE PROCEDURE [dbo].[usp_FormDesignTemplateDetail_Fetch]
 AS     
 BEGIN 
 	SELECT t.[FormID], t.[Field], t.[FieldName], t.[FieldType], t.[Sequence], t1.[Section], 
-	t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence, t1.BackgroundColor   
+	t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence, t1.BackgroundColor, t1.TextColor   
 	FROM FormDesignTemplateDetail t JOIN TemplateFormSection t1 
 	ON t.Section = t1.Section AND t.[FormID] = t1.[FormID]
     WHERE t1.[FormID] = @FormID AND [Field] = @Field ORDER BY t1.[Sequence], t.[Sequence]  
@@ -685,7 +692,7 @@ BEGIN
 SET NOCOUNT ON;  
    
 	SELECT t.[FormID], t.[Field], t.[FieldName], t.[FieldType], t.[Sequence], t1.[Section], 
-	t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence , t1.BackgroundColor
+	t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence , t1.BackgroundColor, t1.TextColor 
 	FROM FormDesignTemplateDetail t RIGHT JOIN TemplateFormSection t1 
 	ON t.Section = t1.Section AND t.[FormID] = t1.[FormID] 
     WHERE t1.[FormID] = @FormID AND (ISNULL(t1.[Description],'') != '' OR [Field] IS NOT NULL) ORDER BY t1.[Sequence], t.[Sequence]
@@ -922,6 +929,7 @@ CREATE PROCEDURE [dbo].[usp_TemplateFormSection_Add]
 	@Section [nvarchar](20) NULL,
 	@Description [nvarchar](max) NULL,
 	@BackgroundColor [nvarchar](20) NULL,
+	@TextColor [nvarchar](20) NULL,
 	@Sequence int NULL  
 AS
 BEGIN
@@ -936,6 +944,7 @@ BEGIN
 		[Section],    
 		[Description],
 		[BackgroundColor],
+		[TextColor],
 		[Sequence]
 	)      
 	VALUES (    
@@ -943,6 +952,7 @@ BEGIN
 		@Section,
 		@Description,
 		@BackgroundColor,
+		@TextColor,
 		@Sequence
 	)  
 END
@@ -956,6 +966,7 @@ CREATE PROCEDURE [dbo].[usp_TemplateFormSection_Update]
     @Section [nvarchar](20) NULL,
     @Description [nvarchar](max) NULL,
 	@BackgroundColor [nvarchar](20) NULL,
+	@TextColor [nvarchar](20) NULL,
     @Sequence int NULL  
 AS    
 BEGIN
@@ -963,7 +974,8 @@ BEGIN
     Update [dbo].TemplateFormSection    
     SET [Description] = @Description,    
     [Sequence] = @Sequence,
-	[BackgroundColor] = @BackgroundColor
+	[BackgroundColor] = @BackgroundColor,
+	[TextColor] = @TextColor
     WHERE FormID = @FormID AND Section = @Section
 
 END
@@ -1062,7 +1074,7 @@ BEGIN
  WHERE t1.[FormID] = @FormID AND (ISNULL(t1.[Description],'') != '' OR [Field] IS NOT NULL)
         
  SELECT t.[FormID], t.[Field], t.[FieldName], t.[FieldType], t.[Sequence], t1.[Section], 
-	t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence, t1.BackgroundColor    
+	t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence, t1.BackgroundColor, t1.TextColor     
  FROM FormDesignTemplateDetail t JOIN TemplateFormSection t1   
  ON t.Section = t1.Section AND t.[FormID] = t1.[FormID]
  WHERE t1.[FormID] = @FormID AND (ISNULL(t1.[Description],'') != '' OR [Field] IS NOT NULL)

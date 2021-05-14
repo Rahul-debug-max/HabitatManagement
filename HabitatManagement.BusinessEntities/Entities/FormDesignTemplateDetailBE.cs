@@ -32,6 +32,8 @@ namespace HabitatManagement.Business
 
         public string BackgroundColor { get; set; }
 
+        public string TextColor { get; set; }
+
 
     }
 }

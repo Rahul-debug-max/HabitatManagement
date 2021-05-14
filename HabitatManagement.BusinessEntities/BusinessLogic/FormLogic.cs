@@ -1044,6 +1044,7 @@ namespace HabitatManagement.Business
             o.Section = Functions.TrimRight(rdr["Section"]);
             o.Description = Functions.TrimRight(rdr["Description"]);
             o.BackgroundColor = Functions.TrimRight(rdr["BackgroundColor"]);
+            o.TextColor = Functions.TrimRight(rdr["TextColor"]);
             o.Sequence = Functions.ToInt(rdr["Sequence"]);
             return o;
         }
@@ -1054,6 +1055,7 @@ namespace HabitatManagement.Business
             cmd.Parameters.AddWithValue("Section", o.Section);
             cmd.Parameters.AddWithValue("Description", o.Description);
             cmd.Parameters.AddWithValue("BackgroundColor", o.BackgroundColor);
+            cmd.Parameters.AddWithValue("TextColor", o.TextColor);
             cmd.Parameters.AddWithValue("Sequence", o.Sequence);
         }
 
@@ -1121,6 +1123,7 @@ namespace HabitatManagement.Business
             o.SectionDescription = Functions.TrimRight(rdr["SectionDescription"]);
             o.SectionSequence = Functions.ToInt(rdr["SectionSequence"]);
             o.BackgroundColor = Functions.TrimRight(rdr["BackgroundColor"]);
+            o.TextColor = Functions.TrimRight(rdr["TextColor"]);
             return o;
         }
 

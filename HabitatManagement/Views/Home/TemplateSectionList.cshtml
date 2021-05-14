@@ -5,6 +5,7 @@
     $(document).ready(function () {
 
         $('#dvSectionList').sortable({
+            helper: fixWidthHelper,
             items: "tr:not(td)",
             containment: 'document',
             placeholder: "ui-state-highlight",
@@ -51,30 +52,37 @@
             });
         }
     });
+
+    function fixWidthHelper(e, ui) {
+        ui.children().each(function () {
+            $(this).width($(this).width());
+        });
+        return ui;
+    }
 </script>
 <form id="TemplateSectionListForm" asp-controller="Home" asp-action="TemplateSection">
     <div class="col-xs-12 paddlftrght-none">
         <table class="table table-hover table-bordered table-condensed">
             <thead>
                 <tr class='ui-state-default ui-th-column ui-th-ltr ui-sortable-handle'>
-                    <th class='text-center table-heading'>Section</th>
-                    <th class='text-center table-heading'>Section Description</th>
+                    <th class='text-center table-heading' style="width:20%;">Section</th>
+                    <th class='text-center table-heading'>Section Description</th>                   
                 </tr>
             </thead>
             <tbody id="dvSectionList">
                 @for (int index = 0; index < Model.TemplateSectionDetail.Count; index++)
                 {
-                    <tr class='table-row' data-FormID="@Model.TemplateSectionDetail[index].FormID" data-Section="@Model.TemplateSectionDetail[index].Section">
-                        <td style="vertical-align: middle; width: 110px;">
-                            @Model.TemplateSectionDetail[index].Section
-                            <input type="hidden" name="TemplateSectionDetail[@index].FormID" value="@Model.TemplateSectionDetail[index].FormID" />
-                            <input type="hidden" name="TemplateSectionDetail[@index].Section" value="@Model.TemplateSectionDetail[index].Section" />
-                            <input type="hidden" name="TemplateSectionDetail[@index].Sequence" value="@Model.TemplateSectionDetail[index].Sequence" />
-                        </td>
-                        <td class="text-center" style="width: 67px;">
-                            @Model.TemplateSectionDetail[index].Description
-                        </td>
-                    </tr>
+                <tr class='table-row' data-FormID="@Model.TemplateSectionDetail[index].FormID" data-Section="@Model.TemplateSectionDetail[index].Section">
+                    <td style="vertical-align: middle; width: 120px;">
+                        @Model.TemplateSectionDetail[index].Section
+                        <input type="hidden" name="TemplateSectionDetail[@index].FormID" value="@Model.TemplateSectionDetail[index].FormID" />
+                        <input type="hidden" name="TemplateSectionDetail[@index].Section" value="@Model.TemplateSectionDetail[index].Section" />
+                        <input type="hidden" name="TemplateSectionDetail[@index].Sequence" value="@Model.TemplateSectionDetail[index].Sequence" />
+                    </td>
+                    <td class="text-center" style="width: 35px; color:@Model.TemplateSectionDetail[index].TextColor; background-color:@Model.TemplateSectionDetail[index].BackgroundColor;">
+                        @Model.TemplateSectionDetail[index].Description
+                    </td>                    
+                </tr>
                 }
             </tbody>
         </table>

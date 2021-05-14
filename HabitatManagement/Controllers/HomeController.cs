@@ -227,6 +227,7 @@ namespace HabitatManagement.Controllers
             templateFormSection.Section = model.Section.ToUpper();
             templateFormSection.Description = model.Description;
             templateFormSection.BackgroundColor = model.BackgroundColor;
+            templateFormSection.TextColor = model.TextColor;
             if (!sectionExist)
             {
                 success = FormLogic.AddTemplateFormSection(templateFormSection);
