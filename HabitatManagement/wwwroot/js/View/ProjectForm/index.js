@@ -30,7 +30,7 @@
 
         $('#CompleteProjectForm').off('click').on('click', function () {
             fireonClick('complete', true);
-        });   
+        });  
     }
 
     var fireonClick = function (clickFor, selectionRequired) {
@@ -113,21 +113,25 @@
 
     var saveDesignTemplate = function (currentDialogID, isComplete, surrogate) {
         var isFormFilled = false;
+        var isErrorFound = false;
         var data = [];
         $('#dvFormFeedback').find("div[data-field]").each(function (inx, ele) {
             var field = 0;
-            var fieldValue = '';
+            var fieldValue = '';           
             var digitalSignatureImage64BitString = '';
 
             obj = $(ele);
             var field = obj.attr('data-field');
             var fieldType = obj.attr('field-Type');
+            var fieldMandatory = obj.attr('data-field-mandatory');
+            obj.find('.text-danger').removeClass('d-none').addClass('d-none');
 
             if (fieldType == defaults.checkListFieldType) {
-                $(obj).find('.checkListTR').each(function (inx, ele) {
+                $(obj).find('.checkListTR').each(function (inx, ele) {                    
                     var checked = '';
                     var yesCheckBox = $(ele).find('input')[0];
                     var noCheckBox = $(ele).find('input')[1];
+                    fieldMandatory = $(ele).find('td').attr('data-field-mandatory');
                     field = $(yesCheckBox).attr('name');
 
                     if ($(yesCheckBox).is(":checked")) {
@@ -136,10 +140,15 @@
                     else if ($(noCheckBox).is(":checked")) {
                         checked = 0;
                     }
+
+                    if (checked === "" && fieldMandatory == "True") {
+                        $(ele).find('td').find('.text-danger').removeClass('d-none');                       
+                        isErrorFound = true;
+                    }
                     data.push({
                         FormID: $('.projectFormCreation').val(),
                         Field: field,
-                        FieldValue: checked,
+                        FieldValue: checked,                      
                         DigitalSignatureImage64BitString: "",
                         FieldType: ""
                     });
@@ -158,15 +167,15 @@
                 fieldValue = checked;
             }
             else if (fieldType == defaults.textboxFieldType) {
-                fieldValue = $(obj).find('input[name^=' + field + ']').val();
+                fieldValue = $(obj).find('input[name^=' + field + ']').val();               
             }
             else if (fieldType == defaults.dateFieldType) {
-                fieldValue = $(obj).find('input[name^=' + field + ']').val();
+                fieldValue = $(obj).find('input[name^=' + field + ']').val();               
             }
             else if (fieldType == defaults.dateAndTimeFieldType) {
                 var date = $(obj).find('input[name^=' + field + ']').val();
                 var time = $(obj).find('.time').find('input').val()
-                fieldValue = date + " " + time;
+                fieldValue = date + " " + time;                
             }
             else if (fieldType == defaults.signatureFieldType) {
                 var singnatureDv = $(obj).find('div[id^="digitalSignature_"]');
@@ -176,20 +185,30 @@
                 fieldValue = $(obj).find('#SignatureId').val();
             }
             else if (fieldType == defaults.textAreaFieldType) {
-                fieldValue = $(obj).find('textarea[name^=' + field + ']').val();
+                fieldValue = $(obj).find('textarea[name^=' + field + ']').val();                
             }
-            if (fieldType != defaults.checkListFieldType) {               
+            if (fieldType != defaults.checkListFieldType) {              
+                fieldValue = (fieldValue != null && fieldValue != undefined && !($.isNumeric(fieldValue))) ? fieldValue.trim() : fieldValue;
+                if (((fieldValue === "" && fieldType != defaults.signatureFieldType) || (fieldType == defaults.signatureFieldType && digitalSignatureImage64BitString === "")) && fieldMandatory == "True") {
+                    $(obj).find('.text-danger').removeClass('d-none').addClass('d-block');                   
+                    isErrorFound = true;                   
+                }
                 data.push({
                     FormID: $('.projectFormCreation').val(),
                     Field: field,
-                    FieldValue: (fieldValue != null && fieldValue != undefined && !($.isNumeric(fieldValue))) ? fieldValue.trim() : fieldValue,                    
+                    FieldValue: fieldValue,                  
                     DigitalSignatureImage64BitString: digitalSignatureImage64BitString,
                     FieldType: fieldType == defaults.signatureFieldType ? defaults.signatureField : ''
-                });
+                });             
             }
         });
+      
+        if (isErrorFound) {
+            $('.modal').animate({ scrollTop: 0 }, 0);
+            return false;
+        }
 
-        if (data.length > 0) {
+        if (data.length > 0)  {
             $.each(data, function (index, value) {
                 if (value.FieldValue != "" || value.DigitalSignatureImage64BitString != '') {
                     isFormFilled = true;
@@ -197,6 +216,7 @@
                 }
             });
         }
+
         if (!isFormFilled && $(".formErrorMessage").length > 0) {
             $(".formErrorMessage").show();
             $('.modal').animate({ scrollTop: 0 }, 0);

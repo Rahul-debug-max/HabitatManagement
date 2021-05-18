@@ -29,9 +29,12 @@
     <div class="container-fluid">
         <div class="form-group mx-0 mx-lg-2 row">
             <label class="col-sm-3 text-left text-lg-right col-form-label paddrght-none" asp-for="Section" id="lblSection">Section</label>
-            <div class="col-sm-9">
+            <div class="col-sm-6">
                 <select asp-for="Section" asp-items="@ViewBag.SectionList" class="custom-select"></select>
             </div>
+            <label class="col-sm-3 text-left text-lg-right col-form-label" for="Mandatory" id="lblMandatory" style="padding-bottom: 0px !important;">
+                Mandatory &nbsp <span>@Html.CheckBox("Mandatory", Model.Mandatory, new { @style = "position: relative; top: 2px;"})</span>
+            </label>
         </div>
 
         <div class="form-group mx-0 mx-lg-2 row">

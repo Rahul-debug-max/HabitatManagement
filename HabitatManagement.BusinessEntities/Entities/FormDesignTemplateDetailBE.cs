@@ -21,6 +21,7 @@ namespace HabitatManagement.Business
 
         public int Sequence { get; set; }
 
+        public bool Mandatory { get; set; }
 
         public string FieldTypeValue { get; set; }
 
@@ -33,6 +34,8 @@ namespace HabitatManagement.Business
         public string BackgroundColor { get; set; }
 
         public string TextColor { get; set; }
+
+        public string MandatoryField { get; set; }
 
 
     }

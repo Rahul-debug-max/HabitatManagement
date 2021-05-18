@@ -330,6 +330,7 @@ namespace HabitatManagement.Controllers
                     "Field Name",
                     "Field Type",
                     "Section",
+                    "Mandatory",
                     "Sequence"
             };
                 return this.Json(new { columnNames });
@@ -367,6 +368,7 @@ namespace HabitatManagement.Controllers
                                                   FieldName = obj.FieldName,
                                                   FieldTypeValue = obj.FieldType.ToString(),
                                                   Section = obj.Section,
+                                                  MandatoryField = obj.Mandatory ? "Yes" : "No",
                                                   Sequence = obj.Sequence
                                               }).ToList();
 
@@ -428,6 +430,7 @@ namespace HabitatManagement.Controllers
             formDesignTemplateDetail.FieldType = model.FieldType;
             formDesignTemplateDetail.Section = model.Section;
             formDesignTemplateDetail.Sequence = model.Sequence;
+            formDesignTemplateDetail.Mandatory = model.Mandatory;
 
             if (model.Field <= 0)
             {

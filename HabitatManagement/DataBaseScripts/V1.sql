@@ -57,20 +57,28 @@ GO
 
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[FormDesignTemplateDetail]') AND TYPE in (N'U'))
 BEGIN
-
-CREATE TABLE [dbo].FormDesignTemplateDetail(
-	[FormID] [int] NOT NULL,
-	[Field] [int] NOT NULL,
-	[FieldName] [nvarchar](max) NULL,
-	[FieldType] [int] NOT NULL,
-	[Section] [nvarchar](20) NOT NULL,
-	[Sequence] [int] NOT NULL DEFAULT ((0)),
- CONSTRAINT [PK_FormDesignTemplateDetail] PRIMARY KEY CLUSTERED 
-(
-	[FormID] ASC,
-	[Field] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	CREATE TABLE [dbo].FormDesignTemplateDetail(
+		[FormID] [int] NOT NULL,
+		[Field] [int] NOT NULL,
+		[FieldName] [nvarchar](max) NULL,
+		[FieldType] [int] NOT NULL,
+		[Section] [nvarchar](20) NOT NULL,
+		[Mandatory] bit NOT NULL DEFAULT(0),
+		[Sequence] [int] NOT NULL DEFAULT ((0)),
+	 CONSTRAINT [PK_FormDesignTemplateDetail] PRIMARY KEY CLUSTERED 
+	(
+		[FormID] ASC,
+		[Field] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+END
+ELSE
+BEGIN
+	IF (COL_LENGTH('[dbo].[FormDesignTemplateDetail]','Mandatory') IS NULL)	
+	BEGIN
+		ALTER TABLE [dbo].[FormDesignTemplateDetail]
+		ADD [Mandatory] bit NOT NULL DEFAULT (0)
+	END
 END
 GO
 
@@ -624,37 +632,40 @@ CREATE PROCEDURE [dbo].[usp_FormDesignTemplateDetail_Add]
     @FormID INT,    
     @FieldName nvarchar(max),    
     @FieldType INT,     
-    @Section nvarchar(20),    
+    @Section nvarchar(20),
+	@Mandatory bit,
     @Sequence INT,
     @Field INT OUT   
 )
 AS    
-BEGIN    
+BEGIN
+	SELECT @Field = ISNULL(MAX(Field),0) + 1 FROM FormDesignTemplateDetail WHERE FormID = @FormID
 
- --DECLARE @Field BIGINT;  
- SELECT @Field = ISNULL(MAX(Field),0) + 1 FROM FormDesignTemplateDetail WHERE FormID = @FormID
+	IF(@Sequence = 0)
+	BEGIN
+		SELECT @Sequence = ISNULL(MAX([Sequence]),0) + 1 FROM FormDesignTemplateDetail WHERE FormID = @FormID AND [Section] = @Section;
+	END
 
- IF(@Sequence = 0)
- BEGIN
-     SELECT @Sequence = ISNULL(MAX([Sequence]),0) + 1 FROM FormDesignTemplateDetail WHERE FormID = @FormID AND [Section] = @Section;
- END
-
-     INSERT INTO FormDesignTemplateDetail    
-        (FormID,    
-        [Field],    
-        FieldName,    
-        FieldType,     
-        [Section],    
-        [Sequence]
-	  )     
-      VALUES (  
+	INSERT INTO FormDesignTemplateDetail    
+	(
+		FormID,    
+		[Field],    
+		FieldName,    
+		FieldType,     
+		[Section],
+		[Mandatory],
+		[Sequence]
+	)     
+	VALUES 
+	(  
 		@FormID,    
 		@Field,    
 		@FieldName,    
 		@FieldType,      
-		@Section,    
+		@Section, 
+		@Mandatory,
 		@Sequence    
-		  )    
+	)    
 END    
 GO
 /****** Object:  StoredProcedure [dbo].[usp_FormDesignTemplateDetail_Fetch]    Script Date: 08-04-2021 15:51:54 ******/
@@ -670,7 +681,7 @@ CREATE PROCEDURE [dbo].[usp_FormDesignTemplateDetail_Fetch]
 )   
 AS     
 BEGIN 
-	SELECT t.[FormID], t.[Field], t.[FieldName], t.[FieldType], t.[Sequence], t1.[Section], 
+	SELECT t.[FormID], t.[Field], t.[FieldName], t.[FieldType], t.Mandatory,t.[Sequence], t1.[Section], 
 	t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence, t1.BackgroundColor, t1.TextColor   
 	FROM FormDesignTemplateDetail t JOIN TemplateFormSection t1 
 	ON t.Section = t1.Section AND t.[FormID] = t1.[FormID]
@@ -691,7 +702,7 @@ AS
 BEGIN  
 SET NOCOUNT ON;  
    
-	SELECT t.[FormID], t.[Field], t.[FieldName], t.[FieldType], t.[Sequence], t1.[Section], 
+	SELECT t.[FormID], t.[Field], t.[FieldName], t.[FieldType], t.Mandatory, t.[Sequence], t1.[Section], 
 	t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence , t1.BackgroundColor, t1.TextColor 
 	FROM FormDesignTemplateDetail t RIGHT JOIN TemplateFormSection t1 
 	ON t.Section = t1.Section AND t.[FormID] = t1.[FormID] 
@@ -710,95 +721,95 @@ CREATE PROCEDURE  [dbo].[usp_FormDesignTemplateDetail_Update]
     @FormID INT,    
     @Field INT,      
     @FieldName nvarchar(max),      
-    @FieldType INT,       
+    @FieldType INT, 
+	@Mandatory bit,
     @Section nvarchar(20),        
     @Sequence INT    
 )    
 AS    
 BEGIN    
- DECLARE @PrevSection nvarchar(20),@PrevSequence int;    
- DECLARE @CheckListPrevSection nvarchar(20);
+	DECLARE @PrevSection nvarchar(20),@PrevSequence int;    
+	DECLARE @CheckListPrevSection nvarchar(20);
  
- SELECT @CheckListPrevSection = Section FROM FormDesignTemplateDetail
-  WHERE FormID = @FormID AND FieldType = 9 AND Field = @Field
+	SELECT @CheckListPrevSection = Section FROM FormDesignTemplateDetail
+	WHERE FormID = @FormID AND FieldType = 9 AND Field = @Field
 
- IF NOT EXISTS(SELECT 1 FROM FormDesignTemplateDetail WHERE FormID = @FormID AND Field = @Field     
-    AND Section = @Section AND [Sequence] = @Sequence)    
- BEGIN    
-  SELECT @PrevSection = Section, @PrevSequence = [Sequence] FROM FormDesignTemplateDetail     
-  WHERE FormID = @FormID AND Field = @Field;    
+	IF NOT EXISTS(SELECT 1 FROM FormDesignTemplateDetail WHERE FormID = @FormID AND Field = @Field     
+	AND Section = @Section AND [Sequence] = @Sequence)    
+	BEGIN    
+		SELECT @PrevSection = Section, @PrevSequence = [Sequence] FROM FormDesignTemplateDetail     
+		WHERE FormID = @FormID AND Field = @Field;    
     
-  IF(@PrevSection != @Section)    
-  BEGIN    
-   UPDATE FormDesignTemplateDetail SET     
-    [Sequence] = [Sequence] + 1    
-    WHERE FormDesignTemplateDetail.FormID = @FormID AND Section = @Section    
-    AND [Sequence] >= @Sequence    
+		IF(@PrevSection != @Section)    
+		BEGIN
+			UPDATE FormDesignTemplateDetail SET
+			[Sequence] = [Sequence] + 1    
+			WHERE FormDesignTemplateDetail.FormID = @FormID AND Section = @Section    
+			AND [Sequence] >= @Sequence    
     
-   UPDATE FormDesignTemplateDetail      
-   SET FieldName = @FieldName,      
-   FieldType = @FieldType,          
-   [Section] = @Section,      
-   [Sequence] = @Sequence    
-   WHERE FormID = @FormID AND [Field] = @Field    
+			UPDATE FormDesignTemplateDetail
+			SET FieldName = @FieldName,      
+			FieldType = @FieldType,          
+			[Section] = @Section,      
+			[Sequence] = @Sequence    
+			WHERE FormID = @FormID AND [Field] = @Field    
     
-   ;WITH templateField    
-   AS    
-   (    
-    SELECT ROW_NUMBER() OVER(ORDER BY [Sequence]) AS RowNumber, FormID,[Section],[Field] FROM FormDesignTemplateDetail    
-    WHERE FormID = @FormID AND Section = @PrevSection    
-   )    
+			;WITH templateField
+			AS    
+			(    
+				SELECT ROW_NUMBER() OVER(ORDER BY [Sequence]) AS RowNumber, FormID,[Section],[Field] FROM FormDesignTemplateDetail    
+				WHERE FormID = @FormID AND Section = @PrevSection    
+			)    
     
-   UPDATE FormDesignTemplateDetail SET FormDesignTemplateDetail.[Sequence] = templateField.RowNumber    
-   FROM FormDesignTemplateDetail INNER JOIN templateField ON     
-   FormDesignTemplateDetail.FormID = templateField.FormID     
-   AND FormDesignTemplateDetail.Section = templateField.Section    
-   AND FormDesignTemplateDetail.[Field] = templateField.[Field];    
-  END    
-  ELSE    
-  BEGIN    
-   IF (@PrevSequence > @Sequence) --Increment seq no      
-   BEGIN    
-    UPDATE FormDesignTemplateDetail SET     
-    FormDesignTemplateDetail.[Sequence] = FormDesignTemplateDetail.[Sequence] + 1    
-    WHERE FormDesignTemplateDetail.FormID = @FormID AND Section = @Section    
-    AND [Sequence] >= @Sequence AND [Sequence] < @PrevSequence    
-   END    
-   ELSE IF (@PrevSequence < @Sequence) --decrement seq no     
-   BEGIN    
-    UPDATE FormDesignTemplateDetail SET     
-    FormDesignTemplateDetail.[Sequence] = FormDesignTemplateDetail.[Sequence] - 1    
-    WHERE FormDesignTemplateDetail.FormID = @FormID AND Section = @Section    
-    AND [Sequence] > @PrevSequence AND [Sequence] <= @Sequence    
-   END    
+			UPDATE FormDesignTemplateDetail SET FormDesignTemplateDetail.[Sequence] = templateField.RowNumber    
+			FROM FormDesignTemplateDetail INNER JOIN templateField ON     
+			FormDesignTemplateDetail.FormID = templateField.FormID     
+			AND FormDesignTemplateDetail.Section = templateField.Section    
+			AND FormDesignTemplateDetail.[Field] = templateField.[Field];    
+		END    
+		ELSE    
+		BEGIN
+			IF (@PrevSequence > @Sequence) --Increment seq no      
+			BEGIN    
+				UPDATE FormDesignTemplateDetail SET     
+				FormDesignTemplateDetail.[Sequence] = FormDesignTemplateDetail.[Sequence] + 1    
+				WHERE FormDesignTemplateDetail.FormID = @FormID AND Section = @Section    
+				AND [Sequence] >= @Sequence AND [Sequence] < @PrevSequence    
+			END    
+			ELSE IF (@PrevSequence < @Sequence) --decrement seq no     
+			BEGIN    
+				UPDATE FormDesignTemplateDetail SET     
+				FormDesignTemplateDetail.[Sequence] = FormDesignTemplateDetail.[Sequence] - 1    
+				WHERE FormDesignTemplateDetail.FormID = @FormID AND Section = @Section    
+				AND [Sequence] > @PrevSequence AND [Sequence] <= @Sequence    
+			END    
     
-   UPDATE FormDesignTemplateDetail      
-   SET FieldName = @FieldName,      
-   FieldType = @FieldType,        
-   [Section] = @Section,      
-   [Sequence] = @Sequence    
-   WHERE FormID = @FormID AND [Field] = @Field    
-  END    
- END    
- ELSE    
- BEGIN    
-  UPDATE FormDesignTemplateDetail      
-  SET FieldName = @FieldName,      
-   FieldType = @FieldType,        
-  [Section] = @Section,      
-  [Sequence] = @Sequence     
-  WHERE FormID = @FormID AND [Field] = @Field    
- END    
+			UPDATE FormDesignTemplateDetail      
+			SET FieldName = @FieldName,      
+			FieldType = @FieldType,        
+			[Section] = @Section,      
+			[Sequence] = @Sequence    
+			WHERE FormID = @FormID AND [Field] = @Field    
+		END    
+	END    
+	ELSE    
+	BEGIN    
+		UPDATE FormDesignTemplateDetail      
+		SET FieldName = @FieldName,      
+		FieldType = @FieldType,        
+		[Section] = @Section,      
+		[Mandatory] = @Mandatory,
+		[Sequence] = @Sequence     
+		WHERE FormID = @FormID AND [Field] = @Field    
+	END
 
-  -- Check List Type
-  IF EXISTS (SELECT 1 FROM FormDesignTemplateDetail WHERE FormID = @FormID AND FieldType = 9 AND Field = @Field)
-  BEGIN
-
-    UPDATE FormDesignTemplateDetail
-	  SET Section = @Section, [Sequence] = @Sequence
-	WHERE FormID = @FormID AND FieldType = 9 AND Section = @CheckListPrevSection
-
-  END
+	-- Check List Type
+	IF EXISTS (SELECT 1 FROM FormDesignTemplateDetail WHERE FormID = @FormID AND FieldType = 9 AND Field = @Field)
+	BEGIN
+		UPDATE FormDesignTemplateDetail
+		SET Section = @Section, [Sequence] = @Sequence
+		WHERE FormID = @FormID AND FieldType = 9 AND Section = @CheckListPrevSection
+	END
 END    
 GO
 
@@ -1064,27 +1075,24 @@ CREATE PROCEDURE [dbo].[usp_FormDesignTemplateDetail_BlockFetch]
  @RecordCount INT OUTPUT    
 AS         
 BEGIN       
- IF(@PageIndex IS NULL)      
- BEGIN      
-  SET @PageIndex = 1         
- END      
+	IF(@PageIndex IS NULL)      
+	BEGIN      
+		SET @PageIndex = 1         
+	END      
   
- SELECT @RecordCount = COUNT(*)  FROM FormDesignTemplateDetail t JOIN TemplateFormSection t1   
- ON t.Section = t1.Section AND t.[FormID] = t1.[FormID]
- WHERE t1.[FormID] = @FormID AND (ISNULL(t1.[Description],'') != '' OR [Field] IS NOT NULL)
+	SELECT @RecordCount = COUNT(*)  FROM FormDesignTemplateDetail t JOIN TemplateFormSection t1   
+	ON t.Section = t1.Section AND t.[FormID] = t1.[FormID]
+	WHERE t1.[FormID] = @FormID AND (ISNULL(t1.[Description],'') != '' OR [Field] IS NOT NULL)
         
- SELECT t.[FormID], t.[Field], t.[FieldName], t.[FieldType], t.[Sequence], t1.[Section], 
+	SELECT t.[FormID], t.[Field], t.[FieldName], t.[FieldType], t.Mandatory, t.[Sequence], t1.[Section], 
 	t1.[Description] as SectionDescription, t1.[Sequence] as SectionSequence, t1.BackgroundColor, t1.TextColor     
- FROM FormDesignTemplateDetail t JOIN TemplateFormSection t1   
- ON t.Section = t1.Section AND t.[FormID] = t1.[FormID]
- WHERE t1.[FormID] = @FormID AND (ISNULL(t1.[Description],'') != '' OR [Field] IS NOT NULL)
- ORDER BY t1.[Sequence], t.[Sequence]           
- OFFSET @PageSize * (@PageIndex - 1) ROWS FETCH NEXT @PageSize ROWS ONLY;    
-
+	FROM FormDesignTemplateDetail t JOIN TemplateFormSection t1   
+	ON t.Section = t1.Section AND t.[FormID] = t1.[FormID]
+	WHERE t1.[FormID] = @FormID AND (ISNULL(t1.[Description],'') != '' OR [Field] IS NOT NULL)
+	ORDER BY t1.[Sequence], t.[Sequence]           
+	OFFSET @PageSize * (@PageIndex - 1) ROWS FETCH NEXT @PageSize ROWS ONLY;
 END      
 GO
-
-
 
 /****** Object:  StoredProcedure [dbo].[usp_TableFieldTypeMaster_Fetch]    Script Date: 08-04-2021 15:51:54 ******/
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TableFieldTypeMaster_Fetch]') AND type in (N'P', N'PC'))
@@ -1102,27 +1110,32 @@ END
 GO
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TableFieldTypeMaster_Add]') AND type in (N'P', N'PC'))
-DROP PROCEDURE [dbo].[usp_TableFieldTypeMaster_Add]
+	DROP PROCEDURE [dbo].[usp_TableFieldTypeMaster_Add]
 GO
 CREATE PROCEDURE [dbo].[usp_TableFieldTypeMaster_Add]  
-@Field [int],
-@ColumnName [nvarchar](max) = NULL,
-@RowCount [int] = NULL,
-@ColumnType [int] = NULL 
-  
-AS   
-  
-INSERT INTO [dbo].TableFieldTypeMaster  
-(Field,  
-ColumnName,  
-[RowCount],  
-[ColumnType]
+(
+	@Field [int],
+	@ColumnName [nvarchar](max) = NULL,
+	@RowCount [int] = NULL,
+	@ColumnType [int] = NULL
 )  
-VALUES (  
-@Field,  
-@ColumnName,  
-@RowCount,  
-@ColumnType)  
+AS
+BEGIN
+	INSERT INTO [dbo].TableFieldTypeMaster  
+	(
+		Field,  
+		ColumnName,  
+		[RowCount],  
+		[ColumnType]
+	)  
+	VALUES 
+	(  
+		@Field,  
+		@ColumnName,  
+		@RowCount,  
+		@ColumnType
+	) 
+END
 GO
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_TableFieldTypeMaster_FetchAll]') AND type in (N'P', N'PC'))

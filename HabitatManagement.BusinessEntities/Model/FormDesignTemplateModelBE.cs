@@ -103,9 +103,9 @@ namespace HabitatManagement.Business
                     //    break;
                     case FormFieldType.Checkbox:
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
-                        sb.AppendFormat("<div class=\"form-group mx-0 mx-lg-2 row\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
+                        sb.AppendFormat("<div class=\"form-group mx-0 mx-lg-2 row\" data-field = \"{0}\" field-Type = \"{1}\" data-field-mandatory = \"{2}\">", field.Field, (int)field.FieldType, field.Mandatory);
                         sb.AppendFormat("<label class=\"col-lg-4 text-left text-lg-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
-                        sb.Append("<div class=\"col-lg-8 formFieldTypeCheckbox\" style=\"padding-top:7px;\">");
+                        sb.Append("<div class=\"col-lg-8 formFieldTypeCheckbox pt-3\">");
                         if (RenderForDragnDrop)
                         {
                             sb.AppendFormat("<div class=\"custom-control custom-checkbox d-inline-flex ml-2\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"yes\" name=\"{0}\" disabled>  <label class=\"custom-control-label\">Yes</label></div>", field.Field);
@@ -116,18 +116,22 @@ namespace HabitatManagement.Business
                             sb.AppendFormat("<div class=\"custom-control custom-checkbox d-inline-flex ml-2\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"yes\" name=\"{0}\" {1}><label class=\"custom-control-label\">Yes</label></div>", field.Field, !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "");
                             sb.AppendFormat("<div class=\"custom-control custom-checkbox d-inline-flex ml-2\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"no\" name=\"{0}\" {1}><label class=\"custom-control-label\">No</label></div>", field.Field, !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && !Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "");
                         }
+                        if (field.Mandatory)
+                        {
+                            sb.AppendFormat(string.Format("<span class=\"text-danger d-none\">The {0} field is required.</span>", field.FieldName));
+                        }
                         sb.Append("</div>");
                         sb.Append("</div>");
                         break;
                     case FormFieldType.Label:
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
-                        sb.AppendFormat("<div class=\"form-group mx-0 mx-lg-2 row\" style=\"padding-left: 25px;padding-right: 20px;text-align: justify;\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
+                        sb.AppendFormat("<div class=\"form-group mx-0 mx-lg-2 row\" style=\"padding-left: 25px;padding-right: 20px;text-align: justify;\" data-field = \"{0}\" field-Type = \"{1}\" data-field-mandatory = \"{2}\">", field.Field, (int)field.FieldType, field.Mandatory);
                         sb.AppendFormat("<label class=\"col-form-label\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
                         sb.Append("</div>");
                         break;
                     case FormFieldType.Textbox:
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
-                        sb.AppendFormat("<div class=\"form-group mx-0 mx-lg-2 row\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
+                        sb.AppendFormat("<div class=\"form-group mx-0 mx-lg-2 row\" data-field = \"{0}\" field-Type = \"{1}\" data-field-mandatory = \"{2}\">", field.Field, (int)field.FieldType, field.Mandatory);
                         sb.AppendFormat("<label class=\"col-lg-4 text-left text-lg-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
                         sb.Append("<div class=\"col-lg-8\">");
                         if (RenderForDragnDrop)
@@ -138,12 +142,16 @@ namespace HabitatManagement.Business
                         {
                             sb.AppendFormat("<input type=\"text\" id=\"{1}\" name=\"{1}\" value=\"{0}\" class=\"form-control\" \\>", _templateFormFieldData?.FieldValue, field.Field);
                         }
+                        if (field.Mandatory)
+                        {
+                            sb.AppendFormat(string.Format("<span class=\"text-danger d-none\">The {0} field is required.</span>", field.FieldName));
+                        }
                         sb.Append("</div>");
                         sb.Append("</div>");
                         break;
                     case FormFieldType.TextArea:
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
-                        sb.AppendFormat("<div class=\"form-group mx-0 mx-lg-2 row\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
+                        sb.AppendFormat("<div class=\"form-group mx-0 mx-lg-2 row\" data-field = \"{0}\" field-Type = \"{1}\" data-field-mandatory = \"{2}\">", field.Field, (int)field.FieldType, field.Mandatory);
                         sb.AppendFormat("<label class=\"col-lg-4 text-left text-lg-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
                         sb.Append("<div class=\"col-lg-8\">");
                         if (RenderForDragnDrop)
@@ -154,6 +162,10 @@ namespace HabitatManagement.Business
                         {
                             sb.AppendFormat("<textarea id=\"{1}\" name=\"{1}\" class=\"form-control textAreaVerticalResizing\" rows=\"3\" >{0}</textarea>", _templateFormFieldData?.FieldValue, field.Field);
                         }
+                        if (field.Mandatory)
+                        {
+                            sb.AppendFormat(string.Format("<span class=\"text-danger d-none\">The {0} field is required.</span>", field.FieldName));
+                        }
                         sb.Append("</div>");
                         sb.Append("</div>");
                         break;
@@ -161,7 +173,7 @@ namespace HabitatManagement.Business
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
                         DateTime dateTime;
                         bool isSuccess = DateTime.TryParse(_templateFormFieldData?.FieldValue, out dateTime);
-                        sb.AppendFormat("<div class=\"form-group mx-0 mx-lg-2 row\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
+                        sb.AppendFormat("<div class=\"form-group mx-0 mx-lg-2 row\" data-field = \"{0}\" field-Type = \"{1}\" data-field-mandatory = \"{2}\">", field.Field, (int)field.FieldType, field.Mandatory);
                         sb.AppendFormat("<label class=\"col-lg-4 text-left text-lg-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
                         sb.Append("<div class=\"col-lg-8\">");
                         sb.AppendFormat("<div class=\"input-group date col-lg-4 pl-0\" name=\"datetimepicker\">");
@@ -178,6 +190,10 @@ namespace HabitatManagement.Business
                         sb.Append("<span class=\"input-group-text\"><i class=\"glyphicons glyphicons-calendar\"></i></span>");
                         sb.Append("</span>");
                         sb.Append("</div>");
+                        if (field.Mandatory)
+                        {
+                            sb.AppendFormat(string.Format("<span class=\"text-danger d-none\">The {0} field is required.</span>", field.FieldName));
+                        }
                         sb.Append("</div>");
                         sb.Append("</div>");
 
@@ -186,9 +202,10 @@ namespace HabitatManagement.Business
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
                         DateTime dateAndTime;
                         bool success = DateTime.TryParse(_templateFormFieldData?.FieldValue, out dateAndTime);
-                        sb.AppendFormat("<div class=\"form-group mx-0 mx-lg-2 row\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
+                        sb.AppendFormat("<div class=\"form-group mx-0 mx-lg-2 row\" data-field = \"{0}\" field-Type = \"{1}\" data-field-mandatory = \"{2}\">", field.Field, (int)field.FieldType, field.Mandatory);
                         sb.AppendFormat("<label class=\"col-lg-4 text-left text-lg-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
-                        sb.Append("<div class=\"col-sm-3\">");
+                        sb.Append("<div class=\"col-sm-8\">");
+                        sb.Append("<div class=\"col-sm-4 d-inline-flex paddlft-none\">");
                         sb.AppendFormat("<div class=\"input-group date pl-0\" name=\"datetimepicker\">");
                         if (RenderForDragnDrop)
                         {
@@ -203,7 +220,7 @@ namespace HabitatManagement.Business
                         sb.Append("</span>");
                         sb.Append("</div>");
                         sb.Append("</div>");
-                        sb.Append("<div class=\"col-sm-3 ml-lg-n3\">");
+                        sb.Append("<div class=\"col-sm-3 ml-lg-n3 d-inline-flex\">");
                         sb.Append("<div class=\"input-group time\" name=\"timepicker\" style=\"width:134px;\">");
                         if (RenderForDragnDrop)
                         {
@@ -218,12 +235,16 @@ namespace HabitatManagement.Business
                         sb.Append("</span>");
                         sb.Append("</div>");
                         sb.Append("</div>");
+                        if (field.Mandatory)
+                        {
+                            sb.AppendFormat(string.Format("<span class=\"text-danger d-none\">The {0} field is required.</span>", field.FieldName));
+                        }
                         sb.Append("</div>");
-
+                        sb.Append("</div>");
                         break;
                     case FormFieldType.Signature:
                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == field.Field).FirstOrDefault();
-                        sb.AppendFormat("<div class=\"form-group mx-0 mx-lg-2 row\" data-field = \"{0}\" field-Type = \"{1}\">", field.Field, (int)field.FieldType);
+                        sb.AppendFormat("<div class=\"form-group mx-0 mx-lg-2 row\" data-field = \"{0}\" field-Type = \"{1}\" data-field-mandatory = \"{2}\">", field.Field, (int)field.FieldType, field.Mandatory);
                         sb.AppendFormat("<label class=\"col-lg-4 text-left text-lg-right col-form-label paddrght-none\" for=\"{1}\">{0}</label>", field.FieldName, field.Field);
                         sb.Append("<div class=\"col-lg-8\">");
                         sb.Append("<div class=\"col-xs-12 col-sm-12 col-md-12 col-lg-12 pl-0 pr-0 dvSignatureDataType\" >");
@@ -253,6 +274,10 @@ namespace HabitatManagement.Business
                             sb.AppendFormat("<input type=\"hidden\" id='SignatureResponse' readonly=\"readonly\" class=\"form-control\" value=\"{0}\"  />", digitalSignatureImage64BitString);
                             sb.AppendFormat("<input type=\"hidden\" id='SignatureId' readonly=\"readonly\" class=\"form-control\" value=\"{0}\"  />", _templateFormFieldData?.FieldValue);
                         }
+                        if(field.Mandatory)
+                        {
+                            sb.AppendFormat(string.Format("<span class=\"text-danger d-none\">The {0} field is required.</span>", field.FieldName));
+                        }                        
                         sb.Append("</div>");
                         sb.Append("</div>");
                         sb.Append("</div>");
@@ -272,7 +297,7 @@ namespace HabitatManagement.Business
                                 {
                                     if (RenderForDragnDrop)
                                     {
-                                        sb.AppendFormat("<tr> <td> {0} </td>", formDesignTemplateDetail.FieldName);
+                                        sb.AppendFormat("<tr> <td> {0} </td>", formDesignTemplateDetail.FieldName, field.Mandatory);
                                         sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"><div class=\"custom-control custom-checkbox\"><input type=\"checkbox\" class=\"custom-control-input\" name=\"checkListEntityType\" disabled><label class=\"custom-control-label\"></label></div></td>");
                                         sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"><div class=\"custom-control custom-checkbox\"><input type=\"checkbox\" class=\"custom-control-input\" name=\"checkListEntityType\" disabled><label class=\"custom-control-label\"></label></div></td>");
                                         sb.Append("</tr>");
@@ -280,7 +305,12 @@ namespace HabitatManagement.Business
                                     else
                                     {
                                         _templateFormFieldData = _templateFormFieldDataList.Where(s => s.Field == formDesignTemplateDetail.Field).FirstOrDefault();
-                                        sb.AppendFormat("<tr class=\"checkListTR\"> <td data-field = \"{1}\"> {0} </td>", formDesignTemplateDetail.FieldName, formDesignTemplateDetail.Field);
+                                        sb.AppendFormat("<tr class=\"checkListTR\"><td data-field = \"{1}\" data-field-mandatory = \"{2}\">{0}", formDesignTemplateDetail.FieldName, formDesignTemplateDetail.Field, formDesignTemplateDetail.Mandatory);
+                                        if (field.Mandatory)
+                                        {
+                                            sb.AppendFormat(string.Format("<br/><span class=\"text-danger d-none\">Selection required</span>", field.FieldName));
+                                        }
+                                        sb.Append("</td>");
                                         sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"><div class=\"custom-control custom-checkbox\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"yes\" name=\"{1}\" {0}><label class=\"custom-control-label\"></label></div></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "", formDesignTemplateDetail.Field);
                                         sb.AppendFormat("<td class=\"bgColorWhite\" style=\"text-align:center;\"> <div class=\"custom-control custom-checkbox\"><input type=\"checkbox\" class=\"custom-control-input\" forType=\"no\" name=\"{1}\" {0}><label class=\"custom-control-label\"></label></div></td>", !string.IsNullOrWhiteSpace(_templateFormFieldData?.FieldValue) && !Functions.IdhammarCharToBool(_templateFormFieldData?.FieldValue) ? "checked" : "", formDesignTemplateDetail.Field);
                                         sb.Append("</tr>");
@@ -292,7 +322,6 @@ namespace HabitatManagement.Business
                             }
                         }
                         break;
-
                 }
             }
 

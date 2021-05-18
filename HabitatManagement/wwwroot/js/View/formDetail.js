@@ -300,10 +300,11 @@
             colNames: formDesignerColumnNames,
             colModel: [
                 { key: false, name: 'field', index: 'field', search: false, hidden: true },
-                { key: false, name: 'fieldName', index: 'fieldName', search: false },
-                { key: false, name: 'fieldTypeValue', index: 'fieldTypeValue', search: false },
-                { key: false, name: 'section', index: 'section', search: false },
-                { key: false, name: 'sequence', index: 'sequence', search: false }
+                { key: false, name: 'fieldName', index: 'fieldName', search: false, width: 350 },
+                { key: false, name: 'fieldTypeValue', index: 'fieldTypeValue', search: false, width: 150 },
+                { key: false, name: 'section', index: 'section', search: false, width: 200 },
+                { key: false, name: 'mandatoryField', index: 'mandatoryField', search: false, width: 100 },
+                { key: false, name: 'sequence', index: 'sequence', search: false, width: 100 }
             ],
             pager: jQuery('#pagerFieldDesigner'),
             rowNum: 10,

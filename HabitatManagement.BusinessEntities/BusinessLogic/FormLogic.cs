@@ -1034,7 +1034,7 @@ namespace HabitatManagement.Business
             cmd.Parameters.AddWithValue("ReferenceNumber", o.ReferenceNumber);
             cmd.Parameters.AddWithValue("FormID", o.FormID);
             cmd.Parameters.AddWithValue("Field", o.Field);
-            cmd.Parameters.AddWithValue("FieldValue", o.FieldValue);           
+            cmd.Parameters.AddWithValue("FieldValue", o.FieldValue);
         }
 
         private static TemplateFormSectionBE ToTemplateFormSectionBE(SqlDataReader rdr)
@@ -1120,6 +1120,7 @@ namespace HabitatManagement.Business
             o.FieldType = (FormFieldType)Functions.ToInt(rdr["FieldType"]);
             o.Section = Functions.TrimRight(rdr["Section"]);
             o.Sequence = Functions.ToInt(rdr["Sequence"]);
+            o.Mandatory = Functions.ToBool(rdr["Mandatory"]);
             o.SectionDescription = Functions.TrimRight(rdr["SectionDescription"]);
             o.SectionSequence = Functions.ToInt(rdr["SectionSequence"]);
             o.BackgroundColor = Functions.TrimRight(rdr["BackgroundColor"]);
@@ -1134,6 +1135,7 @@ namespace HabitatManagement.Business
             cmd.Parameters.AddWithValue("FieldType", (int)o.FieldType);
             cmd.Parameters.AddWithValue("Section", o.Section);
             cmd.Parameters.AddWithValue("Sequence", o.Sequence);
+            cmd.Parameters.AddWithValue("Mandatory", o.Mandatory);
         }
 
         private static FormDesignTemplateBE ToFormDesignTemplateBE(SqlDataReader sqlDataReader)
